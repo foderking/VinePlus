@@ -40,23 +40,38 @@ public class TestUserRepository {
         }
 
         
-        
-        [Fact]
-        public async Task Parsing_User_Doesnt_Throw() {
-            _testOutputHelper.WriteLine(string.Join(", ", validUsers.TakeLast(15)));
+        // [Fact]
+        [Theory]
+        [MemberData(nameof(GetValidUsers))]
+        public async Task Parsing_User_Doesnt_Throw(string username) {
+            // _testOutputHelper.WriteLine(string.Join(", ", validUsers.TakeLast(15)));
             
-            foreach (string username in validUsers.TakeLast(15)) {
+            // foreach (string username in validUsers.TakeLast(15)) {
                 var e = await Record.ExceptionAsync(async () => await userRepo.GetProfile(username));
                 Assert.Null(e);
-            }
+            // }
             
         }
 
-        [Fact]
-        public async Task Parsing_User_Parses_Username_Properly() {
-            foreach (string username in validUsers.TakeLast(20)) {
+        // [Fact]
+        [Theory]
+        [MemberData(nameof(GetValidUsers))]
+        public async Task Parsing_User_Parses_Username_Properly(string username) {
+            // foreach (string username in validUsers.TakeLast(20)) {
                 User user = await userRepo.GetProfile(username);
                 Assert.Equal(username, user.UserName);
+            // }
+        }
+        
+        [Fact]
+        public async Task Parsed_User_Doesnt_Contain_Null_Values() {
+            foreach (string username in validUsers.TakeLast(20)) {
+                User user = await userRepo.GetProfile(username);
+                Assert.NotNull(user.Followers);
+                Assert.NotNull(user.Following);
+                Assert.NotNull(user.AvatarUrl);
+                Assert.NotNull(user.ProfileTitle);
+                Assert.NotNull(user.UserName);
             }
         }
     }
