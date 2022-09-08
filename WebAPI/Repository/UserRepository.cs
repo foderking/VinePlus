@@ -14,7 +14,6 @@ public class UserRepository: IUserRepository
         IEnumerable<HtmlNode> profileTitleNode = sectionNode
             .Where(
                 node => node
-                    // .GetAttributeValue("class", "")
                     .HasClass("profile-title")
             )
             .ToArray();
@@ -22,7 +21,6 @@ public class UserRepository: IUserRepository
         IEnumerable<HtmlNode> profileFollowNode = sectionNode
             .Where(
                 node => node
-                    // .GetAttributeValue("class", "")
                     .HasClass("profile-follow")
             )
             .ToArray();
@@ -38,7 +36,6 @@ public class UserRepository: IUserRepository
          IEnumerable<HtmlNode> profileAvatarNode = sectionNode
             .Where(
                 node => node
-                    // .GetAttributeValue("class", "")
                     .HasClass("profile-avatar")
             )
             .ToArray();
@@ -65,10 +62,49 @@ public class UserRepository: IUserRepository
     }
 
     public async Task<User> GetProfile(string username) {
-        // using FileStream stream = File.OpenRead($"{AppContext.BaseDirectory}/../../../Repository/saboyaba.html");
         Stream stream = await GetStream(username);
         HtmlNode rootNode = Repository.GetRootNode(stream);
         return ParseUser(rootNode);
+    }
+
+    public async Task GetUserBlog(string username) {
+        Stream stream = await GetStream(username);
+        HtmlNode rootNode = Repository.GetRootNode(stream);
+    }
+
+    public async Task GetUserImages(string username) {
+        Stream stream = await GetStream(username);
+        HtmlNode rootNode = Repository.GetRootNode(stream);
+    }
+
+    public async Task GetUserForumPosts(string username) {
+        Stream stream = await GetStream(username);
+        HtmlNode rootNode = Repository.GetRootNode(stream);
+    }
+
+    public async Task GetWikiPosts(string username) {
+        Stream stream = await GetStream(username);
+        HtmlNode rootNode = Repository.GetRootNode(stream);
+    }
+
+    public async Task GetUserFollowing(string username) {
+        Stream stream = await GetStream(username);
+        HtmlNode rootNode = Repository.GetRootNode(stream);
+    }
+
+    public async Task GetUserFollowers(string username) {
+        Stream stream = await GetStream(username);
+        HtmlNode rootNode = Repository.GetRootNode(stream);
+    }
+
+    public async Task GetUserLists(string username) {
+        Stream stream = await GetStream(username);
+        HtmlNode rootNode = Repository.GetRootNode(stream);
+    }
+
+    public async Task GetUserReviews(string username) {
+        Stream stream = await GetStream(username);
+        HtmlNode rootNode = Repository.GetRootNode(stream);
     }
 }    
 
@@ -98,12 +134,9 @@ public static class UserParser
                     .First(
                         h4 => h4
                             .HasClass("js-status-message")
-                            // .GetAttributeValue("class", "")
-                            // .Equals("js-status-message")
                     )
                     .InnerHtml
             )
-            // .Select(CleanString)
             .FirstOrDefault() ?? throw new Exception("af");
     }
 
@@ -123,7 +156,6 @@ public static class UserParser
                     .First()
                     .GetAttributeValue("src", "")
             )
-            // .Select(CleanString)
             .FirstOrDefault() ?? throw new Exception("af");
     }
 
@@ -138,7 +170,6 @@ public static class UserParser
                     .First()
                     .InnerHtml
             )
-            // .Select(CleanString)
             .FirstOrDefault() ?? throw new Exception("asfasf");
     }
     
@@ -153,7 +184,6 @@ public static class UserParser
                     .First()
                     .InnerHtml
             )
-            // .Select(CleanString)
             .FirstOrDefault() ?? throw new Exception("asfasf");
     }
     

@@ -8,15 +8,15 @@ public class User
     /// <summary>
     /// The name of the user
     /// </summary>
-    public string UserName { get; set; }
+    public string? UserName { get; set; }
     /// <summary>
     /// The Url of the users profile picture
     /// </summary>
-    public string AvatarUrl { get; set; }
+    public string? AvatarUrl { get; set; }
     /// <summary>
     /// The title on a users profile
     /// </summary>
-    public string ProfileTitle { get; set; }
+    public string? ProfileTitle { get; set; }
     /// <summary>
     /// Number of post a user has made on the forum
     /// </summary>
@@ -28,20 +28,15 @@ public class User
     /// <summary>
     /// The people the user is currently following
     /// </summary>
-    public Follow Following { get; set; }
+    public Follow? Following { get; set; }
     /// <summary>
     /// The people following the current user
     /// </summary>
-    public Follow Followers { get; set; }
-}
-
-public class Follow
-{
-    public int Number { get; set; }
+    public Follow? Followers { get; set; }
     
-    public string Link { get; set; }
-
-    public bool Equals(Follow other) {
-        return Equals(other.Link, Link) && other.Number == Number;
-    }
+    public string? CoverPicture { get; set; }
+    public string[]? LatestImages { get; set; }
+    public About? AboutMe { get; set; }
+    public UserActivity[]? Activities { get; set; }
+    public ListPreview[]? TopRatedLists { get; set; }
 }
