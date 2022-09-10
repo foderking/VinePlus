@@ -1,7 +1,7 @@
 ﻿namespace WebAPI.Models;
 
 /// <summary>
-/// A class representing a comicvine user
+/// A class representing the profile of a comicvine user
 /// </summary>
 public class User
 {
@@ -14,9 +14,9 @@ public class User
     /// </summary>
     public string? AvatarUrl { get; set; }
     /// <summary>
-    /// The title on a users profile
+    /// The description on a users profile
     /// </summary>
-    public string? ProfileTitle { get; set; }
+    public string? ProfileDescription { get; set; }
     /// <summary>
     /// Number of post a user has made on the forum
     /// </summary>
@@ -33,10 +33,18 @@ public class User
     /// The people following the current user
     /// </summary>
     public Follow? Followers { get; set; }
-    
+    /// <summary>
+    /// An optional cover picture on the user profile
+    /// </summary>
     public string? CoverPicture { get; set; }
-    public string[]? LatestImages { get; set; }
+   /// <summary>
+   /// The about me section of a users profile
+   /// </summary>
     public About? AboutMe { get; set; }
+   /// <summary>
+   /// The most recent images a user has posted
+   /// </summary>
+    public string[]? LatestImages { get; set; }
     public UserActivity[]? Activities { get; set; }
     public ListPreview[]? TopRatedLists { get; set; }
 }
