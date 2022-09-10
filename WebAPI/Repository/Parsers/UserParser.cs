@@ -301,27 +301,21 @@ public static class UserParser
 
          HtmlNode asideNode = GetSecondaryContentNode(rootNode);
 
-         // try {
-             User user = new User();
-             user.UserName = UserParser.ParseUserName(profileTitleNode);
-             user.ProfileDescription = UserParser.ParseProfileTitle(profileTitleNode);
-             user.AvatarUrl = UserParser.ParseAvatarUrl(profileAvatarNode);
-             user.ForumPosts = Convert.ToInt32(UserParser.ParseForumPosts(profileStats));
-             user.WikiPoints = Convert.ToInt32(UserParser.ParseWikiPoints(profileStats));
-             user.Following = UserParser.ParseFollowing(profileStats);
-             user.Followers = UserParser.ParseFollowers(profileStats);
-             
-             user.CoverPicture = UserParser.ParseCoverPicture(asideNode);
-             user.AboutMe = UserParser.ParseAboutMe(asideNode);
-             user.LatestImages = UserParser.ParseLatestImages(asideNode);
-             
-             timer.Stop();
-             logger.LogInformation($"UserParser completed in {Repository.GetElapased(timer.Elapsed)}");
-             return user;
-         // }
-         // catch (Exception e) {
-         //     Console.WriteLine(e.Message);
-         //     throw new Exception("asfasf");
-         // }
+         User user = new User();
+         user.UserName = UserParser.ParseUserName(profileTitleNode);
+         user.ProfileDescription = UserParser.ParseProfileTitle(profileTitleNode);
+         user.AvatarUrl = UserParser.ParseAvatarUrl(profileAvatarNode);
+         user.ForumPosts = Convert.ToInt32(UserParser.ParseForumPosts(profileStats));
+         user.WikiPoints = Convert.ToInt32(UserParser.ParseWikiPoints(profileStats));
+         user.Following = UserParser.ParseFollowing(profileStats);
+         user.Followers = UserParser.ParseFollowers(profileStats);
+         
+         user.CoverPicture = UserParser.ParseCoverPicture(asideNode);
+         user.AboutMe = UserParser.ParseAboutMe(asideNode);
+         user.LatestImages = UserParser.ParseLatestImages(asideNode);
+         
+         timer.Stop();
+         logger.LogInformation($"UserParser completed in {Repository.GetElapased(timer.Elapsed)}");
+         return user;
     }
 }

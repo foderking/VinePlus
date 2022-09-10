@@ -46,5 +46,5 @@ public class User
    /// </summary>
     public string[]? LatestImages { get; set; }
     public UserActivity[]? Activities { get; set; }
-    public ListPreview[]? TopRatedLists { get; set; }
+    public LinkPreview[]? TopRatedLists { get; set; }
 }
