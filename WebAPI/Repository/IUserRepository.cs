@@ -1,10 +1,11 @@
-﻿using WebAPI.Models;
+﻿using WebAPI.Controllers;
+using WebAPI.Models;
 
 namespace WebAPI.Repository;
 
-public interface IUserRepository
+public interface IUserRepository<T>
 {
-    public Task<User> GetProfile(string username);
+    public Task<User> GetProfile(string username, ILogger<T> logger);
     public Task GetUserBlog(string username);
     public Task GetUserImages(string username);
     public Task GetUserForumPosts(string username);

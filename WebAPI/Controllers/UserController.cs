@@ -8,15 +8,22 @@ namespace WebAPI.Controllers;
 [Route("api/[controller]")]
 public class ProfileController: ControllerBase
 {
-    private readonly IUserRepository _userRepository;
-    
-    public ProfileController(IUserRepository userRepository) {
+    private readonly IUserRepository<ProfileController> _userRepository;
+    private readonly ILogger<ProfileController> _logger;
+
+    public ProfileController(IUserRepository<ProfileController> userRepository, ILogger<ProfileController> logger) {
         _userRepository = userRepository;
+        _logger = logger;
     }
     
+    /// <summary>
+    /// Gets the default profile view for a comicvine user
+    /// </summary>
+    /// <param name="username">The username</param>
+    /// <returns></returns>
     [HttpGet("{username}")]
     public Task<User> GetUser(string username) {
-        return _userRepository.GetProfile(username);
+        return _userRepository.GetProfile(username, _logger);
     }
 
     [HttpGet("{username}/blog")]

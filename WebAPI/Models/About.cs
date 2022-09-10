@@ -1,4 +1,6 @@
-﻿namespace WebAPI.Models;
+﻿using System.ComponentModel;
+
+namespace WebAPI.Models;
 
 public class About
 {
@@ -18,9 +20,20 @@ public class About
     /// A summary text (optional)
     /// </summary>
     public string? Summary { get; set; }
+
+    public bool Equals(About other) {
+        Console.WriteLine(other);
+        return Alignment.Equals(other.Alignment)
+               && Points == other.Points
+               && (Summary != null && Summary.Equals(other.Summary) || Summary == null && other.Summary == null)
+               && DateJoined.Equals(other.DateJoined);
+    }
 }
 
 public enum Alignment
 {
-    Good, Neutral, Evil
+    None,
+    Good,
+    Neutral,
+    Evil,
 }
