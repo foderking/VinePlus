@@ -13,7 +13,7 @@ public class TestUserRepository {
         private readonly TestLogger<ProfileController> _testOutputHelper;
         private readonly UserRepository _userRepo;
         private readonly IEnumerable<string> _validUsers;
-        private static readonly int NoTests = 10;
+        private const int NoTests = 5;
 
         public TestGetProfile(ITestOutputHelper testOutputHelper) {
             _testOutputHelper = new TestLogger<ProfileController>(testOutputHelper);
@@ -29,7 +29,7 @@ public class TestUserRepository {
                 )
                 .Select(a => a.InnerHtml.Trim())
                 .Select(UserParser.CleanUsername)
-                // .Where(each => !each.Contains("deactivated"))
+                .Where(each => !each.Contains("deactivated"))
                 .ToArray();
         }
 
@@ -45,40 +45,39 @@ public class TestUserRepository {
             return ParseValidUsers(rootNode);
         }
 
+        private static IEnumerable<object[]> GetTestData() {
+            return GetValidUsers()
+                .Select(each => new [] { (object) each } )
+                .TakeLast(NoTests);
+        }
 
-        [Fact]
-        // [Theory]
-        // [MemberData(nameof(GetValidUsers))]
-        public async Task Parsing_User_Doesnt_Throw(/**string username**/) {
+
+        [Theory]
+        [MemberData(nameof(GetTestData))]
+        public async Task Parsing_User_Doesnt_Throw(string username) {
             // _testOutputHelper.WriteLine(string.Join(", ", validUsers.TakeLast(15)));
-            
-            foreach (string username in _validUsers.TakeLast(NoTests)) {
-                var e = await Record.ExceptionAsync(async () => await _userRepo.GetProfile(username, _testOutputHelper));
-                Assert.Null(e);
-            }
-            
+            Exception? e = await Record.ExceptionAsync(
+                async () => await _userRepo.GetProfile(username, _testOutputHelper)
+            );
+            Assert.Null(e);
         }
 
-        [Fact]
-        // [Theory]
-        // [MemberData(nameof(GetValidUsers))]
-        public async Task Parsing_User_Parses_Username_Properly( /**string username**/) {
-            foreach (string username in _validUsers.TakeLast(NoTests)) {
-                User user = await _userRepo.GetProfile(username, _testOutputHelper);
-                Assert.Equal(username, user.UserName);
-            }
+        [Theory]
+        [MemberData(nameof(GetTestData))]
+        public async Task Parsing_User_Parses_Username_Properly( string username) {
+            User user = await _userRepo.GetProfile(username, _testOutputHelper);
+            Assert.Equal(username, user.UserName);
         }
 
-        [Fact]
-        public async Task Parsed_User_Doesnt_Contain_Null_Values() {
-            foreach (string username in _validUsers.TakeLast(NoTests)) {
-                User user = await _userRepo.GetProfile(username, _testOutputHelper);
-                Assert.NotNull(user.Followers);
-                Assert.NotNull(user.Following);
-                Assert.NotNull(user.AvatarUrl);
-                Assert.NotNull(user.ProfileDescription);
-                Assert.NotNull(user.UserName);
-            }
+        [Theory]
+        [MemberData(nameof(GetTestData))]
+        public async Task Parsed_User_Doesnt_Contain_Null_Values(string username) {
+            User user = await _userRepo.GetProfile(username, _testOutputHelper);
+            Assert.NotNull(user.Followers);
+            Assert.NotNull(user.Following);
+            Assert.NotNull(user.AvatarUrl);
+            Assert.NotNull(user.ProfileDescription);
+            Assert.NotNull(user.UserName);
         }
     }
 

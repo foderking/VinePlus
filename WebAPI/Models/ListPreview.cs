@@ -4,7 +4,7 @@
 /// A preview of a user's list.
 /// Appears on the user's profile on the bottom right
 /// </summary>
-public class ListPreview
+public class LinkPreview
 {
     public string? Link { get; set; }
     public string? Url { get; set; }
