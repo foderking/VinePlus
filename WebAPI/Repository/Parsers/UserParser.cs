@@ -22,6 +22,43 @@ public static class UserParser
         return input.ToLower().Replace(" ", "_");
     }
 
+    // public static IEnumerable<HtmlNode> DirectDescendants(this HtmlNode mainNode) {
+    // }
+    /// <summary>
+    /// Gets all direct child nodes of the current node
+    /// </summary>
+    /// <param name="mainNode">The current node</param>
+    /// <param name="name">The type of all child nodes to return</param>
+    /// <returns>An enumerable representing all valid child nodes</returns>
+    public static IEnumerable<HtmlNode> DirectDescendants(this HtmlNode mainNode, string name) {
+        return mainNode
+            .Elements(name);
+    }
+    
+    /// <summary>
+    /// Gets the first direct child nodes of the current node
+    /// </summary>
+    /// <param name="mainNode">The current node</param>
+    /// <param name="name">The type of the child node</param>
+    /// <returns>The first valid child node</returns>
+    public static HtmlNode FirstDirectDescendant(this HtmlNode mainNode, string name) {
+        return mainNode
+            .Elements(name)
+            .First();
+    }
+    
+    public static HtmlNode FirstDirectDescendant(this HtmlNode mainNode, string name, Func<HtmlNode, bool> predicate) {
+        return mainNode
+            .Elements(name)
+            .First(predicate);
+    }
+    
+    public static HtmlNode? FirstDirectDescendantOrDefault(this HtmlNode mainNode, string name, Func<HtmlNode, bool> predicate) {
+        return mainNode
+            .Elements(name)
+            .FirstOrDefault(predicate);
+    }
+
     public static string ParseUserName(IEnumerable<HtmlNode> profileTitleNode) {
         return profileTitleNode
             .Select(
@@ -130,98 +167,136 @@ public static class UserParser
             .FirstOrDefault() ?? throw new UserParserException(nameof(ParseFollowers));
     }
 
-    public static HtmlNode GetSecondaryContentNode(HtmlNode rootNode) {
+    
+    /// <summary>
+    /// asideNode is the first html>body>div#site-main>div#wrapper>div#site>div#default-content>aside node
+    /// </summary>
+    /// <param name="rootNode">rootNode</param>
+    /// <returns>asideNode</returns>
+    /// <exception cref="UserParserException"></exception>
+    public static HtmlNode GetAsideNode(HtmlNode rootNode) {
         return rootNode
-            .Descendants("div")
-            .First(
-                div => string.Equals(div.GetAttributeValue("id", ""), "site-main", StringComparison.Ordinal)
+            .FirstDirectDescendant("html")
+            .FirstDirectDescendant("body")
+            .FirstDirectDescendant(
+                "div",
+                div => string.Equals(
+                            div.GetAttributeValue("id", ""), 
+                            "site-main", StringComparison.Ordinal
+                        )
             )
-            .Descendants("div")
-            .First(
-                div => string.Equals(div.GetAttributeValue("id", ""), "wrapper", StringComparison.Ordinal)
+            .FirstDirectDescendant(
+                "div",
+                div => string.Equals(
+                            div.GetAttributeValue("id", ""), 
+                            "wrapper", StringComparison.Ordinal
+                        )
             )
-            .Descendants("div")
-            .First(
-                div => string.Equals(div.GetAttributeValue("id", ""), "site", StringComparison.Ordinal)
+            .FirstDirectDescendant(
+                "div",
+                div => string.Equals(
+                    div.GetAttributeValue("id", ""), 
+                    "site", StringComparison.Ordinal
+                    )
             )
-            .Descendants("div")
-            .First(
-                div => string.Equals(div.GetAttributeValue("id", ""), "default-content", StringComparison.Ordinal)
+            .FirstDirectDescendant(
+                "div",
+                div => string.Equals(
+                    div.GetAttributeValue("id", ""), 
+                    "default-content", StringComparison.Ordinal
+                    )
             )
-            .Descendants("aside")
-            .FirstOrDefault() ?? throw new UserParserException(nameof(GetSecondaryContentNode));
+            .DirectDescendants("aside")
+            .FirstOrDefault() ?? throw new UserParserException(nameof(GetAsideNode));
     }
 
     public static string? ParseCoverPicture(HtmlNode asideNode) {
-        HtmlNode? imgNode = asideNode
-            .Descendants("div")
+        HtmlNode? profileNode = asideNode
+            .DirectDescendants("div")
             .FirstOrDefault(
                 div => div.HasClass("profile-image")
             );
-        if (imgNode == null) return null;
-        return imgNode
-            .Descendants("img")
+        if (profileNode == null) return null;
+        return profileNode
+            .FirstDirectDescendant(
+                "div",
+                div => div.HasClass("img")
+            )
+            .FirstDirectDescendant(
+                "a",
+                a => a.HasClass("imgflare") || a.HasClass("imgclass")
+            )
+            .DirectDescendants("img")
             .Select(
-                a => a.GetAttributeValue("src", "")
+                img => img.GetAttributeValue("src", "")
             )
             .FirstOrDefault();
     }
-
-    public static string? ParseSummaryText(HtmlNode asidePos) {
-        HtmlNode? about = asidePos
-            .Descendants("div")
+    
+    /// <summary>
+    /// asidePod is the first node with a child div.aside-pod which has a child div.about-me
+    /// </summary>
+    /// <param name="asideNode">the asideNode</param>
+    /// <returns>asidePod</returns>
+    public static HtmlNode GetAboutMeAsidePod(HtmlNode asideNode) {
+        return asideNode
+            .FirstDirectDescendant(
+                "div",
+                div => 
+                    div
+                        .HasClass("aside-pod") && 
+                   ((IEnumerable<HtmlNode>) div.ChildNodes)
+                       .Any(
+                           each => each.Name=="div" && each.HasClass("about-me")
+                       )
+            );
+    }
+    
+    public static string? ParseSummaryText(HtmlNode asidePod) {
+        HtmlNode? about = asidePod
+            .DirectDescendants("div")
             .FirstOrDefault(
                 div => div.HasClass("about-me")
             );
         if (about == null) return null;
         return about
-            .Descendants("p")
-            .Select(
-                p => p.InnerHtml
-            )
-            .FirstOrDefault();
+            .FirstDirectDescendant("article")
+            .InnerHtml
+            .Trim();
     }
 
-    public static DateTime ParseDateJoined(HtmlNode asidePos) {
-        return asidePos
-            .Descendants("li")
+    public static DateTime ParseDateJoined(HtmlNode asidePod) {
+        return asidePod
+            .FirstDirectDescendant("ul")
+            .DirectDescendants("li")
             .Select(
-                li => li.InnerText.Split(":")[1]
+                li => li.InnerText.Split(":")
+            )
+            .Where(
+                arr => arr[0].Equals("Date joined")
             )
             .Select(
-                text => DateTime.Parse(text)
+                text => DateTime.Parse(text[1])
             )
             .First();
     }
-    
-    public static int ParsePoints(HtmlNode asidePos) {
-        return asidePos
-            .Descendants("li")
-            .Skip(2)
+ 
+    public static Alignment ParseAlignment(HtmlNode asidePod) {
+        string align = asidePod
+            .FirstDirectDescendant("ul")
+            .DirectDescendants("li")
             .Select(
-                li => li.InnerText.Split(":")[1].Split(" ")[0].Trim()
+                li => li.InnerText.Split(":")
+            )
+            .Where(
+                arr => arr[0].Equals("Alignment")
             )
             .Select(
-                text => int.Parse(text)
+                arr => arr[1].Split(" ")[0].Trim()
             )
             .First();
-    }
-
-    public static Alignment ParseAlignment(HtmlNode asidePos) {
-        string? align = asidePos
-            .Descendants("li")
-            .Skip(1)
-            .Select(
-                li => li
-                    .InnerText
-                    .Split(":")[1]
-                    .Split(" ")[0]
-                    .Trim()
-            )
-            .FirstOrDefault();
         
-        if (align == null) throw new UserParserException(nameof(ParseAlignment));
-        
+        // if (align == null) throw new UserParserException(nameof(ParseAlignment));
         return align switch
         {
             "Good"    => Alignment.Good,
@@ -231,30 +306,66 @@ public static class UserParser
             _ => throw new UserParserException(nameof(ParseAlignment))
         };
     }
-    public static About ParseAboutMe(HtmlNode asideNode) {
-        HtmlNode asidePos = asideNode
-            .Descendants("div")
-            .First(
-                div => div.HasClass("aside-pod")
-            );
-        About about = new();
-        about.Summary    = ParseSummaryText(asidePos);
-        about.DateJoined = ParseDateJoined(asidePos);
-        about.Points     = ParsePoints(asidePos);
-        about.Alignment = ParseAlignment(asidePos);
-        return about;
+   
+    public static int ParsePoints(HtmlNode asidePod) {
+        return asidePod
+            .FirstDirectDescendant("ul")
+            .DirectDescendants("li")
+            .Select(
+                li => li.InnerText.Split(":")
+            )
+            .Where(
+                arr => arr[0].Equals("Points")
+            )
+            .Select(
+                arr => arr[1].Split(" ")[0].Trim()
+            )
+            .Select(
+                text => int.Parse(text)
+            )
+            .First();
     }
 
-    public static string[] ParseLatestImages(HtmlNode asideNode) {
+    public static About ParseAboutMe(HtmlNode asideNode) {
+        HtmlNode asidePod = GetAboutMeAsidePod(asideNode);
+        // var xx = asidePod.DirectDescendants("div").ToArray();
+        About about = new();
+        about.Summary    = ParseSummaryText(asidePod);
+        about.DateJoined = ParseDateJoined(asidePod);
+        about.Points     = ParsePoints(asidePod);
+        about.Alignment = ParseAlignment(asidePod);
+        return about;
+    }
+    
+    /// <summary>
+    /// </summary>
+    /// <param name="asideNode">the asideNode</param>
+    /// <returns>asidePod</returns>
+    public static HtmlNode? GetLatestImageAsidePod(HtmlNode asideNode) {
         return asideNode
-            .Descendants("div")
-            .Where(
-                div => div.HasClass("aside-pod")
+            .FirstDirectDescendantOrDefault(
+                "div",
+                div => 
+                    div
+                        .HasClass("aside-pod") && 
+                   ((IEnumerable<HtmlNode>) div.ChildNodes)
+                       .Any(
+                           each => each.Name=="div" && 
+                                    each.HasClass("pod-body") && 
+                                    each.HasClass("gallery-box-pod")
+                       )
+            );
+    }
+ 
+    public static string[]? ParseLatestImages(HtmlNode asideNode) {
+        HtmlNode? asidePod = GetLatestImageAsidePod(asideNode);
+        if (asidePod == null) return null;
+        return asidePod
+            .FirstDirectDescendant(
+                "div",
+                div => div.HasClass("pod-body")
             )
-            .Skip(1)
-            .First(
-            )
-            .Descendants("figure")
+            .DirectDescendants("figure")
             .Select(
                 fig => fig
                     .Descendants("img")
@@ -299,7 +410,7 @@ public static class UserParser
             )
             .ToArray();
 
-         HtmlNode asideNode = GetSecondaryContentNode(rootNode);
+         HtmlNode asideNode = GetAsideNode(rootNode);
 
          User user = new User();
          user.UserName = UserParser.ParseUserName(profileTitleNode);
@@ -311,7 +422,7 @@ public static class UserParser
          user.Followers = UserParser.ParseFollowers(profileStats);
          
          user.CoverPicture = UserParser.ParseCoverPicture(asideNode);
-         user.AboutMe = UserParser.ParseAboutMe(asideNode);
+         user.AboutMe      = UserParser.ParseAboutMe(asideNode);
          user.LatestImages = UserParser.ParseLatestImages(asideNode);
          
          timer.Stop();
