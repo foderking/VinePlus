@@ -35,6 +35,12 @@ public static class UserParser
             .Elements(name);
     }
     
+    public static IEnumerable<HtmlNode> DirectDescendants(this HtmlNode mainNode, string name, Func<HtmlNode, bool> predicate) {
+        return mainNode
+            .Elements(name)
+            .Where(predicate);
+    }
+    
     /// <summary>
     /// Gets the first direct child nodes of the current node
     /// </summary>
@@ -57,6 +63,12 @@ public static class UserParser
         return mainNode
             .Elements(name)
             .FirstOrDefault(predicate);
+    }
+    
+    public static HtmlNode? FirstDirectDescendantOrDefault(this HtmlNode mainNode, string name) {
+        return mainNode
+            .Elements(name)
+            .FirstOrDefault();
     }
 
     public static string ParseUserName(IEnumerable<HtmlNode> profileTitleNode) {
@@ -234,7 +246,7 @@ public static class UserParser
     }
     
     /// <summary>
-    /// asidePod is the first node with a child div.aside-pod which has a child div.about-me
+    /// asidePod is the first node with a child div.aside-pod which has a child header with text "About Me"
     /// </summary>
     /// <param name="asideNode">the asideNode</param>
     /// <returns>asidePod</returns>
@@ -247,7 +259,7 @@ public static class UserParser
                         .HasClass("aside-pod") && 
                    ((IEnumerable<HtmlNode>) div.ChildNodes)
                        .Any(
-                           each => each.Name=="div" && each.HasClass("about-me")
+                           each => each.Name=="header" && Equals(each.InnerText.Trim(), "About Me")
                        )
             );
     }
@@ -374,6 +386,90 @@ public static class UserParser
             )
             .ToArray();
     }
+
+    public static HtmlNode? GetActivityListNode(HtmlNode rootNode) {
+        HtmlNode? mainFeed = rootNode
+            .FirstDirectDescendant("html")
+            .FirstDirectDescendant("body")
+            .FirstDirectDescendant(
+                "div",
+                div => string.Equals(
+                    div.GetAttributeValue("id", ""),
+                    "site-main", StringComparison.Ordinal
+                )
+            )
+            .FirstDirectDescendant(
+                "div",
+                div => string.Equals(
+                    div.GetAttributeValue("id", ""),
+                    "wrapper", StringComparison.Ordinal
+                )
+            )
+            .FirstDirectDescendant(
+                "div",
+                div => string.Equals(
+                    div.GetAttributeValue("id", ""),
+                    "site", StringComparison.Ordinal
+                )
+            )
+            .FirstDirectDescendant(
+                "div",
+                div => string.Equals(
+                    div.GetAttributeValue("id", ""),
+                    "default-content", StringComparison.Ordinal
+                )
+            )
+            .FirstDirectDescendant(
+                "div",
+                div => div.HasClass("primary-content") || div.HasClass("js-article-container")
+            )
+            .FirstDirectDescendant(
+                "div",
+                div => div.HasClass("tab-content")
+            )
+            .FirstDirectDescendantOrDefault(
+                "div",
+                div => Equals(div.GetAttributeValue("id", ""), "js-user-main-feed")
+            );
+        if (mainFeed == null) return null;
+        return mainFeed
+            .FirstDirectDescendantOrDefault("ul");
+    }
+    
+
+    public static UserActivity ParseActivity(HtmlNode liActivityNode) {
+        HtmlNode mediaBodyNode = liActivityNode
+            .FirstDirectDescendant(
+                "div",
+                div => div.HasClass("media")
+            )
+            .FirstDirectDescendant(
+                "div",
+                div => div.HasClass("media-body")
+            );
+        HtmlNode activityMessageNode = mediaBodyNode
+            .FirstDirectDescendant(
+                "span",
+                span => span.HasClass("activity-message")
+            );
+        HtmlNode activityContentNode = mediaBodyNode
+            .FirstDirectDescendant(
+                "div",
+                span => span.HasClass("activity-content")
+            );
+        UserActivity activity = new();
+        // new DateTime( )
+        return activity;
+    }
+
+    public static UserActivity[]? ParseUserActivities(HtmlNode rootNode) {
+        HtmlNode? activityNode = GetActivityListNode(rootNode);
+        if (activityNode == null) return null;
+        return activityNode
+            .DirectDescendants("li")
+            .Select(ParseActivity)
+            .ToArray();
+    }
     
     public static User Parse<T>(HtmlNode rootNode, ILogger<T> logger) {
         Stopwatch timer = Stopwatch.StartNew();
@@ -424,6 +520,7 @@ public static class UserParser
          user.CoverPicture = UserParser.ParseCoverPicture(asideNode);
          user.AboutMe      = UserParser.ParseAboutMe(asideNode);
          user.LatestImages = UserParser.ParseLatestImages(asideNode);
+         user.Activities   = UserParser.ParseUserActivities(rootNode);
          
          timer.Stop();
          logger.LogInformation($"UserParser completed in {Repository.GetElapased(timer.Elapsed)}");
