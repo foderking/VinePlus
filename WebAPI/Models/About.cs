@@ -22,7 +22,6 @@ public class About
     public string? Summary { get; set; }
 
     public bool Equals(About other) {
-        Console.WriteLine(other);
         return Alignment.Equals(other.Alignment)
                && Points == other.Points
                && (Summary != null && Summary.Equals(other.Summary) || Summary == null && other.Summary == null)

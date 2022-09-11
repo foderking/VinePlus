@@ -45,6 +45,7 @@ public class TestUserRepository {
             return ParseValidUsers(rootNode);
         }
 
+
         private static IEnumerable<object[]> GetTestData() {
             return GetValidUsers()
                 .Select(each => new [] { (object) each } )
@@ -100,7 +101,7 @@ public class TestUserRepository {
                             Following = new (){ Link = "/profile/static_shock/following/", Number = 166},
                             ProfileDescription = "Y&#039;all, I&#039;m not a moderator, and I haven&#039;t been a moderator in several years. Stop messaging me about forum rules and all that.",
                             CoverPicture = "https://comicvine.gamespot.com/a/uploads/scale_medium/4/43236/1972990-static_01_06___copy.jpg",
-                            AboutMe = new () { DateJoined = new DateTime(2008, 6,6), Alignment = Alignment.Good, Points = 12480, Summary = "Who wants to know?"},
+                            AboutMe = new () { DateJoined = new DateTime(2008, 6,6), Alignment = Alignment.Good, Points = 12480, Summary = "<p>Who wants to know?</p>"},
                             LatestImages = new []{ "" },
                         }
                     ),
@@ -114,7 +115,7 @@ public class TestUserRepository {
                             Following = new (){ Link = "/profile/saboyaba/following/", Number = 1},
                             ProfileDescription = "testing 1...2..3",
                             CoverPicture = "https://comicvine.gamespot.com/a/uploads/scale_medium/11162/111629420/8610623-4463160778-manga.jpg",
-                            AboutMe = new () { DateJoined = new DateTime(2022, 8,8), Alignment = Alignment.Evil, Points = 0, Summary = " hey. Welcome to my bio!!"},
+                            AboutMe = new () { DateJoined = new DateTime(2022, 8,8), Alignment = Alignment.Evil, Points = 0, Summary = "<p> hey. Welcome to my bio!!</p>"},
                             LatestImages = new []{ "" },
                         }
                     )
@@ -124,6 +125,13 @@ public class TestUserRepository {
 
         private static FileStream GetStream(string path) {
             return File.OpenRead($"{baseDir}/{path}");
+        }
+        
+        private static IEnumerable<object[]> GetUsersWithoutLastestImages() {
+            return new[]
+            {
+                (object[]) new [] {"velentoelectric"}
+            };
         }
 
         [Theory]
@@ -204,9 +212,11 @@ public class TestUserRepository {
             var coverPic = _userDic[username].CoverPicture;
             using Stream stream = GetStream($"Html/{username}.html");
             HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+            HtmlNode asideNode = UserParser.GetAsideNode(rootNode);
+            var testCoverPic = UserParser.ParseCoverPicture(asideNode);
             
-            if (coverPic == null) Assert.Null(UserParser.ParseCoverPicture(rootNode));
-            else Assert.True(coverPic.Equals(UserParser.ParseCoverPicture(rootNode)));
+            if (coverPic == null) Assert.Null(testCoverPic);
+            else Assert.True(coverPic.Equals(testCoverPic));
         }
         
         [Theory]
@@ -216,8 +226,9 @@ public class TestUserRepository {
             var about = _userDic[username].AboutMe!;
             using Stream stream = GetStream($"Html/{username}.html");
             HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+            HtmlNode asideNode = UserParser.GetAsideNode(rootNode);
             
-            Assert.True(about.Equals(UserParser.ParseAboutMe(rootNode)));
+            Assert.True(about.Equals(UserParser.ParseAboutMe(asideNode)));
         }
          
         [Theory]
@@ -227,8 +238,20 @@ public class TestUserRepository {
             var images = _userDic[username].LatestImages!;
             using Stream stream = GetStream($"Html/{username}.html");
             HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+            HtmlNode asideNode = UserParser.GetAsideNode(rootNode);
             
-            Assert.StrictEqual(images, UserParser.ParseLatestImages(rootNode));
+            Assert.StrictEqual(images, UserParser.ParseLatestImages(asideNode));
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUsersWithoutLastestImages))]
+        public async Task Parsing_Users_Without_LatestImages_Works(string username) {
+            Stream stream = await  Repository.Repository.GetStream($"/profile/{username}");
+            
+            HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+            HtmlNode asideNode = UserParser.GetAsideNode(rootNode);
+            var e = Record.Exception(() => UserParser.ParseLatestImages(asideNode));
+            Assert.Null(e);
         }
         
     }
