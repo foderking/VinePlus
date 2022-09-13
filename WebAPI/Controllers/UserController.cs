@@ -22,7 +22,7 @@ public class ProfileController: ControllerBase
     /// <param name="username">The username</param>
     /// <returns></returns>
     [HttpGet("{username}")]
-    public Task<User> GetUser(string username) {
+    public Task<Profile> GetUser(string username) {
         return _userRepository.GetProfile(username, _logger);
     }
 

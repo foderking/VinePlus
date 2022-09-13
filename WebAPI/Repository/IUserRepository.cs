@@ -5,7 +5,7 @@ namespace WebAPI.Repository;
 
 public interface IUserRepository<T>
 {
-    public Task<User> GetProfile(string username, ILogger<T> logger);
+    public Task<Profile> GetProfile(string username, ILogger<T> logger);
     public Task GetUserBlog(string username);
     public Task GetUserImages(string username);
     public Task GetUserForumPosts(string username);

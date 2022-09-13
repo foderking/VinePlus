@@ -3,7 +3,7 @@
 /// <summary>
 /// A class representing the profile of a comicvine user
 /// </summary>
-public class User
+public class Profile
 {
     /// <summary>
     /// The name of the user
