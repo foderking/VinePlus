@@ -49,6 +49,7 @@ public class TestUserRepository {
         private static IEnumerable<object[]> GetTestData() {
             return GetValidUsers()
                 .Select(each => new [] { (object) each } )
+                .Distinct()
                 .TakeLast(NoTests);
         }
 
@@ -85,9 +86,9 @@ public class TestUserRepository {
     public class TestUserParser
     {
         private static string baseDir = $"{AppContext.BaseDirectory}/../../..";
-        private readonly Dictionary<string, User> _userDic;
+        private static readonly Dictionary<string, User> //_userDic;
 
-        public TestUserParser() {
+        // public TestUserParser() {
             _userDic = new Dictionary<string, User>(
                 new []
                 {
@@ -102,7 +103,7 @@ public class TestUserRepository {
                             ProfileDescription = "Y&#039;all, I&#039;m not a moderator, and I haven&#039;t been a moderator in several years. Stop messaging me about forum rules and all that.",
                             CoverPicture = "https://comicvine.gamespot.com/a/uploads/scale_medium/4/43236/1972990-static_01_06___copy.jpg",
                             AboutMe = new () { DateJoined = new DateTime(2008, 6,6), Alignment = Alignment.Good, Points = 12480, Summary = "<p>Who wants to know?</p>"},
-                            LatestImages = new []{ "" },
+                            LatestImages = new []{  "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/7640443-6481578-9596568912-reatj.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6952657-cellgamesarena.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836629-justiceleagueeurope29p21.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836628-justiceleagueeurope29p20.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836627-justiceleagueeurope29p19.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836626-justiceleagueeurope29p18.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836615-action%20631-02.jpg" },
                         }
                     ),
                     new KeyValuePair<string, User> ("saboyaba", new User()
@@ -116,143 +117,228 @@ public class TestUserRepository {
                             ProfileDescription = "testing 1...2..3",
                             CoverPicture = "https://comicvine.gamespot.com/a/uploads/scale_medium/11162/111629420/8610623-4463160778-manga.jpg",
                             AboutMe = new () { DateJoined = new DateTime(2022, 8,8), Alignment = Alignment.Evil, Points = 0, Summary = "<p> hey. Welcome to my bio!!</p>"},
-                            LatestImages = new []{ "" },
+                            LatestImages = new []{ "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646949-images%287%29.jpeg" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646722-capture.png" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646316-perfectlybalanced.jpg" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646314-capture.png" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646041-6sf1uq.jpg" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8645874-9621050148-if-yo.jpg" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8645873-0548618617-if-yo.jpg" },
                         }
                     )
                 }
             ) ;
-        }
+        // }
 
         private static FileStream GetStream(string path) {
             return File.OpenRead($"{baseDir}/{path}");
         }
         
-        private static IEnumerable<object[]> GetUsersWithoutLastestImages() {
+
+
+        private static IEnumerable<object[]> GetUsersWithoutUserActivity() {
             return new[]
             {
-                (object[]) new [] {"velentoelectric"}
+                (object[]) new [] {"willopedia1205"},
             };
         }
 
-        [Theory]
-        [InlineData("saboyaba")]
-        [InlineData("static_shock")]
-        public void Parsing_Username_Works(string value) {
-            using Stream stream = GetStream($"Html/{value}.html");
-            HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-            Assert.Equal(value, UserParser.ParseUserName(new [] {rootNode}));
+        public class WrapperNode
+        {
+            
         }
-        
-        [Theory]
-        [InlineData("saboyaba")]
-        [InlineData("static_shock")]
-        public void Parsing_AvatarUrL_Works(string value) {
-            var url = _userDic[value].AvatarUrl;
-            using Stream stream = GetStream($"Html/{value}.html");
-            HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-            Assert.Equal(url, UserParser.ParseAvatarUrl(new [] {rootNode}));
-        }   
-         
-        [Theory]
-        [InlineData("saboyaba")]
-        [InlineData("static_shock")]
-        public void Parsing_ProfileTitle_Works(string value) {
-            var title = _userDic[value].ProfileDescription;
-            using Stream stream = GetStream($"Html/{value}.html");
-            HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-            Assert.Equal(title, UserParser.ParseProfileTitle(new [] {rootNode}));
-        }   
-         
-        [Theory]
-        [InlineData("saboyaba")]
-        [InlineData("static_shock")]
-        public void Parsing_ForumPosts_Works(string value) {
-            var posts = _userDic[value].ForumPosts;
-            using Stream stream = GetStream($"Html/{value}.html");
-            HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-            Assert.Equal(posts, Convert.ToInt32(UserParser.ParseForumPosts(new [] {rootNode})));
-        }   
-          
-        [Theory]
-        [InlineData("saboyaba")]
-        [InlineData("static_shock")]
-        public void Parsing_WikiPoints_Works(string value) {
-            var points = _userDic[value].WikiPoints;
-            using Stream stream = GetStream($"Html/{value}.html");
-            HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-            Assert.Equal(points, Convert.ToInt32(UserParser.ParseWikiPoints(new [] {rootNode})));
-        }   
+
+        public class ProfileHeaderNode
+        {
+
+            public static HtmlNode GetNode(string username) {
+                using Stream stream = GetStream($"Html/{username}.html");
+                HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+                HtmlNode wrapperNode = UserParser.GetWrapperNode(rootNode);
+                return UserParser.GetProfileHeaderContainer(wrapperNode);
+            }
+            
+            [Theory]
+            [InlineData("saboyaba")]
+            [InlineData("static_shock")]
+            public void Parsing_AvatarUrL_Works(string username) {
+                var url = _userDic[username].AvatarUrl;
+                HtmlNode node = GetNode(username);
+                var testUrl = UserParser.ParseAvatarUrl(node);
+                Assert.Equal(url, testUrl);
+            }
            
-        [Theory]
-        [InlineData("saboyaba")]
-        [InlineData("static_shock")]
-        public void Parsing_Following_Works(string value) {
-            var following = _userDic[value].Following!;
-            using Stream stream = GetStream($"Html/{value}.html");
-            HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-            Assert.True(following.Equals( UserParser.ParseFollowing(new [] {rootNode})));
-        }   
-            
-        [Theory]
-        [InlineData("saboyaba")]
-        [InlineData("static_shock")]
-        public void Parsing_Follower_Works(string value) {
-            var follower = _userDic[value].Followers!;
-            using Stream stream = GetStream($"Html/{value}.html");
-            HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-            // var e = await Record.Exception(() => userRepo.GetProfile(username));
-            // Assert.Null(e);
-            Assert.True(follower.Equals( UserParser.ParseFollowers(new [] {rootNode})));
         }
 
-        [Theory]
-        [InlineData("saboyaba")]
-        [InlineData("static_shock")]
-        public void Parsing_CoverPicture_works(string username) {
-            var coverPic = _userDic[username].CoverPicture;
-            using Stream stream = GetStream($"Html/{username}.html");
-            HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-            HtmlNode asideNode = UserParser.GetAsideNode(rootNode);
-            var testCoverPic = UserParser.ParseCoverPicture(asideNode);
-            
-            if (coverPic == null) Assert.Null(testCoverPic);
-            else Assert.True(coverPic.Equals(testCoverPic));
-        }
-        
-        [Theory]
-        [InlineData("saboyaba")]
-        [InlineData("static_shock")]
-        public void Parsing_AboutMe_works(string username) {
-            var about = _userDic[username].AboutMe!;
-            using Stream stream = GetStream($"Html/{username}.html");
-            HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-            HtmlNode asideNode = UserParser.GetAsideNode(rootNode);
-            
-            Assert.True(about.Equals(UserParser.ParseAboutMe(asideNode)));
-        }
+        public class ProfileTitleNode
+        {
+            public static HtmlNode GetNode(string username) {
+                using Stream stream = GetStream($"Html/{username}.html");
+                HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+                HtmlNode wrapperNode = UserParser.GetWrapperNode(rootNode);
+                HtmlNode profileHeaderNode = UserParser.GetProfileHeaderContainer(wrapperNode);
+                return UserParser.GetProfileTitleNode(profileHeaderNode);
+            }
          
-        [Theory]
-        [InlineData("saboyaba")]
-        [InlineData("static_shock")]
-        public void Parsing_LatestImages_works(string username) {
-            var images = _userDic[username].LatestImages!;
-            using Stream stream = GetStream($"Html/{username}.html");
-            HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-            HtmlNode asideNode = UserParser.GetAsideNode(rootNode);
-            
-            Assert.StrictEqual(images, UserParser.ParseLatestImages(asideNode));
+            [Theory]
+            [InlineData("saboyaba")]
+            [InlineData("static_shock")]
+            public void Parsing_Username_Works(string username) {
+                using Stream stream = GetStream($"Html/{username}.html");
+                HtmlNode node = GetNode(username);
+                var testUsername = UserParser.ParseUserName(node );
+                Assert.Equal(username, testUsername);
+            }
+          
+            [Theory]
+            [InlineData("saboyaba")]
+            [InlineData("static_shock")]
+            public void Parsing_ProfileTitle_Works(string username) {
+                var title = _userDic[username].ProfileDescription;
+                using Stream stream = GetStream($"Html/{username}.html");
+                HtmlNode node = GetNode(username);
+                var testTitle = UserParser.ParseProfileTitle(node);
+                Assert.Equal(title, testTitle);
+            }   
+           
         }
 
-        [Theory]
-        [MemberData(nameof(GetUsersWithoutLastestImages))]
-        public async Task Parsing_Users_Without_LatestImages_Works(string username) {
-            Stream stream = await  Repository.Repository.GetStream($"/profile/{username}");
+        public class AsideNode
+        {
+            private static IEnumerable<object[]> GetUsersWithoutLatestImages() {
+                return new[]
+                {
+                    (object[]) new [] {"velentoelectric"}
+                };
+            }
             
-            HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-            HtmlNode asideNode = UserParser.GetAsideNode(rootNode);
-            var e = Record.Exception(() => UserParser.ParseLatestImages(asideNode));
-            Assert.Null(e);
-        }
+            private static IEnumerable<object[]> GetUsersWithoutCoverImage() {
+                return new[]
+                {
+                    (object[]) new [] {"infinitymatrix"},
+                    // (object[]) new [] {"noxvenala"},
+                    (object[]) new [] {"unhappy-hyena"}
+                };
+            }
+
+            public static HtmlNode GetAsideNode(string username) {
+                using Stream stream = GetStream($"Html/{username}.html");
+                HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+                HtmlNode wrapperNode = UserParser.GetWrapperNode(rootNode);
+                HtmlNode asideNode = UserParser.GetAsideNode(wrapperNode);
+                return asideNode;
+            }
+ 
+            [Theory]
+            [InlineData("saboyaba")]
+            [InlineData("static_shock")]
+            public void Parsing_CoverPicture_works(string username) {
+                var coverPic = _userDic[username].CoverPicture;
+                HtmlNode asideNode = GetAsideNode(username);
+                var testCoverPic = UserParser.ParseCoverPicture(asideNode);
+                
+                if (coverPic == null) Assert.Null(testCoverPic);
+                else Assert.True(coverPic.Equals(testCoverPic));
+            }
+     
+            [Theory]
+            [MemberData(nameof(GetUsersWithoutCoverImage))]
+            public async Task Parsing_Users_Without_CoverPicture_Works(string username) {
+                Stream stream = await  Repository.Repository.GetStream($"/profile/{username}");
+                HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+                HtmlNode wrapperNode = UserParser.GetWrapperNode(rootNode);
+                HtmlNode asideNode = UserParser.GetAsideNode(wrapperNode);
+                var e = Record.Exception(() =>
+                {
+                    string? testCoverImage = UserParser.ParseCoverPicture(asideNode);
+                    Assert.Null(testCoverImage);
+                });
+                Assert.Null(e);
+            }
+            
+            [Theory]
+            [InlineData("saboyaba")]
+            [InlineData("static_shock")]
+            public void Parsing_AboutMe_works(string username) {
+                var about = _userDic[username].AboutMe!;
+                HtmlNode asideNode = GetAsideNode(username);
+                var testAbout = UserParser.ParseAboutMe(asideNode);
+                
+                Assert.True(about.Equals(testAbout));
+            }          
+            
+            [Theory]
+            [InlineData("saboyaba")]
+            [InlineData("static_shock")]
+            public void Parsing_LatestImages_works(string username) {
+                var images = _userDic[username].LatestImages!;
+                HtmlNode asideNode = GetAsideNode(username);
+                var testImages = UserParser.ParseLatestImages(asideNode);
+                
+                Assert.Equal(images, testImages);
+            }
+
+            [Theory]
+            [MemberData(nameof(GetUsersWithoutLatestImages))]
+            public async Task Parsing_Users_Without_LatestImages_Works(string username) {
+                Stream stream = await  Repository.Repository.GetStream($"/profile/{username}");
+                HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+                HtmlNode wrapperNode = UserParser.GetWrapperNode(rootNode);
+                HtmlNode asideNode = UserParser.GetAsideNode(wrapperNode);
+                var e = Record.Exception(() =>
+                {
+                    string[]? testLatestImages = UserParser.ParseLatestImages(asideNode);
+                    Assert.Null(testLatestImages);
+                });
+                Assert.Null(e);
+            }
         
+        }
+
+        public class ProfileStatsNode
+        {
+            public static HtmlNode GetNode(string username) {
+                using Stream stream = GetStream($"Html/{username}.html");
+                HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+                HtmlNode wrapperNode = UserParser.GetWrapperNode(rootNode);
+                HtmlNode profileHeaderNode = UserParser.GetProfileHeaderContainer(wrapperNode);
+                return UserParser.GetStatsNode(profileHeaderNode);
+            }
+
+            [Theory]
+            [InlineData("saboyaba")]
+            [InlineData("static_shock")]
+            public void Parsing_ForumPosts_Works(string username) {
+                var posts = _userDic[username].ForumPosts;
+                HtmlNode node = GetNode(username);
+                var testPost = Convert.ToInt32(UserParser.ParseForumPosts(node));
+                Assert.Equal(posts, testPost);
+            }
+
+            [Theory]
+            [InlineData("saboyaba")]
+            [InlineData("static_shock")]
+            public void Parsing_WikiPoints_Works(string username) {
+                var points = _userDic[username].WikiPoints;
+                HtmlNode node = GetNode(username);
+                var testPoints = Convert.ToInt32(UserParser.ParseWikiPoints(node));
+                Assert.Equal(points, testPoints);
+            }
+
+            [Theory]
+            [InlineData("saboyaba")]
+            [InlineData("static_shock")]
+            public void Parsing_Following_Works(string username) {
+                var following = _userDic[username].Following!;
+                HtmlNode node = GetNode(username);
+                var testFollowing = UserParser.ParseFollowing(node);
+                Assert.True(following.Equals(testFollowing));
+            }
+
+            [Theory]
+            [InlineData("saboyaba")]
+            [InlineData("static_shock")]
+            public void Parsing_Follower_Works(string username) {
+                var follower = _userDic[username].Followers!;
+                HtmlNode node = GetNode(username);
+                var testFollower = UserParser.ParseFollowers(node);
+                Assert.True(follower.Equals(testFollower));
+            }
+        }
+
     }
 }

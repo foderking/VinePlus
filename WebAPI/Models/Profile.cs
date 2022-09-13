@@ -45,6 +45,9 @@ public class User
    /// The most recent images a user has posted
    /// </summary>
     public string[]? LatestImages { get; set; }
+   /// <summary>
+   /// The most recent activities the user engaged in
+   /// </summary>
     public UserActivity[]? Activities { get; set; }
     // public LinkPreview[]? TopRatedLists { get; set; }
 }
