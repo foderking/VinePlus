@@ -15,14 +15,14 @@ public class UserRepository: IUserRepository<ProfileController>
     }
 
 
-    public async Task<User> GetProfile(string username, ILogger<ProfileController> logger) {
+    public async Task<Profile> GetProfile(string username, ILogger<ProfileController> logger) {
         Stopwatch timer   = Stopwatch.StartNew();
         Stream stream     = await Repository.GetStream($"/profile/{username}");;
         HtmlNode rootNode = Repository.GetRootNode(stream);
-        User parsedUser   = UserParser.Parse(rootNode, logger);
+        Profile parsedProfile   = UserParser.Parse(rootNode, logger);
         timer.Stop();
-        logger.LogInformation($"Request to /profile/{username} completed in {Repository.GetElapased(timer.Elapsed)}");
-        return parsedUser;
+        logger.LogInformation($"Request to /profile/{username} completed in {Repository.GetElapsed(timer.Elapsed)}");
+        return parsedProfile;
     }
 
     public async Task GetUserBlog(string username) {

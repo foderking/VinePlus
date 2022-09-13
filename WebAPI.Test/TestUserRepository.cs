@@ -67,32 +67,32 @@ public class TestUserRepository {
         [Theory]
         [MemberData(nameof(GetTestData))]
         public async Task Parsing_User_Parses_Username_Properly( string username) {
-            User user = await _userRepo.GetProfile(username, _testOutputHelper);
-            Assert.Equal(username, user.UserName);
+            Profile profile = await _userRepo.GetProfile(username, _testOutputHelper);
+            Assert.Equal(username, profile.UserName);
         }
 
         [Theory]
         [MemberData(nameof(GetTestData))]
         public async Task Parsed_User_Doesnt_Contain_Null_Values(string username) {
-            User user = await _userRepo.GetProfile(username, _testOutputHelper);
-            Assert.NotNull(user.Followers);
-            Assert.NotNull(user.Following);
-            Assert.NotNull(user.AvatarUrl);
-            Assert.NotNull(user.ProfileDescription);
-            Assert.NotNull(user.UserName);
+            Profile profile = await _userRepo.GetProfile(username, _testOutputHelper);
+            Assert.NotNull(profile.Followers);
+            Assert.NotNull(profile.Following);
+            Assert.NotNull(profile.AvatarUrl);
+            Assert.NotNull(profile.ProfileDescription);
+            Assert.NotNull(profile.UserName);
         }
     }
 
     public class TestUserParser
     {
         private static string baseDir = $"{AppContext.BaseDirectory}/../../..";
-        private static readonly Dictionary<string, User> //_userDic;
+        private static readonly Dictionary<string, Profile> //_userDic;
 
         // public TestUserParser() {
-            _userDic = new Dictionary<string, User>(
+            _userDic = new Dictionary<string, Profile>(
                 new []
                 {
-                    new KeyValuePair<string, User> ("static_shock", new User()
+                    new KeyValuePair<string, Profile> ("static_shock", new Profile()
                         {
                             AvatarUrl = "https://comicvine.gamespot.com/a/uploads/square_tiny/0/7604/6352798-young-justice-outsiders.jpg",
                             UserName = "static_shock",
@@ -106,7 +106,7 @@ public class TestUserRepository {
                             LatestImages = new []{  "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/7640443-6481578-9596568912-reatj.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6952657-cellgamesarena.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836629-justiceleagueeurope29p21.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836628-justiceleagueeurope29p20.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836627-justiceleagueeurope29p19.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836626-justiceleagueeurope29p18.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836615-action%20631-02.jpg" },
                         }
                     ),
-                    new KeyValuePair<string, User> ("saboyaba", new User()
+                    new KeyValuePair<string, Profile> ("saboyaba", new Profile()
                         {
                             AvatarUrl = "https://comicvine.gamespot.com/a/uploads/square_tiny/11162/111629420/8610625-7556855352-images.jpg",
                             UserName = "saboyaba",
@@ -133,7 +133,7 @@ public class TestUserRepository {
         private static IEnumerable<object[]> GetUsersWithoutUserActivity() {
             return new[]
             {
-                (object[]) new [] {"willopedia1205"},
+                new object[] {"willopedia1205"},
             };
         }
 
@@ -202,16 +202,16 @@ public class TestUserRepository {
             private static IEnumerable<object[]> GetUsersWithoutLatestImages() {
                 return new[]
                 {
-                    (object[]) new [] {"velentoelectric"}
+                    new [] {"velentoelectric"}
                 };
             }
             
             private static IEnumerable<object[]> GetUsersWithoutCoverImage() {
                 return new[]
                 {
-                    (object[]) new [] {"infinitymatrix"},
+                    new object[] {"infinitymatrix"},
                     // (object[]) new [] {"noxvenala"},
-                    (object[]) new [] {"unhappy-hyena"}
+                    new object[] {"unhappy-hyena"}
                 };
             }
 

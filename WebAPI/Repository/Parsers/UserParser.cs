@@ -6,9 +6,6 @@ namespace WebAPI.Repository.Parsers;
 
 public class UserParserException : Exception
 {
-    public UserParserException(): base() {
-    }
-        
     public UserParserException(string message) : base($"Parsing Error in {message}") {
     }
     
@@ -22,6 +19,11 @@ public static class UserParser
         return input.ToLower().Replace(" ", "_");
     }
 
+    /// <summary>
+    /// Gets the first child node at path `html>body>div#site-main>div#wrapper` from the root document node
+    /// </summary>
+    /// <param name="rootNode">The root HTML document node</param>
+    /// <returns></returns>
     public static HtmlNode GetWrapperNode(HtmlNode rootNode) {
         return rootNode
             .FirstDirectDescendant("html")
@@ -42,6 +44,11 @@ public static class UserParser
             );
     }
 
+    /// <summary>
+    /// Gets the first child node at path `div#js-kubrick-lead>div.profile-header>div.container` from the wrapperNode
+    /// </summary>
+    /// <param name="wrapperNode">the wrapperNode</param>
+    /// <returns></returns>
     public static HtmlNode GetProfileHeaderContainer(HtmlNode wrapperNode) {
         return wrapperNode
             .FirstDirectDescendant(
@@ -61,6 +68,11 @@ public static class UserParser
             );
     }
 
+    /// <summary>
+    /// Gets the first child node at path `div.profile-title-hold>section.profile-follow>table` from the profileHeaderNode
+    /// </summary>
+    /// <param name="profileHeaderNode"></param>
+    /// <returns></returns>
     public static HtmlNode GetStatsNode(HtmlNode profileHeaderNode) {
         return profileHeaderNode
             .FirstDirectDescendant(
@@ -74,6 +86,11 @@ public static class UserParser
             .FirstDirectDescendant("table");
     }
 
+    /// <summary>
+    /// Gets the first child node at path `div.profile-title-hold>section.profile-title` from the profileHeaderNode
+    /// </summary>
+    /// <param name="profileHeaderNode"></param>
+    /// <returns></returns>
     public static HtmlNode GetProfileTitleNode(HtmlNode profileHeaderNode) {
         return profileHeaderNode
             .FirstDirectDescendant(
@@ -86,6 +103,70 @@ public static class UserParser
             );
     }
 
+    /// <summary>
+    /// Gets the first child node at path `div#site>div#default-content>aside` from the wrapperNode
+    /// </summary>
+    /// <param name="wrapperNode">wrapperNode</param>
+    /// <returns></returns>
+    /// <exception cref="UserParserException"></exception>
+    public static HtmlNode GetAsideNode(HtmlNode wrapperNode) {
+        return wrapperNode
+            .FirstDirectDescendant(
+                "div",
+                div => string.Equals(
+                    div.GetAttributeValue("id", ""), 
+                    "site", StringComparison.Ordinal
+                    )
+            )
+            .FirstDirectDescendant(
+                "div",
+                div => string.Equals(
+                    div.GetAttributeValue("id", ""), 
+                    "default-content", StringComparison.Ordinal
+                    )
+            )
+            .DirectDescendants("aside")
+            .FirstOrDefault() ?? throw new UserParserException(nameof(GetAsideNode));
+    }
+ 
+    /// <summary>
+    /// Gets first child node at path
+    /// `div#site>div#default-content>div.primary-content.js-article-container>div.tab-content>div#js-user-main-feed>ul`
+    /// from the wrapperNode
+    /// </summary>
+    /// <param name="wrapperNode"></param>
+    /// <returns></returns>
+    public static HtmlNode GetActivityListNode(HtmlNode wrapperNode) {
+        return  wrapperNode
+            .FirstDirectDescendant(
+                "div",
+                div => string.Equals(
+                    div.GetAttributeValue("id", ""),
+                    "site", StringComparison.Ordinal
+                )
+            )
+            .FirstDirectDescendant(
+                "div",
+                div => string.Equals(
+                    div.GetAttributeValue("id", ""),
+                    "default-content", StringComparison.Ordinal
+                )
+            )
+            .FirstDirectDescendant(
+                "div",
+                div => div.HasClass("primary-content") || div.HasClass("js-article-container")
+            )
+            .FirstDirectDescendant(
+                "div",
+                div => div.HasClass("tab-content")
+            )
+            .FirstDirectDescendant(
+                "div",
+                div => Equals(div.GetAttributeValue("id", ""), "js-user-main-feed")
+            )
+            .FirstDirectDescendant("ul");
+    }
+   
     
     public static string ParseUserName(HtmlNode profileTitleNode) {
         return profileTitleNode
@@ -120,22 +201,6 @@ public static class UserParser
                 img => img.GetAttributeValue("src", "")
             )
             .First();
-        // return profileAvatarNode
-        //     .Select(
-        //         node => node
-        //             .Descendants("div")
-        //             .First(
-        //                 div => div
-        //                     .HasClass("avatar")
-        //             )
-        //     )
-        //     .Select(
-        //         avatar => avatar
-        //             .Descendants("img")
-        //             .First()
-        //             .GetAttributeValue("src", "")
-        //     )
-        //     .FirstOrDefault() ?? throw new UserParserException(nameof(ParseAvatarUrl));
     }
 
     public static string ParseForumPosts(HtmlNode profileStatsNode) {
@@ -156,26 +221,7 @@ public static class UserParser
             .DirectDescendants("td")
             .Position(2)
             .InnerText;
-
-        // return profileStats
-        //     .Select(
-        //         tbody => tbody
-        //             .Descendants("tr")
-        //             .First()
-        //             .Descendants("td")
-        //             .Skip(1)
-        //             .First()
-        //             .InnerHtml
-        //     )
-        //     .FirstOrDefault() ?? throw new UserParserException(nameof(ParseWikiPoints));
     }
-
-    // public static Follow SelectFollow(HtmlNode tdNode) {
-    //     HtmlNode aNode = tdNode
-    //     string link = aNode.GetAttributeValue("href", null) ?? throw new  UserParserException(nameof(SelectFollow));
-    //     int number = Convert.ToInt32(aNode.InnerHtml);
-    //     return new Follow() { Link = link, Number = number };
-    // }
 
     public static Follow ParseFollowing(HtmlNode profileStatsNode) {
         return profileStatsNode
@@ -194,18 +240,6 @@ public static class UserParser
                 }
             )
             .First();
-        
-        // return profileStats
-        //     .Select(
-        //         tbody => tbody
-        //             .Descendants("tr")
-        //             .First()
-        //             .Descendants("td")
-        //             .Skip(2)
-        //             .First()
-        //     )
-        //     .Select(SelectFollow)
-        //     .FirstOrDefault() ?? throw new UserParserException(nameof(ParseFollowing));
     }
 
     public static Follow ParseFollowers(HtmlNode profileStatsNode) {
@@ -225,62 +259,6 @@ public static class UserParser
                 }
             )
             .First();
-        // return profileStats
-        //     
-        //     .Select(
-        //         table => table
-        //             .Descendants("tr")
-        //             .First()
-        //             .Descendants("td")
-        //             .Skip(3)
-        //             .First()
-        //     )
-        //     .Select(SelectFollow)
-        //     .FirstOrDefault() ?? throw new UserParserException(nameof(ParseFollowers));
-    }
-
-    
-    /// <summary>
-    /// asideNode is the first html>body>div#site-main>div#wrapper>div#site>div#default-content>aside node
-    /// </summary>
-    /// <param name="wrapperNode">rootNode</param>
-    /// <returns>asideNode</returns>
-    /// <exception cref="UserParserException"></exception>
-    public static HtmlNode GetAsideNode(HtmlNode wrapperNode) {
-        return wrapperNode
-        // return rootNode
-        //     .FirstDirectDescendant("html")
-        //     .FirstDirectDescendant("body")
-        //     .FirstDirectDescendant(
-        //         "div",
-        //         div => string.Equals(
-        //                     div.GetAttributeValue("id", ""), 
-        //                     "site-main", StringComparison.Ordinal
-        //                 )
-        //     )
-        //     .FirstDirectDescendant(
-        //         "div",
-        //         div => string.Equals(
-        //                     div.GetAttributeValue("id", ""), 
-        //                     "wrapper", StringComparison.Ordinal
-        //                 )
-        //     )
-            .FirstDirectDescendant(
-                "div",
-                div => string.Equals(
-                    div.GetAttributeValue("id", ""), 
-                    "site", StringComparison.Ordinal
-                    )
-            )
-            .FirstDirectDescendant(
-                "div",
-                div => string.Equals(
-                    div.GetAttributeValue("id", ""), 
-                    "default-content", StringComparison.Ordinal
-                    )
-            )
-            .DirectDescendants("aside")
-            .FirstOrDefault() ?? throw new UserParserException(nameof(GetAsideNode));
     }
 
     public static string? ParseCoverPicture(HtmlNode asideNode) {
@@ -318,7 +296,7 @@ public static class UserParser
                 div => 
                     div
                         .HasClass("aside-pod") && 
-                   ((IEnumerable<HtmlNode>) div.ChildNodes)
+                    div.ChildNodes
                        .Any(
                            each => each.Name=="header" && Equals(each.InnerText.Trim(), "About Me")
                        )
@@ -369,7 +347,6 @@ public static class UserParser
             )
             .First();
         
-        // if (align == null) throw new UserParserException(nameof(ParseAlignment));
         return align switch
         {
             "Good"    => Alignment.Good,
@@ -394,7 +371,7 @@ public static class UserParser
                 arr => arr[1].Split(" ")[0].Trim()
             )
             .Select(
-                text => int.Parse(text)
+                int.Parse
             )
             .First();
     }
@@ -421,7 +398,7 @@ public static class UserParser
                 div => 
                     div
                         .HasClass("aside-pod") && 
-                   ((IEnumerable<HtmlNode>) div.ChildNodes)
+                   div.ChildNodes
                        .Any(
                            each => each.Name=="div" && 
                                     each.HasClass("pod-body") && 
@@ -447,57 +424,7 @@ public static class UserParser
             )
             .ToArray();
     }
-
-    public static HtmlNode GetActivityListNode(HtmlNode wrapperNode) {
-        return  wrapperNode
-        // HtmlNode? mainFeed = rootNode
-            // .FirstDirectDescendant("html")
-            // .FirstDirectDescendant("body")
-            // .FirstDirectDescendant(
-            //     "div",
-            //     div => string.Equals(
-            //         div.GetAttributeValue("id", ""),
-            //         "site-main", StringComparison.Ordinal
-            //     )
-            // )
-            // .FirstDirectDescendant(
-            //     "div",
-            //     div => string.Equals(
-            //         div.GetAttributeValue("id", ""),
-            //         "wrapper", StringComparison.Ordinal
-            //     )
-            // )
-            .FirstDirectDescendant(
-                "div",
-                div => string.Equals(
-                    div.GetAttributeValue("id", ""),
-                    "site", StringComparison.Ordinal
-                )
-            )
-            .FirstDirectDescendant(
-                "div",
-                div => string.Equals(
-                    div.GetAttributeValue("id", ""),
-                    "default-content", StringComparison.Ordinal
-                )
-            )
-            .FirstDirectDescendant(
-                "div",
-                div => div.HasClass("primary-content") || div.HasClass("js-article-container")
-            )
-            .FirstDirectDescendant(
-                "div",
-                div => div.HasClass("tab-content")
-            )
-            .FirstDirectDescendant(
-                "div",
-                div => Equals(div.GetAttributeValue("id", ""), "js-user-main-feed")
-            )//;
-        // if (mainFeed == null) return null;
-        // return mainFeed
-            .FirstDirectDescendant("ul");
-    }
-    
+   
 
     public static UserActivity ParseActivity(HtmlNode liActivityNode) {
         HtmlNode mediaBodyNode = liActivityNode
@@ -526,7 +453,6 @@ public static class UserParser
 
     public static UserActivity[]? ParseUserActivities(HtmlNode wrapperNode) {
         HtmlNode activityNode = GetActivityListNode(wrapperNode);
-        // if (activityNode == null) return null;
         return activityNode
             .DirectDescendants("li")
             .Where(li => li.HasClass("activity-list__item"))
@@ -534,42 +460,9 @@ public static class UserParser
             .ToArray();
     }
     
-    public static User Parse<T>(HtmlNode rootNode, ILogger<T> logger) {
+    public static Profile Parse<T>(HtmlNode rootNode, ILogger<T> logger) {
         Stopwatch timer = Stopwatch.StartNew();
         
-        // IEnumerable<HtmlNode> sectionNode = rootNode
-        //     .Descendants("section")
-        //     .ToArray();
-
-        // IEnumerable<HtmlNode> profileTitleNode = sectionNode
-        //     .Where(
-        //         node => node
-        //             .HasClass("profile-title")
-        //     )
-        //     .ToArray();
-
-        // IEnumerable<HtmlNode> profileFollowNode = sectionNode
-        //     .Where(
-        //         node => node
-        //             .HasClass("profile-follow")
-        //     )
-        //     .ToArray();
-
-        // IEnumerable<HtmlNode> profileStats = profileFollowNode
-        //     .Select(
-        //         node => node
-        //             .Descendants("table")
-        //             .First()
-        //     )
-        //     .ToArray();
-            
-         // IEnumerable<HtmlNode> profileAvatarNode = sectionNode
-         //    .Where(
-         //        node => node
-         //            .HasClass("profile-avatar")
-         //    )
-         //    .ToArray();
-
         HtmlNode wrapperNode = GetWrapperNode(rootNode);
         
         HtmlNode asideNode = GetAsideNode(wrapperNode);
@@ -579,24 +472,24 @@ public static class UserParser
         HtmlNode profileTitleNode = GetProfileTitleNode(profileHeaderNode);
         
 
-         User user = new User();
-         user.Activities   = UserParser.ParseUserActivities(wrapperNode);
-         user.AvatarUrl    = UserParser.ParseAvatarUrl(profileHeaderNode);
+         Profile profile = new Profile();
+         profile.Activities   = UserParser.ParseUserActivities(wrapperNode);
+         profile.AvatarUrl    = UserParser.ParseAvatarUrl(profileHeaderNode);
          
-         user.UserName = UserParser.ParseUserName(profileTitleNode);
-         user.ProfileDescription = UserParser.ParseProfileTitle(profileTitleNode);
+         profile.UserName = UserParser.ParseUserName(profileTitleNode);
+         profile.ProfileDescription = UserParser.ParseProfileTitle(profileTitleNode);
          
-         user.ForumPosts = Convert.ToInt32(UserParser.ParseForumPosts(profileStatsNode));
-         user.WikiPoints = Convert.ToInt32(UserParser.ParseWikiPoints(profileStatsNode));
-         user.Following  = UserParser.ParseFollowing(profileStatsNode);
-         user.Followers  = UserParser.ParseFollowers(profileStatsNode);
+         profile.ForumPosts = Convert.ToInt32(UserParser.ParseForumPosts(profileStatsNode));
+         profile.WikiPoints = Convert.ToInt32(UserParser.ParseWikiPoints(profileStatsNode));
+         profile.Following  = UserParser.ParseFollowing(profileStatsNode);
+         profile.Followers  = UserParser.ParseFollowers(profileStatsNode);
          
-         user.CoverPicture = UserParser.ParseCoverPicture(asideNode);
-         user.AboutMe      = UserParser.ParseAboutMe(asideNode);
-         user.LatestImages = UserParser.ParseLatestImages(asideNode);
+         profile.CoverPicture = UserParser.ParseCoverPicture(asideNode);
+         profile.AboutMe      = UserParser.ParseAboutMe(asideNode);
+         profile.LatestImages = UserParser.ParseLatestImages(asideNode);
          
          timer.Stop();
-         logger.LogInformation($"UserParser completed in {Repository.GetElapased(timer.Elapsed)}");
-         return user;
+         logger.LogInformation($"UserParser completed in {Repository.GetElapsed(timer.Elapsed)}");
+         return profile;
     }
 }
