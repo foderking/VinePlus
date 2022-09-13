@@ -38,5 +38,67 @@ public static class Repository
         // Console.WriteLine($"{timeSpan.TotalSeconds}, {approxTime}, {milli}");
         return $"{hour}h:{minute}m:{seconds}.{(int)(milli*1000)}";
     }
+    // public static IEnumerable<HtmlNode> DirectDescendants(this HtmlNode mainNode) {
+    // }
+    /// <summary>
+    /// Gets all direct child nodes of the current node
+    /// </summary>
+    /// <param name="mainNode">The current node</param>
+    /// <param name="name">The type of all child nodes to return</param>
+    /// <returns>An enumerable representing all valid child nodes</returns>
+    public static IEnumerable<HtmlNode> DirectDescendants(this HtmlNode mainNode, string name) {
+        return mainNode
+            .Elements(name);
+    }
+    
+    public static IEnumerable<HtmlNode> DirectDescendants(this HtmlNode mainNode, string name, Func<HtmlNode, bool> predicate) {
+        return mainNode
+            .Elements(name)
+            .Where(predicate);
+    }
+    
+    /// <summary>
+    /// Gets the first direct child nodes of the current node
+    /// </summary>
+    /// <param name="mainNode">The current node</param>
+    /// <param name="name">The type of the child node</param>
+    /// <returns>The first valid child node</returns>
+    public static HtmlNode FirstDirectDescendant(this HtmlNode mainNode, string name) {
+        return mainNode
+            .Elements(name)
+            .First();
+    }
+    
+    public static HtmlNode FirstDirectDescendant(this HtmlNode mainNode, string name, Func<HtmlNode, bool> predicate) {
+        return mainNode
+            .Elements(name)
+            .First(predicate);
+    }
+    
+    public static HtmlNode? FirstDirectDescendantOrDefault(this HtmlNode mainNode, string name, Func<HtmlNode, bool> predicate) {
+        return mainNode
+            .Elements(name)
+            .FirstOrDefault(predicate);
+    }
+    
+    public static HtmlNode? FirstDirectDescendantOrDefault(this HtmlNode mainNode, string name) {
+        return mainNode
+            .Elements(name)
+            .FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Gets element at specified position (position starts from 1)
+    /// </summary>
+    /// <param name="collection"></param>
+    /// <param name="position"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static T Position<T>(this IEnumerable<T> collection, int position) {
+        if (position < 1) throw new ArgumentException("Position should be greater than 1");
+        return collection
+            .Skip(position - 1)
+            .First();
+    }
 
 }
