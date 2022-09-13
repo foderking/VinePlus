@@ -1,0 +1,12 @@
+﻿.swagger-ui .opblock .opblock-summary-method {
+    color: black;
+}
+
+.swagger-ui .opblock .opblock-summary-path {
+    flex-basis: 30em;
+    text-transform: lowercase;
+}
+
+.model-box {
+    min-width: 10em;
+}

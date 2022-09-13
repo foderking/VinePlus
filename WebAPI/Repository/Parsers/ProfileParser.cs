@@ -13,7 +13,7 @@ public class UserParserException : Exception
     }
 }
 
-public static class UserParser
+public static class ProfileParser
 {
     public static string CleanUsername(string input) {
         return input.ToLower().Replace(" ", "_");
@@ -473,23 +473,23 @@ public static class UserParser
         
 
          Profile profile = new Profile();
-         profile.Activities   = UserParser.ParseUserActivities(wrapperNode);
-         profile.AvatarUrl    = UserParser.ParseAvatarUrl(profileHeaderNode);
+         profile.Activities   = ParseUserActivities(wrapperNode);
+         profile.AvatarUrl    = ParseAvatarUrl(profileHeaderNode);
          
-         profile.UserName = UserParser.ParseUserName(profileTitleNode);
-         profile.ProfileDescription = UserParser.ParseProfileTitle(profileTitleNode);
+         profile.UserName = ParseUserName(profileTitleNode);
+         profile.ProfileDescription = ParseProfileTitle(profileTitleNode);
          
-         profile.ForumPosts = Convert.ToInt32(UserParser.ParseForumPosts(profileStatsNode));
-         profile.WikiPoints = Convert.ToInt32(UserParser.ParseWikiPoints(profileStatsNode));
-         profile.Following  = UserParser.ParseFollowing(profileStatsNode);
-         profile.Followers  = UserParser.ParseFollowers(profileStatsNode);
+         profile.ForumPosts = Convert.ToInt32(ParseForumPosts(profileStatsNode));
+         profile.WikiPoints = Convert.ToInt32(ParseWikiPoints(profileStatsNode));
+         profile.Following  = ParseFollowing(profileStatsNode);
+         profile.Followers  = ParseFollowers(profileStatsNode);
          
-         profile.CoverPicture = UserParser.ParseCoverPicture(asideNode);
-         profile.AboutMe      = UserParser.ParseAboutMe(asideNode);
-         profile.LatestImages = UserParser.ParseLatestImages(asideNode);
+         profile.CoverPicture = ParseCoverPicture(asideNode);
+         profile.AboutMe      = ParseAboutMe(asideNode);
+         profile.LatestImages = ParseLatestImages(asideNode);
          
          timer.Stop();
-         logger.LogInformation($"UserParser completed in {Repository.GetElapsed(timer.Elapsed)}");
+         logger.LogInformation($"ProfileParser completed in {Repository.GetElapsed(timer.Elapsed)}");
          return profile;
     }
 }
