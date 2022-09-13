@@ -19,7 +19,7 @@ public class UserRepository: IUserRepository<ProfileController>
         Stopwatch timer   = Stopwatch.StartNew();
         Stream stream     = await Repository.GetStream($"/profile/{username}");;
         HtmlNode rootNode = Repository.GetRootNode(stream);
-        Profile parsedProfile   = UserParser.Parse(rootNode, logger);
+        Profile parsedProfile   = ProfileParser.Parse(rootNode, logger);
         timer.Stop();
         logger.LogInformation($"Request to /profile/{username} completed in {Repository.GetElapsed(timer.Elapsed)}");
         return parsedProfile;

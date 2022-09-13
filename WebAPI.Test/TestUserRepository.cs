@@ -28,7 +28,7 @@ public class TestUserRepository {
                     a => a.HasClass("neutral")  || a.HasClass("none") || a.HasClass("good") || a.HasClass("evil") 
                 )
                 .Select(a => a.InnerHtml.Trim())
-                .Select(UserParser.CleanUsername)
+                .Select(ProfileParser.CleanUsername)
                 .Where(each => !each.Contains("deactivated"))
                 .ToArray();
         }
@@ -148,8 +148,8 @@ public class TestUserRepository {
             public static HtmlNode GetNode(string username) {
                 using Stream stream = GetStream($"Html/{username}.html");
                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                HtmlNode wrapperNode = UserParser.GetWrapperNode(rootNode);
-                return UserParser.GetProfileHeaderContainer(wrapperNode);
+                HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
+                return ProfileParser.GetProfileHeaderContainer(wrapperNode);
             }
             
             [Theory]
@@ -158,7 +158,7 @@ public class TestUserRepository {
             public void Parsing_AvatarUrL_Works(string username) {
                 var url = _userDic[username].AvatarUrl;
                 HtmlNode node = GetNode(username);
-                var testUrl = UserParser.ParseAvatarUrl(node);
+                var testUrl = ProfileParser.ParseAvatarUrl(node);
                 Assert.Equal(url, testUrl);
             }
            
@@ -169,9 +169,9 @@ public class TestUserRepository {
             public static HtmlNode GetNode(string username) {
                 using Stream stream = GetStream($"Html/{username}.html");
                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                HtmlNode wrapperNode = UserParser.GetWrapperNode(rootNode);
-                HtmlNode profileHeaderNode = UserParser.GetProfileHeaderContainer(wrapperNode);
-                return UserParser.GetProfileTitleNode(profileHeaderNode);
+                HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
+                HtmlNode profileHeaderNode = ProfileParser.GetProfileHeaderContainer(wrapperNode);
+                return ProfileParser.GetProfileTitleNode(profileHeaderNode);
             }
          
             [Theory]
@@ -180,7 +180,7 @@ public class TestUserRepository {
             public void Parsing_Username_Works(string username) {
                 using Stream stream = GetStream($"Html/{username}.html");
                 HtmlNode node = GetNode(username);
-                var testUsername = UserParser.ParseUserName(node );
+                var testUsername = ProfileParser.ParseUserName(node );
                 Assert.Equal(username, testUsername);
             }
           
@@ -191,7 +191,7 @@ public class TestUserRepository {
                 var title = _userDic[username].ProfileDescription;
                 using Stream stream = GetStream($"Html/{username}.html");
                 HtmlNode node = GetNode(username);
-                var testTitle = UserParser.ParseProfileTitle(node);
+                var testTitle = ProfileParser.ParseProfileTitle(node);
                 Assert.Equal(title, testTitle);
             }   
            
@@ -218,8 +218,8 @@ public class TestUserRepository {
             public static HtmlNode GetAsideNode(string username) {
                 using Stream stream = GetStream($"Html/{username}.html");
                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                HtmlNode wrapperNode = UserParser.GetWrapperNode(rootNode);
-                HtmlNode asideNode = UserParser.GetAsideNode(wrapperNode);
+                HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
+                HtmlNode asideNode = ProfileParser.GetAsideNode(wrapperNode);
                 return asideNode;
             }
  
@@ -229,7 +229,7 @@ public class TestUserRepository {
             public void Parsing_CoverPicture_works(string username) {
                 var coverPic = _userDic[username].CoverPicture;
                 HtmlNode asideNode = GetAsideNode(username);
-                var testCoverPic = UserParser.ParseCoverPicture(asideNode);
+                var testCoverPic = ProfileParser.ParseCoverPicture(asideNode);
                 
                 if (coverPic == null) Assert.Null(testCoverPic);
                 else Assert.True(coverPic.Equals(testCoverPic));
@@ -240,11 +240,11 @@ public class TestUserRepository {
             public async Task Parsing_Users_Without_CoverPicture_Works(string username) {
                 Stream stream = await  Repository.Repository.GetStream($"/profile/{username}");
                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                HtmlNode wrapperNode = UserParser.GetWrapperNode(rootNode);
-                HtmlNode asideNode = UserParser.GetAsideNode(wrapperNode);
+                HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
+                HtmlNode asideNode = ProfileParser.GetAsideNode(wrapperNode);
                 var e = Record.Exception(() =>
                 {
-                    string? testCoverImage = UserParser.ParseCoverPicture(asideNode);
+                    string? testCoverImage = ProfileParser.ParseCoverPicture(asideNode);
                     Assert.Null(testCoverImage);
                 });
                 Assert.Null(e);
@@ -256,7 +256,7 @@ public class TestUserRepository {
             public void Parsing_AboutMe_works(string username) {
                 var about = _userDic[username].AboutMe!;
                 HtmlNode asideNode = GetAsideNode(username);
-                var testAbout = UserParser.ParseAboutMe(asideNode);
+                var testAbout = ProfileParser.ParseAboutMe(asideNode);
                 
                 Assert.True(about.Equals(testAbout));
             }          
@@ -267,7 +267,7 @@ public class TestUserRepository {
             public void Parsing_LatestImages_works(string username) {
                 var images = _userDic[username].LatestImages!;
                 HtmlNode asideNode = GetAsideNode(username);
-                var testImages = UserParser.ParseLatestImages(asideNode);
+                var testImages = ProfileParser.ParseLatestImages(asideNode);
                 
                 Assert.Equal(images, testImages);
             }
@@ -277,11 +277,11 @@ public class TestUserRepository {
             public async Task Parsing_Users_Without_LatestImages_Works(string username) {
                 Stream stream = await  Repository.Repository.GetStream($"/profile/{username}");
                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                HtmlNode wrapperNode = UserParser.GetWrapperNode(rootNode);
-                HtmlNode asideNode = UserParser.GetAsideNode(wrapperNode);
+                HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
+                HtmlNode asideNode = ProfileParser.GetAsideNode(wrapperNode);
                 var e = Record.Exception(() =>
                 {
-                    string[]? testLatestImages = UserParser.ParseLatestImages(asideNode);
+                    string[]? testLatestImages = ProfileParser.ParseLatestImages(asideNode);
                     Assert.Null(testLatestImages);
                 });
                 Assert.Null(e);
@@ -294,9 +294,9 @@ public class TestUserRepository {
             public static HtmlNode GetNode(string username) {
                 using Stream stream = GetStream($"Html/{username}.html");
                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                HtmlNode wrapperNode = UserParser.GetWrapperNode(rootNode);
-                HtmlNode profileHeaderNode = UserParser.GetProfileHeaderContainer(wrapperNode);
-                return UserParser.GetStatsNode(profileHeaderNode);
+                HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
+                HtmlNode profileHeaderNode = ProfileParser.GetProfileHeaderContainer(wrapperNode);
+                return ProfileParser.GetStatsNode(profileHeaderNode);
             }
 
             [Theory]
@@ -305,7 +305,7 @@ public class TestUserRepository {
             public void Parsing_ForumPosts_Works(string username) {
                 var posts = _userDic[username].ForumPosts;
                 HtmlNode node = GetNode(username);
-                var testPost = Convert.ToInt32(UserParser.ParseForumPosts(node));
+                var testPost = Convert.ToInt32(ProfileParser.ParseForumPosts(node));
                 Assert.Equal(posts, testPost);
             }
 
@@ -315,7 +315,7 @@ public class TestUserRepository {
             public void Parsing_WikiPoints_Works(string username) {
                 var points = _userDic[username].WikiPoints;
                 HtmlNode node = GetNode(username);
-                var testPoints = Convert.ToInt32(UserParser.ParseWikiPoints(node));
+                var testPoints = Convert.ToInt32(ProfileParser.ParseWikiPoints(node));
                 Assert.Equal(points, testPoints);
             }
 
@@ -325,7 +325,7 @@ public class TestUserRepository {
             public void Parsing_Following_Works(string username) {
                 var following = _userDic[username].Following!;
                 HtmlNode node = GetNode(username);
-                var testFollowing = UserParser.ParseFollowing(node);
+                var testFollowing = ProfileParser.ParseFollowing(node);
                 Assert.True(following.Equals(testFollowing));
             }
 
@@ -335,7 +335,7 @@ public class TestUserRepository {
             public void Parsing_Follower_Works(string username) {
                 var follower = _userDic[username].Followers!;
                 HtmlNode node = GetNode(username);
-                var testFollower = UserParser.ParseFollowers(node);
+                var testFollower = ProfileParser.ParseFollowers(node);
                 Assert.True(follower.Equals(testFollower));
             }
         }

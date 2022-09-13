@@ -26,41 +26,81 @@ public class ProfileController: ControllerBase
         return _userRepository.GetProfile(username, _logger);
     }
 
-    [HttpGet("{username}/blog")]
-    public Task GetBlog(string username) {
-        return _userRepository.GetUserBlog(username);
-    }
-
-    [HttpGet("{username}/images")]
-    public Task GetImages(string username) {
-        return _userRepository.GetUserImages(username);
-    }
-
-    [HttpGet("{username}/forums")]
-    public Task GetForum(string username) {
-        return _userRepository.GetUserForumPosts(username);
-    }
-
-    [HttpGet("{username}/wiki-submissions")]
-    public Task GetWiki(string username) {
-        return _userRepository.GetWikiPosts(username);
-    }
-
+    /// <summary>
+    /// Gets the people a comicvine user is following
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
     [HttpGet("{username}/following")]
     public Task GetFollowing(string username) {
         return _userRepository.GetUserFollowing(username);
     }
 
-    [HttpGet("{username}/follower")]
+    /// <summary>
+    /// Gets a comicvine user's followers
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
+    [HttpGet("{username}/followers")]
     public Task GetFollowers(string username) {
         return _userRepository.GetUserFollowers(username);
     }
 
+    /// <summary>
+    /// Gets all the blog posts by a comicvine user
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
+    [HttpGet("{username}/blog")]
+    public Task GetBlog(string username) {
+        return _userRepository.GetUserBlog(username);
+    }
+
+    /// <summary>
+    /// Gets all images a comicvine user has posted
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
+    [HttpGet("{username}/images")]
+    public Task GetImages(string username) {
+        return _userRepository.GetUserImages(username);
+    }
+
+    /// <summary>
+    /// Gets all forums posts by a comicvine user
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
+    [HttpGet("{username}/forums")]
+    public Task GetForum(string username) {
+        return _userRepository.GetUserForumPosts(username);
+    }
+
+    /// <summary>
+    /// Gets a comicvine users wiki submissions
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
+    [HttpGet("{username}/wiki-submissions")]
+    public Task GetWiki(string username) {
+        return _userRepository.GetWikiPosts(username);
+    }
+
+    /// <summary>
+    /// Gets all lists made by a comicvine user
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
     [HttpGet("{username}/lists")]
     public Task GetLists(string username) {
         return _userRepository.GetUserLists(username);
     }
 
+    /// <summary>
+    /// Gets all reviews made by a comicvine user
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
     [HttpGet("{username}/reviews")]
     public Task GetReviews(string username) {
         return _userRepository.GetUserReviews(username);
