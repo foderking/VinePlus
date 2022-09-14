@@ -26,8 +26,11 @@ builder.Services.AddScoped<IUserRepository<ProfileController>, UserRepository>()
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) {
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction()) {
     app.UseSwagger();
+    
+    if (app.Environment.IsProduction()) app.UseExceptionHandler("/error");
+        
     app.UseSwaggerUI( c =>
     {
         c.InjectStylesheet("../css/swagger.css");
