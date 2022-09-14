@@ -22,8 +22,16 @@ public class ProfileController: ControllerBase
     /// <param name="username">The username</param>
     /// <returns></returns>
     [HttpGet("{username}")]
-    public Task<Profile> GetUser(string username) {
-        return _userRepository.GetProfile(username, _logger);
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Profile))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetUser(string username) {
+        try {
+            Profile profile = await _userRepository.GetProfile(username, _logger);
+            return Ok(profile);
+        }
+        catch (HttpRequestException e) {
+            return NotFound();
+        }
     }
 
     /// <summary>

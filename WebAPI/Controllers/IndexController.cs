@@ -20,4 +20,10 @@ public class IndexController : ControllerBase
     public IActionResult Index() {
         return Redirect("/api");
     }
+
+    [Route("/error")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public IActionResult HandleError() {
+        return Problem();
+    }
 }
