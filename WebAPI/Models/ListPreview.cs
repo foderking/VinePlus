@@ -6,7 +6,7 @@
 /// </summary>
 public class LinkPreview
 {
-    public string? Link { get; set; }
+    public string? Text { get; set; }
     public string? Url { get; set; }
     
 }
