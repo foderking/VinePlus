@@ -41,10 +41,10 @@ public class Profile
    /// The about me section of a users profile
    /// </summary>
     public About? AboutMe { get; set; }
-   /// <summary>
-   /// The most recent images a user has posted
-   /// </summary>
-    public string[]? LatestImages { get; set; }
+   // /// <summary>
+   // /// The most recent images a user has posted
+   // /// </summary>
+   //  public string[]? LatestImages { get; set; }
    /// <summary>
    /// The most recent activities the user engaged in
    /// </summary>
