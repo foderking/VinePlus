@@ -407,27 +407,27 @@ public static class ProfileParser
             );
     }
  
-    public static string[]? ParseLatestImages(HtmlNode asideNode) {
-        HtmlNode? asidePod = GetLatestImageAsidePod(asideNode);
-        if (asidePod == null) return null;
-        return asidePod
-            .FirstDirectDescendant(
-                "div",
-                div => div.HasClass("pod-body")
-            )
-            .DirectDescendants("figure")
-            .Select(
-                fig => fig
-                    .Descendants("img")
-                    .First()
-                    .GetAttributeValue("src", "")
-            )
-            .ToArray();
-    }
+    // public static string[]? ParseLatestImages(HtmlNode asideNode) {
+    //     HtmlNode? asidePod = GetLatestImageAsidePod(asideNode);
+    //     if (asidePod == null) return null;
+    //     return asidePod
+    //         .FirstDirectDescendant(
+    //             "div",
+    //             div => div.HasClass("pod-body")
+    //         )
+    //         .DirectDescendants("figure")
+    //         .Select(
+    //             fig => fig
+    //                 .Descendants("img")
+    //                 .First()
+    //                 .GetAttributeValue("src", "")
+    //         )
+    //         .ToArray();
+    // }
    
 
     public static UserActivity ParseActivity(HtmlNode liActivityNode) {
-        HtmlNode mediaBodyNode = liActivityNode
+        HtmlNode activityMessageNode = liActivityNode
             .FirstDirectDescendant(
                 "div",
                 div => div.HasClass("media")
@@ -435,17 +435,17 @@ public static class ProfileParser
             .FirstDirectDescendant(
                 "div",
                 div => div.HasClass("media-body")
-            );
-        HtmlNode activityMessageNode = mediaBodyNode
+            )
             .FirstDirectDescendant(
                 "span",
                 span => span.HasClass("activity-message")
             );
-        HtmlNode activityContentNode = mediaBodyNode
-            .FirstDirectDescendant(
-                "div",
-                span => span.HasClass("activity-content")
-            );
+        
+        // HtmlNode activityContentNode = mediaBodyNode
+        //     .FirstDirectDescendant(
+        //         "div",
+        //         span => span.HasClass("activity-content")
+        //     );
         UserActivity activity = new();
         // new DateTime( )
         return activity;
@@ -486,10 +486,10 @@ public static class ProfileParser
          
          profile.CoverPicture = ParseCoverPicture(asideNode);
          profile.AboutMe      = ParseAboutMe(asideNode);
-         profile.LatestImages = ParseLatestImages(asideNode);
+         // profile.LatestImages = ParseLatestImages(asideNode);
          
          timer.Stop();
-         logger.LogInformation($"ProfileParser completed in {Repository.GetElapsed(timer.Elapsed)}");
+         logger.LogInformation("ProfileParser completed in {Elapsed}", Repository.GetElapsed(timer.Elapsed));
          return profile;
     }
 }
