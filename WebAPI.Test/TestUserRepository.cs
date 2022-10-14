@@ -86,49 +86,42 @@ public class TestUserRepository {
     public class TestUserParser
     {
         private static string baseDir = $"{AppContext.BaseDirectory}/../../..";
-        private static readonly Dictionary<string, Profile> //_userDic;
-
-        // public TestUserParser() {
-            _userDic = new Dictionary<string, Profile>(
-                new []
-                {
-                    new KeyValuePair<string, Profile> ("static_shock", new Profile()
-                        {
-                            AvatarUrl = "https://comicvine.gamespot.com/a/uploads/square_tiny/0/7604/6352798-young-justice-outsiders.jpg",
-                            UserName = "static_shock",
-                            ForumPosts = 53107,
-                            WikiPoints = 12480,
-                            Followers = new (){ Link = "/profile/static_shock/follower/", Number = 739},
-                            Following = new (){ Link = "/profile/static_shock/following/", Number = 166},
-                            ProfileDescription = "Y&#039;all, I&#039;m not a moderator, and I haven&#039;t been a moderator in several years. Stop messaging me about forum rules and all that.",
-                            CoverPicture = "https://comicvine.gamespot.com/a/uploads/scale_medium/4/43236/1972990-static_01_06___copy.jpg",
-                            AboutMe = new () { DateJoined = new DateTime(2008, 6,6), Alignment = Alignment.Good, Points = 12480, Summary = "<p>Who wants to know?</p>"},
-                            LatestImages = new []{  "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/7640443-6481578-9596568912-reatj.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6952657-cellgamesarena.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836629-justiceleagueeurope29p21.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836628-justiceleagueeurope29p20.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836627-justiceleagueeurope29p19.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836626-justiceleagueeurope29p18.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836615-action%20631-02.jpg" },
-                        }
-                    ),
-                    new KeyValuePair<string, Profile> ("saboyaba", new Profile()
-                        {
-                            AvatarUrl = "https://comicvine.gamespot.com/a/uploads/square_tiny/11162/111629420/8610625-7556855352-images.jpg",
-                            UserName = "saboyaba",
-                            ForumPosts = 811,
-                            WikiPoints = 0,
-                            Followers = new (){ Link = "/profile/saboyaba/follower/", Number = 1},
-                            Following = new (){ Link = "/profile/saboyaba/following/", Number = 1},
-                            ProfileDescription = "testing 1...2..3",
-                            CoverPicture = "https://comicvine.gamespot.com/a/uploads/scale_medium/11162/111629420/8610623-4463160778-manga.jpg",
-                            AboutMe = new () { DateJoined = new DateTime(2022, 8,8), Alignment = Alignment.Evil, Points = 0, Summary = "<p> hey. Welcome to my bio!!</p>"},
-                            LatestImages = new []{ "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646949-images%287%29.jpeg" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646722-capture.png" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646316-perfectlybalanced.jpg" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646314-capture.png" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646041-6sf1uq.jpg" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8645874-9621050148-if-yo.jpg" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8645873-0548618617-if-yo.jpg" },
-                        }
-                    )
-                }
-            ) ;
-        // }
+        private static readonly Dictionary<string, Profile> _userDic = new Dictionary<string, Profile>(
+            new [] {
+                new KeyValuePair<string, Profile> ("static_shock", new Profile()
+                    {
+                        AvatarUrl = "https://comicvine.gamespot.com/a/uploads/square_tiny/0/7604/6352798-young-justice-outsiders.jpg",
+                        UserName = "static_shock",
+                        ForumPosts = 53107,
+                        WikiPoints = 12480,
+                        Followers = new (){ Link = "/profile/static_shock/follower/", Number = 739},
+                        Following = new (){ Link = "/profile/static_shock/following/", Number = 166},
+                        ProfileDescription = "Y&#039;all, I&#039;m not a moderator, and I haven&#039;t been a moderator in several years. Stop messaging me about forum rules and all that.",
+                        CoverPicture = "https://comicvine.gamespot.com/a/uploads/scale_medium/4/43236/1972990-static_01_06___copy.jpg",
+                        AboutMe = new () { DateJoined = new DateTime(2008, 6,6), Alignment = Alignment.Good, Points = 12480, Summary = "<p>Who wants to know?</p>"},
+                        // LatestImages = new []{  "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/7640443-6481578-9596568912-reatj.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6952657-cellgamesarena.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836629-justiceleagueeurope29p21.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836628-justiceleagueeurope29p20.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836627-justiceleagueeurope29p19.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836626-justiceleagueeurope29p18.jpg", "https://comicvine.gamespot.com/a/uploads/square_small/0/7604/6836615-action%20631-02.jpg" },
+                    }
+                ),
+                new KeyValuePair<string, Profile> ("saboyaba", new Profile()
+                    {
+                        AvatarUrl = "https://comicvine.gamespot.com/a/uploads/square_tiny/11162/111629420/8610625-7556855352-images.jpg",
+                        UserName = "saboyaba",
+                        ForumPosts = 811,
+                        WikiPoints = 0,
+                        Followers = new (){ Link = "/profile/saboyaba/follower/", Number = 1},
+                        Following = new (){ Link = "/profile/saboyaba/following/", Number = 1},
+                        ProfileDescription = "testing 1...2..3",
+                        CoverPicture = "https://comicvine.gamespot.com/a/uploads/scale_medium/11162/111629420/8610623-4463160778-manga.jpg",
+                        AboutMe = new () { DateJoined = new DateTime(2022, 8,8), Alignment = Alignment.Evil, Points = 0, Summary = "<p> hey. Welcome to my bio!!</p>"},
+                        // LatestImages = new []{ "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646949-images%287%29.jpeg" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646722-capture.png" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646316-perfectlybalanced.jpg" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646314-capture.png" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8646041-6sf1uq.jpg" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8645874-9621050148-if-yo.jpg" , "https://comicvine.gamespot.com/a/uploads/square_small/11162/111629420/8645873-0548618617-if-yo.jpg" },
+                    }
+                )
+            }
+        ) ;
 
         private static FileStream GetStream(string path) {
             return File.OpenRead($"{baseDir}/{path}");
         }
-        
-
 
         private static IEnumerable<object[]> GetUsersWithoutUserActivity() {
             return new[]
@@ -199,17 +192,17 @@ public class TestUserRepository {
 
         public class AsideNode
         {
-            private static IEnumerable<object[]> GetUsersWithoutLatestImages() {
-                return new[]
-                {
-                    new [] {"velentoelectric"}
-                };
-            }
+            // private static IEnumerable<object[]> GetUsersWithoutLatestImages() {
+            //     return new[]
+            //     {
+            //         new [] {"velentoelectric"}
+            //     };
+            // }
             
             private static IEnumerable<object[]> GetUsersWithoutCoverImage() {
                 return new[]
                 {
-                    new object[] {"infinitymatrix"},
+                    new object[] {"abc"},
                     // (object[]) new [] {"noxvenala"},
                     new object[] {"unhappy-hyena"}
                 };
@@ -261,32 +254,91 @@ public class TestUserRepository {
                 Assert.True(about.Equals(testAbout));
             }          
             
+            // [Theory]
+            // [InlineData("saboyaba")]
+            // [InlineData("static_shock")]
+            // public void Parsing_LatestImages_works(string username) {
+            //     var images = _userDic[username].LatestImages!;
+            //     HtmlNode asideNode = GetAsideNode(username);
+            //     var testImages = ProfileParser.ParseLatestImages(asideNode);
+            //     
+            //     Assert.Equal(images, testImages);
+            // }
+
+            // [Theory]
+            // [MemberData(nameof(GetUsersWithoutLatestImages))]
+            // public async Task Parsing_Users_Without_LatestImages_Works(string username) {
+            //     Stream stream = await  Repository.Repository.GetStream($"/profile/{username}");
+            //     HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+            //     HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
+            //     HtmlNode asideNode = ProfileParser.GetAsideNode(wrapperNode);
+            //     var e = Record.Exception(() =>
+            //     {
+            //         string[]? testLatestImages = ProfileParser.ParseLatestImages(asideNode);
+            //         Assert.Null(testLatestImages);
+            //     });
+            //     Assert.Null(e);
+            // }
+            //
+        }
+
+        public class Activities
+        {
+             public static HtmlNode GetNode(string username) {
+                using Stream stream = GetStream($"Html/{username}.html");
+                HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+                return ProfileParser.GetWrapperNode(rootNode);
+            }           
+             
+             private static IEnumerable<object[]> GetUsersWithoutActivities() {
+                return new[]
+                {
+                    new object[] {"abc"},
+                };
+            }
+
+             [Theory]
+             [MemberData(nameof(GetUsersWithoutActivities))]
+             public async Task Parsing_Users_Without_Activities_Works(string username) {
+                 Stream stream = await  Repository.Repository.GetStream($"/profile/{username}");
+                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+                 HtmlNode node = ProfileParser.GetWrapperNode(rootNode);
+                 var testActivities = ProfileParser.ParseUserActivities(node);
+                 Assert.Null(testActivities);
+             }
+
             [Theory]
             [InlineData("saboyaba")]
             [InlineData("static_shock")]
-            public void Parsing_LatestImages_works(string username) {
-                var images = _userDic[username].LatestImages!;
-                HtmlNode asideNode = GetAsideNode(username);
-                var testImages = ProfileParser.ParseLatestImages(asideNode);
+            public void Parsing_Activities_Works(string username) {
+                HtmlNode node = GetNode(username);
+                var testActivities = ProfileParser.ParseUserActivities(node);
+                Assert.NotNull(testActivities);
                 
-                Assert.Equal(images, testImages);
+                foreach (UserActivity activity in testActivities!) {
+                    switch (activity.Type) {
+                        case ActivityType.Comment:
+                            Assert.NotNull(activity.CommentActivity);
+                            Assert.Null(activity.FollowActivity);
+                            Assert.Null(activity.ImageActivity);
+                            break;
+                        case ActivityType.Follow:
+                            Assert.Null(activity.CommentActivity);
+                            Assert.NotNull(activity.FollowActivity);
+                            Assert.Null(activity.ImageActivity);
+                            break;
+                        case ActivityType.Image:
+                            Assert.Null(activity.CommentActivity);
+                            Assert.Null(activity.FollowActivity);
+                            Assert.NotNull(activity.ImageActivity);
+                            break;
+                        default:
+                            Assert.True(false);
+                            break;
+                    }
+                }
             }
 
-            [Theory]
-            [MemberData(nameof(GetUsersWithoutLatestImages))]
-            public async Task Parsing_Users_Without_LatestImages_Works(string username) {
-                Stream stream = await  Repository.Repository.GetStream($"/profile/{username}");
-                HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
-                HtmlNode asideNode = ProfileParser.GetAsideNode(wrapperNode);
-                var e = Record.Exception(() =>
-                {
-                    string[]? testLatestImages = ProfileParser.ParseLatestImages(asideNode);
-                    Assert.Null(testLatestImages);
-                });
-                Assert.Null(e);
-            }
-        
         }
 
         public class ProfileStatsNode
