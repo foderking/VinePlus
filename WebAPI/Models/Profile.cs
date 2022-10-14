@@ -37,14 +37,14 @@ public class Profile
     /// An optional cover picture on the user profile
     /// </summary>
     public string? CoverPicture { get; set; }
+    /// <summary>
+    /// The background image of the profile header
+    /// </summary>
+    public string? BackgroundImage { get; set; }
    /// <summary>
    /// The about me section of a users profile
    /// </summary>
     public About? AboutMe { get; set; }
-   // /// <summary>
-   // /// The most recent images a user has posted
-   // /// </summary>
-   //  public string[]? LatestImages { get; set; }
    /// <summary>
    /// The most recent activities the user engaged in
    /// </summary>

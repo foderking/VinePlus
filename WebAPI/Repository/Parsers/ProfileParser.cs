@@ -406,25 +406,7 @@ public static class ProfileParser
                        )
             );
     }
- 
-    // public static string[]? ParseLatestImages(HtmlNode asideNode) {
-    //     HtmlNode? asidePod = GetLatestImageAsidePod(asideNode);
-    //     if (asidePod == null) return null;
-    //     return asidePod
-    //         .FirstDirectDescendant(
-    //             "div",
-    //             div => div.HasClass("pod-body")
-    //         )
-    //         .DirectDescendants("figure")
-    //         .Select(
-    //             fig => fig
-    //                 .Descendants("img")
-    //                 .First()
-    //                 .GetAttributeValue("src", "")
-    //         )
-    //         .ToArray();
-    // }
-   
+  
 
     public static UserActivity ParseActivity(HtmlNode liActivityNode) {
         HtmlNode mediaBody = liActivityNode
@@ -546,6 +528,16 @@ public static class ProfileParser
             .Select(ParseActivity)
             .ToArray();
     }
+
+    public static string ParseBackgroundImage(HtmlNode wrapperNode) {
+        return wrapperNode
+            .FirstDirectDescendant(
+                "div",
+                div => div.GetAttributeValue("id", "") == "js-kubrick-lead"
+            )
+            .GetAttributeValue("style", "")
+            .Split("background-image: url(")[1][..^1];
+    }
     
     public static Profile Parse<T>(HtmlNode rootNode, ILogger<T> logger) {
         Stopwatch timer = Stopwatch.StartNew();
@@ -562,6 +554,7 @@ public static class ProfileParser
          Profile profile = new Profile();
          profile.Activities   = ParseUserActivities(wrapperNode);
          profile.AvatarUrl    = ParseAvatarUrl(profileHeaderNode);
+         profile.BackgroundImage = ParseBackgroundImage(wrapperNode);
          
          profile.UserName = ParseUserName(profileTitleNode);
          profile.ProfileDescription = ParseProfileTitle(profileTitleNode);
