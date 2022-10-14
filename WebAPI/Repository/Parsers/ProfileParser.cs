@@ -427,7 +427,7 @@ public static class ProfileParser
    
 
     public static UserActivity ParseActivity(HtmlNode liActivityNode) {
-        HtmlNode activityMessageNode = liActivityNode
+        HtmlNode mediaBody = liActivityNode
             .FirstDirectDescendant(
                 "div",
                 div => div.HasClass("media")
@@ -435,24 +435,111 @@ public static class ProfileParser
             .FirstDirectDescendant(
                 "div",
                 div => div.HasClass("media-body")
-            )
+            ); 
+        
+        HtmlNode activityMessageNode = mediaBody
             .FirstDirectDescendant(
                 "span",
                 span => span.HasClass("activity-message")
-            );
-        
-        // HtmlNode activityContentNode = mediaBodyNode
-        //     .FirstDirectDescendant(
-        //         "div",
-        //         span => span.HasClass("activity-content")
-        //     );
+            ); 
+        HtmlNode activityContentNode = mediaBody
+            .FirstDirectDescendant(
+                "div",
+                div => div.HasClass("activity-content")
+            );       
+         
         UserActivity activity = new();
-        // new DateTime( )
+
+        activity.ActivityTime = activityMessageNode
+            .FirstDirectDescendant("time")
+            .InnerText;
+
+        string activityType = activityMessageNode
+            .FirstDirectDescendant("i")
+            .FirstDirectDescendant("svg")
+            .GetAttributeValue("class", "")
+            .Split(" ")[1];
+        
+        switch (activityType) {
+            case "symbol-picture":
+                activity.Type = ActivityType.Image;
+                activity.ImageActivity = new ImageActivity()
+                {
+                    ImageUrl = activityContentNode
+                        .FirstDirectDescendant("figure")
+                        .FirstDirectDescendant("a")
+                        .FirstDirectDescendant("img")
+                        .GetAttributeValue("src", "")
+                };
+                break;
+            
+            case "symbol-smile":
+                activity.Type = ActivityType.Follow;
+                activity.FollowActivity = new FollowActivity()
+                {
+                    User = new LinkPreview()
+                    {
+                        Url = activityMessageNode
+                            .FirstDirectDescendant("a")
+                            .GetAttributeValue("href", ""),
+                        Text = activityMessageNode
+                            .FirstDirectDescendant("a")
+                            .InnerText
+                            .Trim()
+                    }
+                };
+                break;
+            
+            case "symbol-comments-alt":
+                activity.Type = ActivityType.Comment;
+                activity.CommentActivity = new CommentActivity()
+                {
+                    Content = activityContentNode
+                        .FirstDirectDescendant("p")
+                        .InnerHtml,
+                    
+                    Topic = new LinkPreview()
+                    {
+                        Url = activityMessageNode
+                            .DirectDescendants("a")
+                            .Skip(0)
+                            .First()
+                            .GetAttributeValue("href", ""),
+                        Text = activityMessageNode
+                            .DirectDescendants("a")
+                            .Skip(0)
+                            .First()
+                            .InnerHtml
+                    },
+                    
+                    Forum = new LinkPreview()
+                    {
+                        Url = activityMessageNode
+                            .DirectDescendants("a")
+                            .Skip(1)
+                            .First()
+                            .GetAttributeValue("href", ""),
+                        Text = activityMessageNode
+                            .DirectDescendants("a")
+                            .Skip(1)
+                            .First()
+                            .InnerHtml
+                    }
+                };
+                break;
+            
+            default:
+                throw new UserParserException(nameof(ParseActivity));
+        }
+        
         return activity;
     }
 
     public static UserActivity[]? ParseUserActivities(HtmlNode wrapperNode) {
         HtmlNode activityNode = GetActivityListNode(wrapperNode);
+
+        if (activityNode.FirstDirectDescendant("li").HasClass("none")) return null;
+        
         return activityNode
             .DirectDescendants("li")
             .Where(li => li.HasClass("activity-list__item"))
