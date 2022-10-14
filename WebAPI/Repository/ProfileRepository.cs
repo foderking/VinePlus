@@ -21,7 +21,7 @@ public class UserRepository: IUserRepository<ProfileController>
         HtmlNode rootNode = Repository.GetRootNode(stream);
         Profile parsedProfile   = ProfileParser.Parse(rootNode, logger);
         timer.Stop();
-        logger.LogInformation($"Request to /profile/{username} completed in {Repository.GetElapsed(timer.Elapsed)}");
+        logger.LogInformation("Request to /profile/{Username} completed in {Elapsed}", username, Repository.GetElapsed(timer.Elapsed));
         return parsedProfile;
     }
 

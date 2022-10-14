@@ -8,9 +8,6 @@ public class UserParserException : Exception
 {
     public UserParserException(string message) : base($"Parsing Error in {message}") {
     }
-    
-    public UserParserException(string message, Exception inner) : base(message, inner) {
-    }
 }
 
 public static class ProfileParser
@@ -168,6 +165,13 @@ public static class ProfileParser
     }
    
     
+    /// <summary>
+    /// Parses the username: which is at path
+    /// `h1`
+    /// from the profileTitleNode
+    /// </summary>
+    /// <param name="profileTitleNode"></param>
+    /// <returns></returns>
     public static string ParseUserName(HtmlNode profileTitleNode) {
         return profileTitleNode
             .DirectDescendants("h1")
@@ -177,6 +181,13 @@ public static class ProfileParser
             .First();
     }
 
+    /// <summary>
+    /// Parses the profile title: which is at path
+    /// `h4#js-status-message`
+    /// from profileTitleNode
+    /// </summary>
+    /// <param name="profileTitleNode"></param>
+    /// <returns></returns>
     public static string ParseProfileTitle(HtmlNode profileTitleNode) {
         return profileTitleNode
             .FirstDirectDescendant(
@@ -185,7 +196,14 @@ public static class ProfileParser
             )
             .InnerText;
     }
-
+        
+    /// <summary>
+    /// Parses the avatar url: which is at path
+    /// `section.profile-avatar>div.avatar>img`
+    /// from profileHeaderNode
+    /// </summary>
+    /// <param name="profileHeaderNode"></param>
+    /// <returns></returns>
     public static string ParseAvatarUrl(HtmlNode profileHeaderNode) {
         return profileHeaderNode
             .FirstDirectDescendant(
@@ -203,6 +221,13 @@ public static class ProfileParser
             .First();
     }
 
+    /// <summary>
+    /// Parses number of forum posts, which is at path
+    /// `tr>td[1]`
+    /// from profileStatsNode
+    /// </summary>
+    /// <param name="profileStatsNode"></param>
+    /// <returns></returns>
     public static string ParseForumPosts(HtmlNode profileStatsNode) {
         return profileStatsNode
             .FirstDirectDescendant(
@@ -212,7 +237,14 @@ public static class ProfileParser
             .Position(1)
             .InnerText;       
     }
-
+    
+    /// <summary>
+    /// Parses number of forum posts, which is at path
+    /// `tr>td[2]`
+    /// from profileStatsNode
+    /// </summary>
+    /// <param name="profileStatsNode"></param>
+    /// <returns></returns>
     public static string ParseWikiPoints(HtmlNode profileStatsNode) {
         return profileStatsNode
             .FirstDirectDescendant(
@@ -242,6 +274,14 @@ public static class ProfileParser
             .First();
     }
 
+    /// <summary>
+    /// Parses number of followers, which is at path
+    /// `tr>td[4]>a`
+    /// from profileStatsNode
+    /// </summary>
+    /// <param name="profileStatsNode"></param>
+    /// <returns></returns>
+    /// <exception cref="UserParserException"></exception>
     public static Follow ParseFollowers(HtmlNode profileStatsNode) {
         return profileStatsNode
             .FirstDirectDescendant(
@@ -261,6 +301,13 @@ public static class ProfileParser
             .First();
     }
 
+    /// <summary>
+    /// Parse cover picture, which is at path
+    /// `div.profile-image>div.img>a.imgflare.imgclass>img`
+    /// from asideNode
+    /// </summary>
+    /// <param name="asideNode"></param>
+    /// <returns></returns>
     public static string? ParseCoverPicture(HtmlNode asideNode) {
         HtmlNode? profileNode = asideNode
             .DirectDescendants("div")
@@ -376,6 +423,11 @@ public static class ProfileParser
             .First();
     }
 
+    /// <summary>
+    /// Parses about me section, which is at the asideNode
+    /// </summary>
+    /// <param name="asideNode"></param>
+    /// <returns></returns>
     public static About ParseAboutMe(HtmlNode asideNode) {
         HtmlNode asidePod = GetAboutMeAsidePod(asideNode);
         // var xx = asidePod.DirectDescendants("div").ToArray();
@@ -387,26 +439,25 @@ public static class ProfileParser
         return about;
     }
     
-    /// <summary>
-    /// </summary>
-    /// <param name="asideNode">the asideNode</param>
-    /// <returns>asidePod</returns>
-    public static HtmlNode? GetLatestImageAsidePod(HtmlNode asideNode) {
-        return asideNode
-            .FirstDirectDescendantOrDefault(
-                "div",
-                div => 
-                    div
-                        .HasClass("aside-pod") && 
-                   div.ChildNodes
-                       .Any(
-                           each => each.Name=="div" && 
-                                    each.HasClass("pod-body") && 
-                                    each.HasClass("gallery-box-pod")
-                       )
-            );
-    }
-  
+    // /// <summary>
+    // /// </summary>
+    // /// <param name="asideNode">the asideNode</param>
+    // /// <returns>asidePod</returns>
+    // public static HtmlNode? GetLatestImageAsidePod(HtmlNode asideNode) {
+    //     return asideNode
+    //         .FirstDirectDescendantOrDefault(
+    //             "div",
+    //             div => 
+    //                 div
+    //                     .HasClass("aside-pod") && 
+    //                div.ChildNodes
+    //                    .Any(
+    //                        each => each.Name=="div" && 
+    //                                 each.HasClass("pod-body") && 
+    //                                 each.HasClass("gallery-box-pod")
+    //                    )
+    //         );
+    // }
 
     public static UserActivity ParseActivity(HtmlNode liActivityNode) {
         HtmlNode mediaBody = liActivityNode
@@ -517,6 +568,13 @@ public static class ProfileParser
         return activity;
     }
 
+    /// <summary>
+    /// Parses user activities which is at path
+    /// `li.activity-list__item`
+    /// from wrapperNode
+    /// </summary>
+    /// <param name="wrapperNode"></param>
+    /// <returns></returns>
     public static UserActivity[]? ParseUserActivities(HtmlNode wrapperNode) {
         HtmlNode activityNode = GetActivityListNode(wrapperNode);
 
@@ -529,6 +587,13 @@ public static class ProfileParser
             .ToArray();
     }
 
+    /// <summary>
+    /// Parses background image which is at path
+    /// `div#js-kubrick-lead`
+    /// from wrapperNode
+    /// </summary>
+    /// <param name="wrapperNode"></param>
+    /// <returns></returns>
     public static string ParseBackgroundImage(HtmlNode wrapperNode) {
         return wrapperNode
             .FirstDirectDescendant(
