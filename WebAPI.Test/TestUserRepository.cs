@@ -132,14 +132,8 @@ public class TestUserRepository {
             };
         }
 
-        public class WrapperNode
+        public class ProfileHeader
         {
-            
-        }
-
-        public class ProfileHeaderNode
-        {
-
             public static HtmlNode GetNode(string username) {
                 using Stream stream = GetStream($"Html/{username}.html");
                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
