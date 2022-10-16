@@ -21,7 +21,7 @@ public class IndexController : ControllerBase
         return Redirect("/api");
     }
 
-    [Route("/error")]
+    [Route("/api/error")]
     [ApiExplorerSettings(IgnoreApi = true)]
     public IActionResult HandleError() {
         return Problem();

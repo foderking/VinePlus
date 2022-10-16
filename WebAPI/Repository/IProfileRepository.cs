@@ -6,12 +6,9 @@ namespace WebAPI.Repository;
 public interface IUserRepository<T>
 {
     public Task<Profile> GetProfile(string username, ILogger<T> logger);
-    public Task GetUserBlog(string username);
+    public Task<FollowingPage> GetUserFollowing(string username, int pageNo, ILogger<T> logger);
+    public Task<FollowersPage> GetUserFollowers(string username, int pageNo, ILogger<T> logger);
+    public Task<BlogPage> GetUserBlog(string username, int pageNo, ILogger<T> logger);
     public Task GetUserImages(string username);
     public Task GetUserForumPosts(string username);
-    public Task GetWikiPosts(string username);
-    public Task GetUserFollowing(string username);
-    public Task GetUserFollowers(string username);
-    public Task GetUserLists(string username);
-    public Task GetUserReviews(string username);
 }
