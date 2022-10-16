@@ -94,8 +94,8 @@ public class TestUserRepository {
                         UserName = "static_shock",
                         ForumPosts = 53107,
                         WikiPoints = 12480,
-                        Followers = new (){ Link = "/profile/static_shock/follower/", Number = 739},
-                        Following = new (){ Link = "/profile/static_shock/following/", Number = 166},
+                        Followers = new (){ Url = "/profile/static_shock/follower/", Text = "739"},
+                        Following = new (){ Url = "/profile/static_shock/following/", Text = "166"},
                         ProfileDescription = "Y&#039;all, I&#039;m not a moderator, and I haven&#039;t been a moderator in several years. Stop messaging me about forum rules and all that.",
                         CoverPicture = "https://comicvine.gamespot.com/a/uploads/scale_medium/4/43236/1972990-static_01_06___copy.jpg",
                         AboutMe = new () { DateJoined = new DateTime(2008, 6,6), Alignment = Alignment.Good, Points = 12480, Summary = "<p>Who wants to know?</p>"},
@@ -109,8 +109,8 @@ public class TestUserRepository {
                         UserName = "saboyaba",
                         ForumPosts = 811,
                         WikiPoints = 0,
-                        Followers = new (){ Link = "/profile/saboyaba/follower/", Number = 1},
-                        Following = new (){ Link = "/profile/saboyaba/following/", Number = 1},
+                        Followers = new (){ Url = "/profile/saboyaba/follower/", Text = "1"},
+                        Following = new (){ Url = "/profile/saboyaba/following/", Text = "1"},
                         ProfileDescription = "testing 1...2..3",
                         CoverPicture = "https://comicvine.gamespot.com/a/uploads/scale_medium/11162/111629420/8610623-4463160778-manga.jpg",
                         AboutMe = new () { DateJoined = new DateTime(2022, 8,8), Alignment = Alignment.Evil, Points = 0, Summary = "<p> hey. Welcome to my bio!!</p>"},
@@ -348,7 +348,8 @@ public class TestUserRepository {
                 var following = _userDic[username].Following!;
                 HtmlNode node = GetNode(username);
                 var testFollowing = ProfileParser.ParseFollowing(node);
-                Assert.True(following.Equals(testFollowing));
+                Assert.True(following.Text == testFollowing.Text);
+                Assert.True(following.Url == testFollowing.Url);
             }
 
             [Theory]
@@ -358,7 +359,8 @@ public class TestUserRepository {
                 var follower = _userDic[username].Followers!;
                 HtmlNode node = GetNode(username);
                 var testFollower = ProfileParser.ParseFollowers(node);
-                Assert.True(follower.Equals(testFollower));
+                Assert.True(follower.Text == testFollower.Text);
+                Assert.True(follower.Url == testFollower.Url);
             }
         }
 

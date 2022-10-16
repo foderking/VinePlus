@@ -255,7 +255,7 @@ public static class ProfileParser
             .InnerText;
     }
 
-    public static Follow ParseFollowing(HtmlNode profileStatsNode) {
+    public static LinkPreview ParseFollowing(HtmlNode profileStatsNode) {
         return profileStatsNode
             .FirstDirectDescendant(
                 "tr"
@@ -264,11 +264,11 @@ public static class ProfileParser
             .Position(3)
             .DirectDescendants("a")
             .Select(
-                aNode => new Follow()
+                aNode => new LinkPreview()
                 {
-                    Link = aNode.GetAttributeValue("href", null) ??
+                    Url = aNode.GetAttributeValue("href", null) ??
                            throw new UserParserException(nameof(ParseFollowers)),
-                    Number = Convert.ToInt32(aNode.InnerText)
+                    Text = aNode.InnerText
                 }
             )
             .First();
@@ -282,7 +282,7 @@ public static class ProfileParser
     /// <param name="profileStatsNode"></param>
     /// <returns></returns>
     /// <exception cref="UserParserException"></exception>
-    public static Follow ParseFollowers(HtmlNode profileStatsNode) {
+    public static LinkPreview ParseFollowers(HtmlNode profileStatsNode) {
         return profileStatsNode
             .FirstDirectDescendant(
                 "tr"
@@ -291,11 +291,11 @@ public static class ProfileParser
             .Position(4)
             .DirectDescendants("a")
             .Select(
-                aNode => new Follow()
+                aNode => new LinkPreview()
                 {
-                    Link = aNode.GetAttributeValue("href", null) ??
+                    Url = aNode.GetAttributeValue("href", null) ??
                            throw new UserParserException(nameof(ParseFollowers)),
-                    Number = Convert.ToInt32(aNode.InnerText)
+                    Text = aNode.InnerText
                 }
             )
             .First();
@@ -612,29 +612,28 @@ public static class ProfileParser
         HtmlNode asideNode = GetAsideNode(wrapperNode);
         
         HtmlNode profileHeaderNode = GetProfileHeaderContainer(wrapperNode);
-        HtmlNode profileStatsNode = GetStatsNode(profileHeaderNode);
+        HtmlNode profileStatsNode = GetStatsNode(profileHeaderNode); 
         HtmlNode profileTitleNode = GetProfileTitleNode(profileHeaderNode);
         
-
-         Profile profile = new Profile();
-         profile.Activities   = ParseUserActivities(wrapperNode);
-         profile.AvatarUrl    = ParseAvatarUrl(profileHeaderNode);
-         profile.BackgroundImage = ParseBackgroundImage(wrapperNode);
+        Profile profile = new Profile(); 
+        profile.Activities   = ParseUserActivities(wrapperNode);
+        profile.AvatarUrl    = ParseAvatarUrl(profileHeaderNode);
+        profile.BackgroundImage = ParseBackgroundImage(wrapperNode);
+        
+        profile.UserName = ParseUserName(profileTitleNode);
+        profile.ProfileDescription = ParseProfileTitle(profileTitleNode);
          
-         profile.UserName = ParseUserName(profileTitleNode);
-         profile.ProfileDescription = ParseProfileTitle(profileTitleNode);
+        profile.ForumPosts = Convert.ToInt32(ParseForumPosts(profileStatsNode));
+        profile.WikiPoints = Convert.ToInt32(ParseWikiPoints(profileStatsNode)); 
+        profile.Following  = ParseFollowing(profileStatsNode);
+        profile.Followers  = ParseFollowers(profileStatsNode);
          
-         profile.ForumPosts = Convert.ToInt32(ParseForumPosts(profileStatsNode));
-         profile.WikiPoints = Convert.ToInt32(ParseWikiPoints(profileStatsNode));
-         profile.Following  = ParseFollowing(profileStatsNode);
-         profile.Followers  = ParseFollowers(profileStatsNode);
-         
-         profile.CoverPicture = ParseCoverPicture(asideNode);
-         profile.AboutMe      = ParseAboutMe(asideNode);
+        profile.CoverPicture = ParseCoverPicture(asideNode);
+        profile.AboutMe      = ParseAboutMe(asideNode);
          // profile.LatestImages = ParseLatestImages(asideNode);
          
-         timer.Stop();
-         logger.LogInformation("ProfileParser completed in {Elapsed}", Repository.GetElapsed(timer.Elapsed));
-         return profile;
+        timer.Stop();
+        logger.LogInformation("ProfileParser completed in {Elapsed}", Repository.GetElapsed(timer.Elapsed));
+        return profile;
     }
 }

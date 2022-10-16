@@ -29,15 +29,15 @@ public static class Repository
     /// <returns>The HTML stream of the webpage</returns>
     public static Task<Stream> GetStream(string path, Dictionary<string, string>? query = null) {
         NameValueCollection q = HttpUtility.ParseQueryString(string.Empty);
-        if (query != null) {
+        if (query != null)
             foreach (var (a,b) in query) {
-                query[a] = b;
+                q[a] = b;
             }
-        }
+        
         HttpClient client  = new HttpClient();
         UriBuilder uri     = new("https://comicvine.gamespot.com");
         client.BaseAddress = new Uri("https://comicvine.gamespot.com");
-        return client.GetStreamAsync($"{path}/{q}");
+        return client.GetStreamAsync($"{path}?{q}");
     }    
     
     /// <summary>

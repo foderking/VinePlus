@@ -3,7 +3,7 @@
 public class UserActivity
 {
     public ActivityType Type { get; set; }
-    public string ActivityTime { get; set; }
+    public string? ActivityTime { get; set; }
     
     public CommentActivity? CommentActivity { get; set; }
     public ImageActivity? ImageActivity { get; set; }

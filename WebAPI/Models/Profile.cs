@@ -28,11 +28,11 @@ public class Profile
     /// <summary>
     /// The people the user is currently following
     /// </summary>
-    public Follow? Following { get; set; }
+    public LinkPreview? Following { get; set; }
     /// <summary>
     /// The people following the current user
     /// </summary>
-    public Follow? Followers { get; set; }
+    public LinkPreview? Followers { get; set; }
     /// <summary>
     /// An optional cover picture on the user profile
     /// </summary>
