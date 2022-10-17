@@ -72,7 +72,7 @@ public class ImageParser
         
         ImagePage imagePage = new();
 
-        imagePage.PageNo = pageNo;
+        imagePage.PageIndex = pageNo;
         imagePage.TotalPages = (int) Math.Ceiling(
             float.Parse(
                 totalImages
