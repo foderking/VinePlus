@@ -40,6 +40,18 @@ public static class Repository
         return client.GetStreamAsync($"{path}?{q}");
     }    
     
+     public static Task<T?> GetJson<T>(string path, Dictionary<string, string>? query = null) {
+        NameValueCollection q = HttpUtility.ParseQueryString(string.Empty);
+        if (query != null)
+            foreach (var (a,b) in query) {
+                q[a] = b;
+            }
+        
+        HttpClient client  = new ();
+        UriBuilder uri     = new ("https://comicvine.gamespot.com");
+        client.BaseAddress = new Uri("https://comicvine.gamespot.com");
+        return client.GetFromJsonAsync<T>($"{path}?{q}");
+    }   
     /// <summary>
     /// Get the string representation of a timespan
     /// </summary>

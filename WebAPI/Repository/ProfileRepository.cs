@@ -66,9 +66,13 @@ public class UserRepository: IUserRepository<ProfileController>
         return blogPage;
     }
 
-    public async Task GetUserImages(string username) {
-        Stream stream = await GetStream(username);
+    public async Task<ImagePage> GetUserImages(string username, int pageNo, ILogger<ProfileController> logger) {
+        await using Stream stream = await Repository.GetStream($"/profile/{username}/images");
+        
         HtmlNode rootNode = Repository.GetRootNode(stream);
+        ImagePage imagePage = await ImageParser.Parse(rootNode, pageNo-1, logger);
+
+        return imagePage;
     }
 
     public async Task GetUserForumPosts(string username) {

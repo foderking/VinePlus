@@ -78,6 +78,7 @@ public class ProfileController: ControllerBase
     /// Gets all the blog posts by a comicvine user
     /// </summary>
     /// <param name="username"></param>
+    /// <param name="pageNo">the page number</param>
     /// <returns></returns>
     [HttpGet("{username}/blog")]
     public async Task<ActionResult<BlogPage>> GetBlog(string username, [FromQuery(Name = "page")] int pageNo) {
@@ -94,10 +95,17 @@ public class ProfileController: ControllerBase
     /// Gets all images a comicvine user has posted
     /// </summary>
     /// <param name="username"></param>
+    /// <param name="pageNo">page number</param>
     /// <returns></returns>
     [HttpGet("{username}/images")]
-    public Task GetImages(string username) {
-        return _userRepository.GetUserImages(username);
+    public async Task<ActionResult<ImagePage>> GetImages(string username, [FromQuery(Name = "page")] int pageNo) {
+        try {
+            ImagePage imagePage = await _userRepository.GetUserImages(username, Math.Max(pageNo, 1), _logger);
+            return Ok(imagePage);
+        }
+        catch (HttpRequestException) {
+            return NotFound();
+        }
     }
 
     // /// <summary>

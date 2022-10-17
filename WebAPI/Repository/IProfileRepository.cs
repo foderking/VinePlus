@@ -9,6 +9,6 @@ public interface IUserRepository<T>
     public Task<FollowingPage> GetUserFollowing(string username, int pageNo, ILogger<T> logger);
     public Task<FollowersPage> GetUserFollowers(string username, int pageNo, ILogger<T> logger);
     public Task<BlogPage> GetUserBlog(string username, int pageNo, ILogger<T> logger);
-    public Task GetUserImages(string username);
+    public Task<ImagePage> GetUserImages(string username, int pageNo, ILogger<T> logger);
     public Task GetUserForumPosts(string username);
 }
