@@ -23,13 +23,23 @@ builder.Services.AddSwaggerGen(
     });
 builder.Services.AddScoped<IUserRepository<ProfileController>, UserRepository>();
 
+
 var app = builder.Build();
+
+var port = Environment.GetEnvironmentVariable("PORT");
+
+if (!string.IsNullOrWhiteSpace(port)) {
+    app.Urls.Add("http://*:" + port);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction()) {
     app.UseSwagger();
-    
-    if (app.Environment.IsProduction()) app.UseExceptionHandler("/error");
+
+    if (app.Environment.IsProduction()) {
+        app.UseExceptionHandler("/error");
+        app.UseHttpsRedirection();
+    }
         
     app.UseSwaggerUI( c =>
     {
@@ -39,7 +49,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction()) {
     });
 }
 
-app.UseHttpsRedirection();
+
 
 app.UseAuthorization();
 
