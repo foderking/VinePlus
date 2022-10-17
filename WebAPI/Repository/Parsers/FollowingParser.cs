@@ -11,6 +11,12 @@ public class FollowingParserException : Exception
 
 public static class FollowingParser
 {
+    /// <summary>
+    /// Getts the node at path
+    /// `div#site>div#default-content>div.primary-content
+    /// </summary>
+    /// <param name="wrapperNode"></param>
+    /// <returns></returns>
     public static HtmlNode GetMainNode(HtmlNode wrapperNode) {
         return wrapperNode
             .FirstDirectDescendant(
