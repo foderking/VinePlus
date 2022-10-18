@@ -137,7 +137,7 @@ public class TestUserRepository {
             public static HtmlNode GetNode(string username) {
                 using Stream stream = GetStream($"Html/{username}.html");
                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                return ProfileParser.GetWrapperNode(rootNode);
+                return MainParser.GetWrapperNode(rootNode);
             }
             
             [Theory]
@@ -167,7 +167,7 @@ public class TestUserRepository {
             public static HtmlNode GetNode(string username) {
                 using Stream stream = GetStream($"Html/{username}.html");
                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
+                HtmlNode wrapperNode = MainParser.GetWrapperNode(rootNode);
                 HtmlNode profileHeaderNode = ProfileParser.GetProfileHeaderContainer(wrapperNode);
                 return ProfileParser.GetProfileTitleNode(profileHeaderNode);
             }
@@ -208,7 +208,7 @@ public class TestUserRepository {
             public static HtmlNode GetAsideNode(string username) {
                 using Stream stream = GetStream($"Html/{username}.html");
                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
+                HtmlNode wrapperNode = MainParser.GetWrapperNode(rootNode);
                 HtmlNode asideNode = ProfileParser.GetAsideNode(wrapperNode);
                 return asideNode;
             }
@@ -230,7 +230,7 @@ public class TestUserRepository {
             public async Task Parsing_Users_Without_CoverPicture_Works(string username) {
                 Stream stream = await  Repository.Repository.GetStream($"/profile/{username}");
                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
+                HtmlNode wrapperNode = MainParser.GetWrapperNode(rootNode);
                 HtmlNode asideNode = ProfileParser.GetAsideNode(wrapperNode);
                 var e = Record.Exception(() =>
                 {
@@ -257,7 +257,7 @@ public class TestUserRepository {
              public static HtmlNode GetNode(string username) {
                 using Stream stream = GetStream($"Html/{username}.html");
                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                return ProfileParser.GetWrapperNode(rootNode);
+                return MainParser.GetWrapperNode(rootNode);
             }           
              
              private static IEnumerable<object[]> GetUsersWithoutActivities() {
@@ -272,7 +272,7 @@ public class TestUserRepository {
              public async Task Parsing_Users_Without_Activities_Works(string username) {
                  Stream stream = await  Repository.Repository.GetStream($"/profile/{username}");
                  HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                 HtmlNode node = ProfileParser.GetWrapperNode(rootNode);
+                 HtmlNode node = MainParser.GetWrapperNode(rootNode);
                  var testActivities = ProfileParser.ParseUserActivities(node);
                  Assert.Null(testActivities);
              }
@@ -316,7 +316,7 @@ public class TestUserRepository {
             public static HtmlNode GetNode(string username) {
                 using Stream stream = GetStream($"Html/{username}.html");
                 HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
-                HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
+                HtmlNode wrapperNode = MainParser.GetWrapperNode(rootNode);
                 HtmlNode profileHeaderNode = ProfileParser.GetProfileHeaderContainer(wrapperNode);
                 return ProfileParser.GetStatsNode(profileHeaderNode);
             }

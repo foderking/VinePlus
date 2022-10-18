@@ -17,31 +17,6 @@ public static class ProfileParser
     }
 
     /// <summary>
-    /// Gets the first child node at path `html>body>div#site-main>div#wrapper` from the root document node
-    /// </summary>
-    /// <param name="rootNode">The root HTML document node</param>
-    /// <returns></returns>
-    public static HtmlNode GetWrapperNode(HtmlNode rootNode) {
-        return rootNode
-            .FirstDirectDescendant("html")
-            .FirstDirectDescendant("body")
-            .FirstDirectDescendant(
-                "div",
-                div => string.Equals(
-                    div.GetAttributeValue("id", ""),
-                    "site-main", StringComparison.Ordinal
-                )
-            )
-            .FirstDirectDescendant(
-                "div",
-                div => string.Equals(
-                    div.GetAttributeValue("id", ""),
-                    "wrapper", StringComparison.Ordinal
-                )
-            );
-    }
-
-    /// <summary>
     /// Gets the first child node at path `div#js-kubrick-lead>div.profile-header>div.container` from the wrapperNode
     /// </summary>
     /// <param name="wrapperNode">the wrapperNode</param>
@@ -607,7 +582,7 @@ public static class ProfileParser
     public static Profile Parse<T>(HtmlNode rootNode, ILogger<T> logger) {
         Stopwatch timer = Stopwatch.StartNew();
         
-        HtmlNode wrapperNode = GetWrapperNode(rootNode);
+        HtmlNode wrapperNode = MainParser.GetWrapperNode(rootNode);
         
         HtmlNode asideNode = GetAsideNode(wrapperNode);
         

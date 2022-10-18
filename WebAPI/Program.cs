@@ -21,7 +21,9 @@ builder.Services.AddSwaggerGen(
         var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
     });
+        
 builder.Services.AddScoped<IUserRepository<ProfileController>, UserRepository>();
+builder.Services.AddScoped<IForumRepository, ForumRepository>();
 
 
 var app = builder.Build();
