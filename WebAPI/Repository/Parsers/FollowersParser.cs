@@ -35,7 +35,7 @@ public static class FollowersParser
     }
 
     public static FollowersPage Parse<T>(HtmlNode rootNode, int pageNo, ILogger<T> logger) {
-        HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
+        HtmlNode wrapperNode = MainParser.GetWrapperNode(rootNode);
         HtmlNode mainNode = FollowingParser.GetMainNode(wrapperNode);
 
         HtmlNode? navNode = mainNode

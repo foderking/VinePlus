@@ -65,7 +65,7 @@ public class ImageParser
     }
 
     public static async Task<ImagePage> Parse<T>(HtmlNode rootNode, int pageNo, ILogger<T> logger) {
-        HtmlNode wrapperNode = ProfileParser.GetWrapperNode(rootNode);
+        HtmlNode wrapperNode = MainParser.GetWrapperNode(rootNode);
         HtmlNode mainNode = GetMainNode(wrapperNode);
         HtmlNode dataNode = GetDataNode(mainNode);
         string totalImages = ParseTotalImages(wrapperNode);
