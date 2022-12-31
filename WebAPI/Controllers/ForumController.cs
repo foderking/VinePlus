@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models;
 using WebAPI.Repository;
+using WebAPI.Scripts;
 
 namespace WebAPI.Controllers;
 
@@ -27,5 +29,14 @@ public class ForumController : ControllerBase
         catch (HttpRequestException) {
             return NotFound();
         }
+    }
+
+    [HttpGet("scrape")]
+    public async Task<string> Scrape() {
+        Stopwatch watch = new();
+        watch.Start();
+        await ScrapeThreads.Scrape();
+        watch.Stop();
+        return watch.Elapsed.ToString();
     }
 }

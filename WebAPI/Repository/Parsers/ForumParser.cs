@@ -47,6 +47,10 @@ public class ForumParser
             .Split("#")[1]
             .Split("-")[^1];
 
+        string lastPostPage =  lastPostLink
+            .Split("#")[0]
+            .Split("=")[1];
+        
         HtmlNode authorNode = flexNode
             .FirstDirectDescendant(
                 "div",
@@ -146,17 +150,21 @@ public class ForumParser
         ForumThread forumThread = new();
         forumThread.NoViews = int.Parse(views);
         forumThread.NoPost  = int.Parse(posts);
-        forumThread.MostRecentPostNo = int.Parse(lastPostNo);
-        forumThread.MostRecentPostLink = lastPostLink;
+        forumThread.MostRecentPostNo   = int.Parse(lastPostNo);
+        forumThread.MostRecentPostPage = int.Parse(lastPostPage);
         forumThread.DateCreated = DateTime.Parse(dateCreated);
         forumThread.CreatorName = creator;
         forumThread.CreatorLink = creatorLink;
         forumThread.ThreadTitle = type is "Question" or "Answered" ?  threadTitle[3..] : threadTitle;
-        forumThread.ThreadLink = threadLink;
-        forumThread.ThreadType = type;
-        forumThread.BoardName = board;
-        forumThread.BoardLink = boardLink;
+        forumThread.ThreadLink  = threadLink;
+        forumThread.ThreadType  = type;
+        forumThread.BoardName   = board;
+        forumThread.BoardLink   = boardLink;
 
+        forumThread.Id = int.Parse(
+            threadLink
+                .Split("-")[^1][..^1]
+        );
         forumThread.IsLocked = topicNode
             .FirstDirectDescendantOrDefault(
                 "img",
