@@ -58,7 +58,7 @@ public class ForumThread
     // public ComicvineUser? Creator { get; set; }
     public string CreatorName { get; set; }
     
-    public ForumPost[] Posts { get; set; }
+    public List<ForumPost> Posts { get; set; }
 }
 
 // public enum ThreadType

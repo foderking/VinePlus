@@ -94,8 +94,19 @@ public class PostParser
 
         return forumPost;
     }
-    public static ForumPost[]? ParseThreads(HtmlNode forumBlockNode) {
-        return forumBlockNode
+    public static ForumPost[] ParseThreads(HtmlNode forumBlockNode, int id) {
+        bool isEmpty = forumBlockNode
+            .FirstDirectDescendant(
+                "section",
+                div => div.HasClass("forum-messages")
+            )
+            .DirectDescendants(
+                "div",
+                div => div.HasClass("js-message") && div.GetAttributeValue("id", "").Split("-").Length == 3
+            )
+            .Any();
+        
+        return isEmpty ? Array.Empty<ForumPost>() : forumBlockNode
             .FirstDirectDescendant(
                 "section",
                 div => div.HasClass("forum-messages")
@@ -105,26 +116,56 @@ public class PostParser
                 div => div.HasClass("js-message") && div.GetAttributeValue("id", "").Split("-").Length == 3
             )
             .Select(ParsePost)
+            .Select(each =>
+            {
+                each.ThreadId = id;
+                return each;
+            })
             .ToArray();
     }
 
     public static HtmlNode GetForumBlockNode(HtmlNode wrapperNode) {
-        return wrapperNode
-            .FirstDirectDescendant(
-                "div",
-                div => div.GetAttributeValue("id", "") == "forum-content"
-            )
-            .FirstDirectDescendant(
-                "div",
-                div => div.HasClass("three-column--span-two")
-            )
-            .FirstDirectDescendant(
-                "div",
-                div => div.HasClass("js-forum-block")
-            );
+        if (wrapperNode.FirstDirectDescendantOrDefault("div", div => div.GetAttributeValue("id", "") == "forum-content") != null)
+            return wrapperNode
+                .FirstDirectDescendant(
+                    "div",
+                    div => div.GetAttributeValue("id", "") == "forum-content"
+                )
+                .FirstDirectDescendant(
+                    "div",
+                    div => div.HasClass("three-column--span-two")
+                )
+                .FirstDirectDescendant(
+                    "div",
+                    div => div.HasClass("js-forum-block")
+                );
+        else if (wrapperNode.FirstDirectDescendantOrDefault("div", div => div.HasClass("js-toc-generate")) != null)
+            return wrapperNode
+                .FirstDirectDescendant(
+                    "div",
+                    div => div.HasClass("js-toc-generate")
+                )
+                .FirstDirectDescendant(
+                    "div",
+                    div => div.GetAttributeValue("id", "") == "site"
+                )
+                .FirstDirectDescendant(
+                    "div",
+                    div => div.GetAttributeValue("id", "") == "forum-content"
+                )
+                .FirstDirectDescendant(
+                    "div",
+                    div => div.HasClass("primary-content")
+                )
+                .FirstDirectDescendant(
+                    "div",
+                    div => div.HasClass("js-forum-block")
+                );
+        
+        else throw new Exception("Unknown Thread Type");
     }
     
-    public static PostPage Parse<T>(HtmlNode rootNode, int pageNo, ILogger<T> logger) {
+    public static PostPage Parse<T>(HtmlNode rootNode, int pageNo, int id, ILogger<T>? logger) {
         HtmlNode wrapperNode = MainParser.GetWrapperNode(rootNode);
         HtmlNode forumBlockNode = GetForumBlockNode(wrapperNode);
 
@@ -140,7 +181,7 @@ public class PostParser
         
         PostPage postPage = new();
         postPage.PageNo = pageNo;
-        postPage.ForumThreads = ParseThreads(forumBlockNode);
+        postPage.ForumPosts = ParseThreads(forumBlockNode, id);
         
         postPage.TotalPages = paginateNode==null ? 1 : int.Parse(
             paginateNode

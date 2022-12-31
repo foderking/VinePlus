@@ -41,7 +41,8 @@ using (var scope = app.Services.CreateScope()) {
     var service = scope.ServiceProvider;
     string? path = builder.Configuration.GetSection("SeedPath").Value;
 
-    Seed.Initialize(service, path);
+    Seed.InitializeForums(service, path);
+    Seed.InitializePosts(service).Wait();
 }
 var port = Environment.GetEnvironmentVariable("PORT");
 
