@@ -1,7 +1,11 @@
-﻿namespace WebAPI.Database;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WebAPI.Database;
 
 public class ComicvineUser
 {
-    public string Name { get; set; }
+    [Key]
     public string GalleryId { get; set; }
+    public string Name { get; set; }
+    public string Link { get; set; }
 }
