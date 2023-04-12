@@ -1,0 +1,22 @@
+﻿
+## Thread
+- name
+- link
+- creator
+- date created
+- no of posts
+- views
+- content
+- forum
+- no of pages
+- id
+
+## Post
+- creator
+- thread -> Thread
+- link
+- date created
+- content
+- page
+- post number
+- id
