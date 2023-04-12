@@ -1,0 +1,93 @@
+﻿using ComicVine.API.Database;
+
+namespace ComicVine.API.Models;
+
+public class ForumThread
+{
+    public ForumThread(int id, string threadTitle, string threadLink, string boardName, string boardLink, bool isLocked, bool isPinned, string threadType, int mostRecentPostNo, int mostRecentPostPage, DateTime dateCreated, int noPost, int noViews, string creatorLink, string creatorName, List<ForumPost> posts) {
+        Id = id;
+        ThreadTitle = threadTitle;
+        ThreadLink = threadLink;
+        BoardName = boardName;
+        BoardLink = boardLink;
+        IsLocked = isLocked;
+        IsPinned = isPinned;
+        ThreadType = threadType;
+        MostRecentPostNo = mostRecentPostNo;
+        MostRecentPostPage = mostRecentPostPage;
+        DateCreated = dateCreated;
+        NoPost = noPost;
+        NoViews = noViews;
+        CreatorLink = creatorLink;
+        CreatorName = creatorName;
+        Posts = posts;
+    }
+
+    public ForumThread() {
+        
+    }
+
+    /// <summary>
+    /// Unique id of the thread
+    /// </summary>
+    public int Id { get; set; }
+    /// <summary>
+    /// The title of the thread
+    /// </summary>
+    public string ThreadTitle { get; set; }
+    /// <summary>
+    /// Link to the thread
+    /// </summary>
+    public string ThreadLink { get; set; }
+    
+    /// <summary>
+    /// The board the thread was posted to
+    /// </summary>
+    public string BoardName { get; set; }
+    /// <summary>
+    /// Link to the board the thread was posted to
+    /// </summary>
+    public string BoardLink { get; set; }
+    
+    public bool IsLocked { get; set; }
+    public bool IsPinned { get; set; }
+    // public bool IsAnswered { get; set; }
+    
+    /// <summary>
+    /// Type of thread - Normal, Poll, Blog 
+    /// </summary>
+    public string ThreadType { get; set; }
+    
+    /// <summary>
+    /// Serial number of the most recent post on the thread
+    /// </summary>
+    public int MostRecentPostNo { get; set; }
+    public int MostRecentPostPage { get; set; }
+    
+    /// <summary>
+    /// The date the thread was created
+    /// </summary>
+    public DateTime DateCreated { get; set; }
+    
+    /// <summary>
+    /// The number of post to the thread
+    /// </summary>
+    public int NoPost { get; set; }
+    
+    public int NoViews { get; set; }
+    
+    public string CreatorLink { get; set; }
+    /////////////////////////
+    // public ComicvineUser? Creator { get; set; }
+    public string CreatorName { get; set; }
+    
+    public List<ForumPost> Posts { get; set; }
+}
+
+// public enum ThreadType
+// {
+//     Normal,
+//     Poll,
+//     Question,
+//     Blog
+// }

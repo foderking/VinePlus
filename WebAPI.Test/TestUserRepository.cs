@@ -1,8 +1,8 @@
 using HtmlAgilityPack;
-using WebAPI.Controllers;
-using WebAPI.Models;
-using WebAPI.Repository;
-using WebAPI.Repository.Parsers;
+using ComicVine.API.Controllers;
+using ComicVine.API.Models;
+using ComicVine.API.Repository;
+using ComicVine.API.Repository.Parsers;
 using Xunit.Abstractions;
 
 namespace WebAPI.Test;
