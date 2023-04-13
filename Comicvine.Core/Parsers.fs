@@ -1,6 +1,7 @@
 ﻿
 namespace Comicvine.Core
 open System
+open FSharp.Control
 open HtmlAgilityPack
 open Microsoft.FSharp.Core
 
@@ -260,3 +261,29 @@ module Parsers =
                 | ThreadPost.OP(n) ->
                     { IsComment = false; Comment = Unchecked.defaultof<_> ; OP = n }
         )
+        
+    let parseAllPosts (path: string) page = taskSeq {
+        let id  = path.Split("-") |> Seq.last |> (fun x -> x.Split("/")[0]) |> int
+        let! stream = Net.getStreamByPage page path 
+        let node = stream |> Net.getRootNode
+        let last = parsePostEnd node
+        yield ParsePosts id node
+        
+        for p in [2..last] do
+            printfn "%A" p
+            let! s= Net.getStreamByPage p path 
+            yield s
+                |> Net.getRootNode
+                |> ParsePosts id
+    }
+    
+    let parseA path page =
+        
+        let foldPost state curr =
+            [curr] |> Seq.ofList |> Seq.append state
+            
+        parseAllPosts path page
+        |> TaskSeq.map (fun x -> x |> TaskSeq.ofSeq)
+        |> TaskSeq.concat
+        |> TaskSeq.fold foldPost (Seq.ofList [])
+        

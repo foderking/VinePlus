@@ -39,11 +39,12 @@ public class PostRepository: IPostRepository
         // }
     }
 
-    public async Task<IEnumerable<Comicvine.Core.Parsers.Post>> GetPost(string path) {
+    public Task<IEnumerable<Comicvine.Core.Parsers.Post>> GetPost(string path) {
 
-        await using Stream stream = await Repository.GetStream(path);
-        int id = int.Parse(path.Split("-").Last().Split('/')[0]);
-        HtmlNode rootNode = Repository.GetRootNode(stream);
-        return Comicvine.Core.Parsers.ParsePosts(id, rootNode);
+        // await using Stream stream = await Repository.GetStream(path);
+        // int id = int.Parse(path.Split("-").Last().Split('/')[0]);
+        // Comicvine.Core.Parsers.parseAllPosts(path, page)
+        // HtmlNode rootNode = Repository.GetRootNode(stream);
+        return Comicvine.Core.Parsers.parseA(path, 1);
     }
 }
