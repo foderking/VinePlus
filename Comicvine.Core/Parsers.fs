@@ -5,8 +5,8 @@ open HtmlAgilityPack
 open Microsoft.FSharp.Core
 
 module Parsers =
-    type CommentContent = string
-    type OPContent = string
+    // type CommentContent = string
+    // type OPContent = string
     
     type Alignment =
         | None    = 1
@@ -28,12 +28,14 @@ module Parsers =
         // { Name: string; Link: string; AvatarUrl: string }
     type ThreadComments =
         { Id: int; PostNo: int; Creator: Link; IsEdited: bool
-          Created: DateTime; Content: CommentContent; ThreadId: int }
+          Created: DateTime; Content: string; ThreadId: int }
     type ThreadOP =
-        { Creator: Link; IsEdited: bool; Created: DateTime; Content: OPContent; ThreadId: int }
+        { Creator: Link; IsEdited: bool; Created: DateTime; Content: string; ThreadId: int }
     type ThreadPost =
         | Comment of ThreadComments
         | OP      of ThreadOP
+    type Post =
+        { IsComment: bool; Comment: ThreadComments; OP: ThreadOP }
     type ThreadOverview =
         { Id: int; Thread: Link; Board: Link; IsPinned: bool; IsLocked: bool;
           Type: ThreadType; LastPostNo: int; LastPostPage: int; Created: DateTime;
@@ -134,7 +136,9 @@ module Parsers =
         |> _getChildElements (_classPredicate "profile-blog") "article"
         |> Seq.map parse
    
-    let ParseComments threadId (rootNode: HtmlNode) =
+        
+        
+    let parsePosts threadId (rootNode: HtmlNode) =
         let getForumBlockNode wrapperNode =
             if Option.isSome (_getFirstChildIfAny (_idPredicate "forum-content") "div" wrapperNode) then
                 wrapperNode
@@ -209,3 +213,12 @@ module Parsers =
                         { ThreadId = threadId; Content = content; Created = created; IsEdited = edited; Creator = creator }
                         |> ThreadPost.OP
                 )
+    let ParsePosts threadId rootNode =
+        parsePosts threadId rootNode
+        |> Seq.map (fun node ->
+            match node with
+            | ThreadPost.Comment(n) ->
+                { IsComment = true ; Comment = n; OP = Unchecked.defaultof<_> }
+            | ThreadPost.OP(n) ->
+                { IsComment = false; Comment = Unchecked.defaultof<_> ; OP = n }
+        )

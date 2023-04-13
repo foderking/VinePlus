@@ -9,6 +9,7 @@ namespace ComicVine.API.Repository;
 public interface IPostRepository
 {
     public Task<PostPage> GetPostPage(string path, int pageNo, ILogger<PostController> logger);
+    public Task<IEnumerable<Comicvine.Core.Parsers.Post>> GetPost(string path);
 }
 
 public class PostRepository: IPostRepository
@@ -36,5 +37,13 @@ public class PostRepository: IPostRepository
         //     Console.WriteLine("Error: {0} in {1}", e.Message,path);
         //     return await GetPostPage(path, pageNo, logger);
         // }
+    }
+
+    public async Task<IEnumerable<Comicvine.Core.Parsers.Post>> GetPost(string path) {
+
+        await using Stream stream = await Repository.GetStream(path);
+        int id = int.Parse(path.Split("-").Last().Split('/')[0]);
+        HtmlNode rootNode = Repository.GetRootNode(stream);
+        return Comicvine.Core.Parsers.ParsePosts(id, rootNode);
     }
 }

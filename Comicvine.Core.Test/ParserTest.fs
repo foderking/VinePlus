@@ -12,42 +12,42 @@ let makeRequest (path: string) =
         return! client.GetStringAsync(path)
     }
     
-let tryTask f x =
-    fun _ -> f x |> printfn "%A"
+// let tryTask f x =
+//     fun _ -> f x |> printfn "%A"
    
 let getNodeFromPath path = task {
     let! stream = Main.getStream path
     return Main.getRootNode stream
 }
 
-let inline testShouldNotThrow parser path = task {
-    let! node = getNodeFromPath path
-    
-    let ex = Record.Exception(fun () ->
-        parser node
-        |> ignore
-    )
-    Assert.Null(ex)
-}
-
-module Helpers =
-    [<Fact>]
-    let ``function raising exception should fail "testShouldNotThrow" helper`` () =
-        let f _ =
-            raise (Exception("bla"))
-        // let ex = Record.Exception(
-        //     testShouldNotThrow f ""
-        // )
-        Assert.ThrowsAsync<Xunit.Sdk.NullException>(
-            fun () ->
-                testShouldNotThrow f ""
-        )
-    
+// let inline testShouldNotThrow parser path = task {
+//     let! node = getNodeFromPath path
+//     
+//     let ex = Record.Exception(fun () ->
+//         parser node
+//         |> ignore
+//     )
+//     Assert.Null(ex)
+// }
+//
+// module Helpers =
+//     [<Fact>]
+//     let ``function raising exception should fail "testShouldNotThrow" helper`` () =
+//         let f _ =
+//             raise (Exception("bla"))
+//         // let ex = Record.Exception(
+//         //     testShouldNotThrow f ""
+//         // )
+//         Assert.ThrowsAsync<Xunit.Sdk.NullException>(
+//             fun () ->
+//                 testShouldNotThrow f ""
+//         )
+//     
 
 module BlogParser =
-    [<Fact>]
-    let ``parsing a valid blog should not fail`` () =
-        testShouldNotThrow Parsers.ParseBlog "/profile/saboyaba/blog"
+    // [<Fact>]
+    // let ``parsing a valid blog should not fail`` () =
+    //     testShouldNotThrow Parsers.ParseBlog "/profile/saboyaba/blog"
         
     [<Fact>]
     let ``valid blog should not be empty sequence``() = task {
@@ -56,7 +56,7 @@ module BlogParser =
     }
         
 
-module CommentParser =
+module PostParser =
     // [<Fact>]
     // let ``parsing valid thread with comments should not fail``() = task {
     //     let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
@@ -81,14 +81,14 @@ module CommentParser =
     [<Fact>]
     let ``valid comments should not be empty``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.ParseComments 2300312 node
+        let j = Parsers.parsePosts 2300312 node
         Assert.NotEmpty j
     }
     
     [<Fact>]
     let ``should correctly show edited posts exists``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.ParseComments 2300312 node
+        let j = Parsers.parsePosts 2300312 node
                 |> Seq.map (fun e ->
                     match e with
                     | Parsers.ThreadPost.OP(n) -> n.IsEdited
@@ -100,7 +100,7 @@ module CommentParser =
     [<Fact>]
     let ``date created for each post should be unique``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.ParseComments 2300312 node
+        let j = Parsers.parsePosts 2300312 node
         let k = j
                 |> Seq.map (fun e ->
                     match e with
@@ -115,7 +115,7 @@ module CommentParser =
     [<Fact>]
     let ``"ThreadId" value should be correct and the same``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.ParseComments 2300312 node
+        let j = Parsers.parsePosts 2300312 node
         let k = j
                 |> Seq.map (fun e ->
                     match e with
@@ -130,7 +130,7 @@ module CommentParser =
     [<Fact>]
     let ``content of each post should not be empty``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.ParseComments 2300312 node
+        let j = Parsers.parsePosts 2300312 node
         let k = j
                 |> Seq.map (fun e ->
                     match e with
@@ -145,7 +145,7 @@ module CommentParser =
     [<Fact>]
     let ``creator details should not be empty``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.ParseComments 2300312 node
+        let j = Parsers.parsePosts 2300312 node
         let k = j
                 |> Seq.map (fun e ->
                     match e with
@@ -160,7 +160,7 @@ module CommentParser =
     [<Fact>]
     let ``comment ids should be distinct``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.ParseComments 2300312 node
+        let j = Parsers.parsePosts 2300312 node
                 |> Seq.map (fun e ->
                     match e with
                     | Parsers.ThreadPost.OP _ -> None
@@ -177,7 +177,7 @@ module CommentParser =
     [<Fact>]
     let ``"PostNo" should be distinct``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.ParseComments 2300312 node
+        let j = Parsers.parsePosts 2300312 node
                 |> Seq.map (fun e ->
                     match e with
                     | Parsers.ThreadPost.OP _ -> None
