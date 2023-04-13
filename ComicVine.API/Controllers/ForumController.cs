@@ -31,12 +31,12 @@ public class ForumController : ControllerBase
         }
     }
 
-    [HttpGet("scrape")]
-    public async Task<string> Scrape() {
-        Stopwatch watch = new();
-        watch.Start();
-        await ScrapeThreads.Scrape();
-        watch.Stop();
-        return watch.Elapsed.ToString();
-    }
+    // [HttpGet("scrape")]
+    // public async Task<string> Scrape() {
+    //     Stopwatch watch = new();
+    //     watch.Start();
+    //     await ScrapeThreads.Scrape();
+    //     watch.Stop();
+    //     return watch.Elapsed.ToString();
+    // }
 }
