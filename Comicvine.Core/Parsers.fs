@@ -24,8 +24,8 @@ module Parsers =
         { Blog: Link; Created: DateTime; Comments: int }
     type About =
         { DateJoined: DateTime;  Alignment: Alignment; Points: int; Summary: string }
-    // type FollowRelationship =
-        // { Name: string; Link: string; AvatarUrl: string }
+    type FollowRelationship =
+        { FollowRelationship: Link; AvatarUrl: string }
     type ThreadComments =
         { Id: int; PostNo: int; Creator: Link; IsEdited: bool
           Created: DateTime; Content: string; ThreadId: int }
@@ -136,7 +136,6 @@ module Parsers =
         |> _getChildElements (_classPredicate "profile-blog") "article"
         |> Seq.map parse
    
-        
         
     let parsePosts threadId (rootNode: HtmlNode) =
         let getForumBlockNode wrapperNode =
