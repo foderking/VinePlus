@@ -24,8 +24,8 @@ module Parsers =
         { Blog: Link; Created: DateTime; Comments: int }
     type About =
         { DateJoined: DateTime;  Alignment: Alignment; Points: int; Summary: string }
-    type FollowRelationship =
-        { Name: string; Link: string; AvatarUrl: string }
+    // type FollowRelationship =
+        // { Name: string; Link: string; AvatarUrl: string }
     type ThreadComments =
         { Id: int; PostNo: int; Creator: Link; IsEdited: bool
           Created: DateTime; Content: CommentContent; ThreadId: int }
@@ -152,8 +152,8 @@ module Parsers =
                 None
         
         match rootNode |> getWrapperNode |> getForumBlockNode with
-              | Some(node) -> node
-              | None -> raise (Exception("Unknown thread type"))
+        | Some(node) -> node
+        | None -> raise (Exception("Unknown thread type"))
         |> _getFirstChildElement (_classPredicate "js-forum-block") "div"
         |> _getFirstChildElement (_classPredicate "forum-messages") "section"
         |> _getChildElements (_classPredicate "js-message") "div"
@@ -163,77 +163,49 @@ module Parsers =
                                      |> _getFirstChildElement (_classPredicate "message-wrap") "div"
                                      |> _getFirstChildElement (_classPredicate "message-inner") "div"
                                      
-                    if messageNode
-                             |> _getFirstChildElement (_classPredicate "message-title") "div"
-                             |> _getChildElements (fun n -> n.Attributes.Contains("name")) "a"
-                             |> Seq.exists (fun _ -> true)
-                    then
-                        {
-                            Id = messageNode
+                    let edited = messageNode
                                  |> _getFirstChildElement (_classPredicate "message-title") "div"
-                                 |> _getFirstChildElement (fun n -> n.Attributes.Contains("name")) "a"
-                                 |> _getAttrib "name"
-                                 |> (fun x -> x.Split("-")[x.Length - 1])
-                                 |> int
-                            PostNo = messageNode
-                                     |> _getFirstChildElement (_classPredicate "message-title") "div"
-                                     |> _getFirstChildElement (fun n -> n.Attributes.Contains("name")) "a"
-                                     |> (fun x -> x.InnerText.Trim()[1..])
-                                     |> int
-                            IsEdited = messageNode
-                                     |> _getFirstChildElement (_classPredicate "message-title") "div"
-                                     |> (fun x -> x.InnerText.Contains("Edited By"))
-                        
-                            Creator = {
-                                Link = messageNode
-                                        |> _getFirstChildElement (_classPredicate "message-title") "div"
-                                        |> _getFirstChildElement (_classPredicate "message-user") "a"
-                                        |> _getAttrib "data-user-profile"
-                                Text = messageNode
-                                        |> _getFirstChildElement (_classPredicate "message-title") "div"
-                                        |> _getFirstChildElement (_classPredicate "message-user") "a"
-                                        |> (fun x -> x.InnerText.Trim())
-                            }
-                            Created = messageNode
-                                      |> _getFirstChildElement (_classPredicate "message-options") "div"
-                                      |> _getFirstChildElement (_classPredicate "date") "div"
-                                      |> _getAttrib "datetime"
-                                      |> DateTime.Parse
-                            Content = messageNode
-                                      |> _getFirstChildElement (_classPredicate "message-title") "div"
-                                      |> _getFirstChildElement (_classPredicate "message-content") "article"
-                                      |> (fun x -> x.InnerHtml)
-                            ThreadId = threadId
+                                 |> (fun x -> x.InnerText.Contains("Edited By"))
+                    let created = messageNode
+                                  |> _getFirstChildElement (_classPredicate "message-options") "div"
+                                  |> _getFirstChildElement (_classPredicate "date") "time"
+                                  |> _getAttrib "datetime"
+                                  |> DateTime.Parse
+                    let content = messageNode
+                                  |> _getFirstChildElement (_classPredicate "message-content") "article"
+                                  |> (fun x -> x.InnerHtml)
+                    let creator = {
+                        Link = messageNode
+                                |> _getFirstChildElement (_classPredicate "message-title") "div"
+                                |> _getFirstChildElement (_classPredicate "message-user") "a"
+                                |> _getAttrib "data-user-profile"
+                        Text = messageNode
+                                |> _getFirstChildElement (_classPredicate "message-title") "div"
+                                |> _getFirstChildElement (_classPredicate "message-user") "a"
+                                |> (fun x -> x.InnerText.Trim())
+                    }
+                    
+                    if messageNode
+                        |> _getFirstChildElement (_classPredicate "message-title") "div"
+                        |> _getChildElements (fun n -> n.Attributes.Contains("name")) "a"
+                        |> Seq.exists (fun _ -> true)
+                    then
+                        { ThreadId = threadId; Content = content; Created = created; IsEdited = edited; Creator = creator
+                          Id = messageNode
+                             |> _getFirstChildElement (_classPredicate "message-title") "div"
+                             |> _getFirstChildElement (fun n -> n.Attributes.Contains("name")) "a"
+                             |> _getAttrib "name"
+                             |> (fun x -> x.Split("-"))
+                             |> Seq.last
+                             |> int;
+                          PostNo = messageNode
+                                    |> _getFirstChildElement (_classPredicate "message-title") "div"
+                                    |> _getFirstChildElement (fun n -> n.Attributes.Contains("name")) "a"
+                                    |> (fun x -> x.InnerText.Trim()[1..])
+                                    |> int  
                         }
                         |> ThreadPost.Comment
                     else
-                        // {
-                        //     IsEdited = messageNode
-                        //              |> _getFirstChildElement (_classPredicate "message-title") "div"
-                        //              |> (fun x -> x.InnerText.Contains("Edited By"))
-                        //
-                        //     Creator = {
-                        //         Link = messageNode
-                        //                 |> _getFirstChildElement (_classPredicate "message-title") "div"
-                        //                 |> _getFirstChildElement (_classPredicate "message-user") "a"
-                        //                 |> _getAttrib "data-user-profile"
-                        //         Text = messageNode
-                        //                 |> _getFirstChildElement (_classPredicate "message-title") "div"
-                        //                 |> _getFirstChildElement (_classPredicate "message-user") "a"
-                        //                 |> (fun x -> x.InnerText.Trim())
-                        //     }
-                        //     Created = messageNode
-                        //               |> _getFirstChildElement (_classPredicate "message-options") "div"
-                        //               |> _getFirstChildElement (_classPredicate "date") "div"
-                        //               |> _getAttrib "datetime"
-                        //               |> DateTime.Parse
-                        //     Content = messageNode
-                        //               |> _getFirstChildElement (_classPredicate "message-title") "div"
-                        //               |> _getFirstChildElement (_classPredicate "message-content") "article"
-                        //               |> (fun x -> x.InnerHtml)
-                        //     ThreadId = threadId
-                        // }
-                        
-                        { ThreadId = threadId; Content = ""; Created = DateTime.Now; IsEdited = true; Creator = {Text =""; Link=""} }
+                        { ThreadId = threadId; Content = content; Created = created; IsEdited = edited; Creator = creator }
                         |> ThreadPost.OP
                 )
