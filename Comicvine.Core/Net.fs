@@ -4,9 +4,10 @@ open System
 open System.Collections.Generic
 open System.IO
 open System.Net.Http
+open FSharp.Control
 open HtmlAgilityPack
 
-    module Main = 
+    module Net = 
         let getStreamWithParam (query: Dictionary<string,string>) (path: string) = task {
             use querystring = new FormUrlEncodedContent(query)
             let q = querystring.ReadAsStringAsync()
@@ -18,8 +19,27 @@ open HtmlAgilityPack
         
         let getStream = getStreamWithParam (Dictionary<string, string>())
         
+        let getStreamByPage (page: int) =
+            getStreamWithParam (Dictionary[KeyValuePair("page", page |> string)])
         
         let getRootNode(htmlStream: Stream) =
             let rootNode = HtmlDocument()
             rootNode.Load(htmlStream)
             rootNode.DocumentNode
+
+        let parseAllGeneric parseStream parserData parseEnd (path: string) (page: int) = taskSeq {
+            let! stream = parseStream page path 
+            let node = stream |> getRootNode
+            let last = parseEnd node
+            yield parserData node
+            
+            for page in 2..last do
+                let! stream = parseStream page path 
+                yield stream
+                    |> getRootNode
+                    |> parserData
+        }
+        
+        
+        // let parseAllPosts =
+        //     parseAllGeneric getStreamByPage Parsers.parsePosts Parser
