@@ -15,11 +15,11 @@ class Forum
 public static class ScrapeThreads
 {
     public static async Task<ForumThread[]> GetThreads(int pageNo) {
-        await using Stream stream = await Repository.Repository.GetStream($"/forums", new ( new []
+        await using Stream stream = await Repository.GetStream($"/forums", new ( new []
         {
             new KeyValuePair<string, string>("page", pageNo.ToString())
         }) );
-        HtmlNode rootNode = Repository.Repository.GetRootNode(stream);
+        HtmlNode rootNode = Repository.GetRootNode(stream);
         HtmlNode wrapperNode = MainParser.GetWrapperNode(rootNode);
         return ForumParser.ParseThreads(wrapperNode)!;
     }

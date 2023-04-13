@@ -5,6 +5,11 @@ using HtmlAgilityPack;
 
 namespace ComicVine.API.Repository;
 
+public interface IForumRepository
+{
+    public Task<ForumPage> GetForumPage(int pageNo, ILogger<ForumController> logger);
+}
+
 public class ForumRepository : IForumRepository
 {
     public async Task<ForumPage> GetForumPage(int pageNo, ILogger<ForumController>? logger = null) {
