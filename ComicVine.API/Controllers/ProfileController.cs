@@ -1,5 +1,6 @@
 ﻿using ComicVine.API.Models;
 using ComicVine.API.Repository;
+using Comicvine.Core;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ComicVine.API.Controllers;
@@ -80,10 +81,20 @@ public class ProfileController: ControllerBase
     /// <param name="username"></param>
     /// <param name="pageNo">the page number</param>
     /// <returns></returns>
+    // [HttpGet("{username}/blog")]
+    // public async Task<ActionResult<BlogPage>> GetBlog(string username, [FromQuery(Name = "page")] int pageNo) {
+    //     try {
+    //         BlogPage blogPage = await _userRepository.GetUserBlog(username, Math.Max(pageNo, 1), _logger);
+    //         return Ok(blogPage);
+    //     }
+    //     catch (HttpRequestException) {
+    //         return NotFound();
+    //     }
+    // }
     [HttpGet("{username}/blog")]
-    public async Task<ActionResult<BlogPage>> GetBlog(string username, [FromQuery(Name = "page")] int pageNo) {
+    public async Task<ActionResult<Parsers.Blog>> GetBlog(string username) {
         try {
-            BlogPage blogPage = await _userRepository.GetUserBlog(username, Math.Max(pageNo, 1), _logger);
+            var blogPage = await _userRepository.GetBlog(username);
             return Ok(blogPage);
         }
         catch (HttpRequestException) {

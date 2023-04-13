@@ -27,4 +27,8 @@
       <Folder Include="wwwrooot\images" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Comicvine.Core\Comicvine.Core.fsproj" />
+    </ItemGroup>
+
 </Project>

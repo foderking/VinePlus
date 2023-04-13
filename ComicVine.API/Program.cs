@@ -38,14 +38,14 @@ builder.Services.AddDbContext<ForumContext>(o => o.UseNpgsql(connectionString));
 var app = builder.Build();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-using (var scope = app.Services.CreateScope()) {
-    var service = scope.ServiceProvider;
-    string? path = builder.Configuration.GetSection("SeedPath").Value;
+// using (var scope = app.Services.CreateScope()) {
+//     var service = scope.ServiceProvider;
+//     string? path = builder.Configuration.GetSection("SeedPath").Value;
 
-    Seed.InitializeForums(service);
+    // Seed.InitializeForums(service);
     // Seed.InitializeForums(service, path);
     // Seed.InitializePosts(service).Wait();
-}
+// }
 var port = Environment.GetEnvironmentVariable("PORT");
 
 if (!string.IsNullOrWhiteSpace(port)) {

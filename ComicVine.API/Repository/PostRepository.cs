@@ -6,6 +6,11 @@ using HtmlAgilityPack;
 
 namespace ComicVine.API.Repository;
 
+public interface IPostRepository
+{
+    public Task<PostPage> GetPostPage(string path, int pageNo, ILogger<PostController> logger);
+}
+
 public class PostRepository: IPostRepository
 {
 
