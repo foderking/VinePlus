@@ -1,5 +1,6 @@
 ﻿using ComicVine.API.Models;
 using ComicVine.API.Repository;
+using Comicvine.Core;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ComicVine.API.Controllers;
@@ -19,10 +20,10 @@ public class PostController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<PostPage>> GetPage([FromQuery(Name = "page")] int pageNo, [FromQuery(Name = "threadPath")] string path) {
+    public async Task<ActionResult<Parsers.Post>> GetPage([FromQuery(Name = "page")] int pageNo, [FromQuery(Name = "threadPath")] string path) {
         try {
-            PostPage postPage = await _postRepo.GetPostPage(path, Math.Max(1, pageNo), _logger);
-            return postPage;
+            var postPage = await _postRepo.GetPost(path);
+            return Ok(postPage);
         }
         catch (HttpRequestException) {
             return NotFound();
