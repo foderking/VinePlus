@@ -10,11 +10,13 @@ open HtmlAgilityPack
     module Net = 
         let getStreamWithParam (query: Dictionary<string,string>) (path: string) = task {
             use querystring = new FormUrlEncodedContent(query)
-            let q = querystring.ReadAsStringAsync()
+            let! q = querystring.ReadAsStringAsync()
+            // printfn "%A" q.Result
             
             let client = new HttpClient()
             client.BaseAddress <- Uri("https://comicvine.gamespot.com")
             return! client.GetStreamAsync($"{path}?{q}");
+            // return! client.GetStreamAsync("/forums/battles-7/kotor-sith-lords-vs-cw-sith-lords-1631389/?page=2");
         }
         
         let getStream = getStreamWithParam (Dictionary<string, string>())
@@ -40,6 +42,3 @@ open HtmlAgilityPack
                     |> parserData
         }
         
-        
-        // let parseAllPosts =
-        //     parseAllGeneric getStreamByPage Parsers.parsePosts Parser
