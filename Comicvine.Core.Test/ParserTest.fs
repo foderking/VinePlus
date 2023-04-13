@@ -16,8 +16,8 @@ let makeRequest (path: string) =
 //     fun _ -> f x |> printfn "%A"
    
 let getNodeFromPath path = task {
-    let! stream = Main.getStream path
-    return Main.getRootNode stream
+    let! stream = Net.getStream path
+    return Net.getRootNode stream
 }
 
 // let inline testShouldNotThrow parser path = task {
@@ -57,26 +57,15 @@ module BlogParser =
         
 
 module PostParser =
-    // [<Fact>]
-    // let ``parsing valid thread with comments should not fail``() = task {
-    //     let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-    //     // let ex = Record.Exception(
-    //     //     fun () ->
-    //             // testShouldNotThrow (Parsers.ParseComments 2300312) "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-    //             // raise (Exception("adssfafd"))
-    //             //
-    //     Parsers.ParseComments 2300312 node
-    //     |> Seq.map( fun e ->
-    //         match e with
-    //         | ThreadPost.OP(z) -> z.Created
-    //         | ThreadPost.Comment(z) -> z.Created
-    //     )
-    //     |> printf "%A"
-    //     // )
-    //     // printf "%A" (Parsers.ParseComments 2300312 node)
-    //     // Assert.Null(ex)
-    //     Assert.True(true)
-    // }
+    [<Fact>]
+    let ``parsing no of pages in thread works correctly``() = task {
+        let! node = getNodeFromPath "/forums/gen-discussion-1/site-rules-and-faqs-669033/"
+        Assert.Equal(Parsers.parsePostEnd node, 1)
+        let! node = getNodeFromPath "/forums/bug-reporting-2/important-new-bug-reporting-procedure-2052355/"
+        Assert.Equal(Parsers.parsePostEnd node, 6)
+        let! node = getNodeFromPath "/forums/battles-7/mcu-thor-iw-vs-lord-boros-opm-1946556/"
+        Assert.Equal(Parsers.parsePostEnd node, 7)
+    }
 
     [<Fact>]
     let ``valid comments should not be empty``() = task {
