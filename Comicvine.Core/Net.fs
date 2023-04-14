@@ -21,8 +21,8 @@ open HtmlAgilityPack
         
         let getStream = getStreamWithParam (Dictionary<string, string>())
         
-        let getStreamByPage (page: int) =
-            getStreamWithParam (Dictionary[KeyValuePair("page", page |> string)])
+        let getStreamByPage (page: int) path =
+            getStreamWithParam (Dictionary[KeyValuePair("page", page |> string)]) path 
         
         let getRootNode(htmlStream: Stream) =
             let rootNode = HtmlDocument()
