@@ -28,21 +28,37 @@ let getNodeFromPath path = task {
     let! stream = Net.getStream path
     return Net.getRootNode stream
 }
+let usersWithBlog: obj[] list =
+    [
+        [|"owie"|]
+        [|"death4bunnies"|]
+        [|"sc"|]
+        [|"cbishop"|]
+    ]
 
-module BlogParser =
-    let usersWithBlog: obj[] list =
-        [
-            [|"owie"|]
-            [|"death4bunnies"|]
-            [|"sc"|]
-            [|"cbishop"|]
-        ]
+module BlogEndParer =
+    [<Fact>]
+    let ``number of pages returned should not be more than amount known``() = task {
+        let! node = getNodeFromPath $"/profile/owie/blog"
+        let no = Parsers.parseBlogEnd node
+        Assert.True(no >= 4)
+        let! node = getNodeFromPath $"/profile/death4bunnies/blog"
+        let no = Parsers.parseBlogEnd node
+        Assert.True(no >= 2)
+        let! node = getNodeFromPath $"/profile/sc/blog"
+        let no = Parsers.parseBlogEnd node
+        Assert.True(no >= 2)
+        let! node = getNodeFromPath $"/profile/cbishop/blog"
+        let no = Parsers.parseBlogEnd node
+        Assert.True(no >= 88)
+    }
     
+module BlogParser =
     [<Theory>]
     [<MemberData(nameof(usersWithBlog))>]
     let ``valid blog should not be empty sequence``(username: string) = task {
         let! node = getNodeFromPath $"/profile/{username}/blog"
-        let j = Parsers.ParseBlog node
+        let j = Parsers.parseBlog node
         Assert.NotEmpty j
     }
     
@@ -50,7 +66,7 @@ module BlogParser =
     [<MemberData(nameof(usersWithBlog))>]
     let ``created dates should be unique``(username: string) = task {
         let! node = getNodeFromPath $"/profile/{username}/blog"
-        let j = Parsers.ParseBlog node
+        let j = Parsers.parseBlog node
         let k = j |> Seq.distinctBy (fun x -> x.Created)
         Assert.Equal(j |> Seq.length, k |> Seq.length)
     }
@@ -59,7 +75,7 @@ module BlogParser =
     [<MemberData(nameof(usersWithBlog))>]
     let ``blog id should be unique``(username: string) = task {
         let! node = getNodeFromPath $"/profile/{username}/blog"
-        let j = Parsers.ParseBlog node
+        let j = Parsers.parseBlog node
         let k = j |> Seq.distinctBy (fun x -> x.Id)
         Assert.Equal(j |> Seq.length, k |> Seq.length)
     }
@@ -68,7 +84,7 @@ module BlogParser =
     [<MemberData(nameof(usersWithBlog))>]
     let ``threadids that are not null should be unique``(username: string) = task {
         let! node = getNodeFromPath $"/profile/{username}/blog"
-        let j = Parsers.ParseBlog node |> Seq.filter (fun x -> x.ThreadId.HasValue)
+        let j = Parsers.parseBlog node |> Seq.filter (fun x -> x.ThreadId.HasValue)
         let k = j |> Seq.distinctBy (fun x -> x.ThreadId.Value)
         Assert.Equal(j |> Seq.length, k |> Seq.length)
     }
@@ -82,7 +98,7 @@ module BlogParser =
     [<MemberData(nameof(usersWithBlog))>]
     let ``"Blog.Text" should satisfy invariant with "Blog.Link"``(username: string) = task {
         let! node = getNodeFromPath $"/profile/{username}/blog"
-        let j = Parsers.ParseBlog node
+        let j = Parsers.parseBlog node
         j
         |> Seq.iter (
             fun x ->
@@ -294,7 +310,8 @@ module ThreadParser =
         Parsers.parseThread node
         |> Seq.iter (
             fun x ->
-                Assert.True(x.Thread.Link.StartsWith("/forums/"))
+                Assert.True(x.Thread.Link.StartsWith("/"))
+                Assert.True(x.Thread.Link.EndsWith("/"))
         )
     }
     
@@ -307,6 +324,7 @@ module ThreadParser =
                 Assert.True(x.Thread.Text.Length > 1)
         )
     }
+    
  module ThreadEndParser =
     [<Fact>]
     let ``parsing no of threads works correctly``() = task {

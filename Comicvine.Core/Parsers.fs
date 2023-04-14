@@ -124,9 +124,84 @@ module Parsers =
     
     type IParsable<'T> =
         abstract member ParseData: HtmlNode -> 'T
+   
+    let parseAllData parseData parseEnd (path: string) page = taskSeq {
+        let! stream = Net.getStreamByPage page path 
+        let node = stream |> Net.getRootNode
+        let last = parseEnd node
+        yield parseData node
+        
+        for p in [2..last] do
+            let! s = Net.getStreamByPage p path 
+            yield s
+                |> Net.getRootNode
+                |> parseData
+    }
+ 
+    let _unwrapSome message opt =
+        match opt with
+        | Some x -> x
+        | None ->  raise (Exception(message))
         
         
-    let ParseBlog (rootNode: HtmlNode) =
+    let _getForumBlockNode wrapperNode =
+        if Option.isSome (_getFirstChildIfAny (_idPredicate "forum-content") "div" wrapperNode) then
+            wrapperNode
+            |> _getFirstChildElement (_idPredicate "forum-content") "div"
+            |> _getFirstChildElement (_classPredicate "three-column--span-two") "div"
+            |> Some
+        elif Option.isSome (_getFirstChildIfAny (_classPredicate "js-toc-generate") "div" wrapperNode) then
+            wrapperNode
+            |> _getFirstChildElement (_classPredicate "js-toc-generate") "div"
+            |> _getFirstChildElement (_idPredicate "site") "div"
+            |> _getFirstChildElement (_idPredicate "forum-content") "div"
+            |> _getFirstChildElement (_classPredicate "primary-content") "div"
+            |> Some
+        else
+            None
+            
+    let parsePageEnd rootNode =
+        match rootNode
+            |> getWrapperNode
+            |> _getForumBlockNode
+            |> _unwrapSome "Unknown Thread type"
+            |> _getFirstChildElement (_classPredicate "forum-bar") "div"
+            |> _getFirstChildIfAny (_classPredicate "paginate") "ul" with
+        | Some(x) ->
+            x
+            |> _getChildElements (_attribPredicate "class" "paginate__item") "li"
+            |> Seq.map (fun a -> a.InnerText.Trim())
+            |> Seq.last
+            |> int
+        | None -> 1
+        
+    let unwrapTaskSeq t =
+        let _folder state curr =
+            Seq.append state [curr]
+        t
+        |> TaskSeq.map (fun x -> x |> TaskSeq.ofSeq)
+        |> TaskSeq.concat 
+        |> TaskSeq.fold _folder (Seq.ofList [])
+         
+        
+    let parseBlogEnd (rootNode: HtmlNode) =
+        match
+            rootNode
+            |> getWrapperNode
+            |> _getFirstChildElement (_idPredicate "site") "div"
+            |> _getFirstChildElement (_idPredicate "default-content") "div"
+            |> _getFirstChildElement (_classPredicate "primary-content") "div"
+            |> _getFirstChildIfAny (_classPredicate "paginate") "ul"
+        with
+        | Some(n) ->
+            n
+            |> _getChildElements (_attribPredicate "class" "paginate__item") "li"
+            |> Seq.last
+            |> _innerTrim
+            |> int
+        | None -> 1
+        
+    let parseBlog (rootNode: HtmlNode) =
         let parse (node: HtmlNode) =
             let aNode =
                 node
@@ -178,43 +253,14 @@ module Parsers =
         |> _getFirstChildElement (_classPredicate "primary-content") "div"
         |> _getChildElements (_classPredicate "profile-blog") "article"
         |> Seq.map parse
-   
-    let _unwrapSome message opt =
-        match opt with
-        | Some x -> x
-        | None ->  raise (Exception(message))
         
+    
+    let parseAllBlogs path page =
+        parseAllData parseBlog parseBlogEnd path page
         
-    let _getForumBlockNode wrapperNode =
-        if Option.isSome (_getFirstChildIfAny (_idPredicate "forum-content") "div" wrapperNode) then
-            wrapperNode
-            |> _getFirstChildElement (_idPredicate "forum-content") "div"
-            |> _getFirstChildElement (_classPredicate "three-column--span-two") "div"
-            |> Some
-        elif Option.isSome (_getFirstChildIfAny (_classPredicate "js-toc-generate") "div" wrapperNode) then
-            wrapperNode
-            |> _getFirstChildElement (_classPredicate "js-toc-generate") "div"
-            |> _getFirstChildElement (_idPredicate "site") "div"
-            |> _getFirstChildElement (_idPredicate "forum-content") "div"
-            |> _getFirstChildElement (_classPredicate "primary-content") "div"
-            |> Some
-        else
-            None
-            
-    let parsePageEnd rootNode =
-        match rootNode
-            |> getWrapperNode
-            |> _getForumBlockNode
-            |> _unwrapSome "Unknown Thread type"
-            |> _getFirstChildElement (_classPredicate "forum-bar") "div"
-            |> _getFirstChildIfAny (_classPredicate "paginate") "ul" with
-        | Some(x) ->
-            x
-            |> _getChildElements (_attribPredicate "class" "paginate__item") "li"
-            |> Seq.map (fun a -> a.InnerText.Trim())
-            |> Seq.last
-            |> int
-        | None -> 1
+    let ParseBlogsFull path =
+        parseAllBlogs path 1
+        |> unwrapTaskSeq
         
     let parseThread rootNode =
         rootNode
@@ -341,19 +387,24 @@ module Parsers =
                     Creator = { Text = creatorName; Link = creatorLink }; Comments = Unchecked.defaultof<_> }
                 )
         
-    let parseAllThreads (path: string) page = taskSeq {
-        let! stream = Net.getStreamByPage page path 
-        let node = stream |> Net.getRootNode
-        let last = parsePageEnd node
-        yield parseThread node
-        
-        for p in [2..last] do
-            printfn "%A" p
-            let! s= Net.getStreamByPage p path 
-            yield s
-                |> Net.getRootNode
-                |> parseThread
-    }       
+    let parseAllThreads path page=
+        parseAllData parseThread parsePageEnd path page
+    // let parseAllThreads (path: string) page = taskSeq {
+    //     let! stream = Net.getStreamByPage page path 
+    //     let node = stream |> Net.getRootNode
+    //     let last = parsePageEnd node
+    //     yield parseThread node
+    //     
+    //     for p in [2..last] do
+    //         printfn "%A" p
+    //         let! s= Net.getStreamByPage p path 
+    //         yield s
+    //             |> Net.getRootNode
+    //             |> parseThread
+    // }
+    let ParseThreadsFull path =
+        parseAllThreads path 1
+        |> unwrapTaskSeq
        
     let parsePosts threadId (rootNode: HtmlNode) =
         rootNode
@@ -450,13 +501,7 @@ module Parsers =
                 |> Net.getRootNode
                 |> ParsePosts id
     }
-    let unwrapTaskSeq =
-        let _folder state curr =
-            Seq.append state [curr]
-        TaskSeq.map (fun x -> x |> TaskSeq.ofSeq) >>
-        TaskSeq.concat >>
-        TaskSeq.fold _folder (Seq.ofList [])
-    
+   
     let ParsePostsFull path = 
         parseAllPosts path 1
         |> unwrapTaskSeq
