@@ -40,33 +40,33 @@ public static class Seed
     // }
     
 
-     public static async Task CacheForums() {
-         Console.WriteLine("[+] Caching Threads"); 
-         IDatabase db = redis.GetDatabase();
-         
-         db.KeyDelete(ThreadKey);
-
-         ForumPage forumPage = await ForumRepo.GetForumPage(1);
-         int totalPages = forumPage.TotalPages;
-         // int totalPages = 100;
-         // string redisHashmap = "forums:hash";
-
-         await Parallel.ForEachAsync(Enumerable.Range(1, totalPages), new ParallelOptions { MaxDegreeOfParallelism = maxParallel }, 
-             (page, token) => GetEachForumPage(page, token, async (eachThread, cancToken) =>
-                 {
-                     string serializedThread = JsonSerializer.Serialize<ForumThread>(eachThread);
-                     // return !(await db.SetAddAsync("forums", serializedThread ));
-                     return !(await db.SetAddAsync(ThreadKey, serializedThread ));
-                     // if (db.HashExists(redisHashmap, eachThread.Id)) {
-                     //     
-                     // }
-                     // else {
-                     //     db.HashSetAsync("forums:hash")
-                     // }
-                 }
-             )
-         );
-     }
+     // public static async Task CacheForums() {
+     //     Console.WriteLine("[+] Caching Threads"); 
+     //     IDatabase db = redis.GetDatabase();
+     //     
+     //     db.KeyDelete(ThreadKey);
+     //
+     //     ForumPage forumPage = await ForumRepo.GetForumPage(1);
+     //     int totalPages = forumPage.TotalPages;
+     //     // int totalPages = 100;
+     //     // string redisHashmap = "forums:hash";
+     //
+     //     await Parallel.ForEachAsync(Enumerable.Range(1, totalPages), new ParallelOptions { MaxDegreeOfParallelism = maxParallel }, 
+     //         (page, token) => GetEachForumPage(page, token, async (eachThread, cancToken) =>
+     //             {
+     //                 string serializedThread = JsonSerializer.Serialize<ForumThread>(eachThread);
+     //                 // return !(await db.SetAddAsync("forums", serializedThread ));
+     //                 return !(await db.SetAddAsync(ThreadKey, serializedThread ));
+     //                 // if (db.HashExists(redisHashmap, eachThread.Id)) {
+     //                 //     
+     //                 // }
+     //                 // else {
+     //                 //     db.HashSetAsync("forums:hash")
+     //                 // }
+     //             }
+     //         )
+     //     );
+     // }
 
      public static async Task GetCachedForums(ForumContext context) { 
          Console.WriteLine("[+] Storing Threads in DB"); 
@@ -122,44 +122,44 @@ public static class Seed
     //     return allThreads;
     // }
 
-    public static async ValueTask GetEachForumPage(int pageNo, CancellationToken token, Func<ForumThread, CancellationToken, Task<bool>> UpdateRedisFunc) {
-        try {
-
-            ForumPage forumPage = await ForumRepo.GetForumPage(pageNo);
-            Console.WriteLine("Parsed Page {0}", forumPage.PageNo);
-
-            foreach (ForumThread eachThread in forumPage.ForumThreads) {
-                bool dupl = await UpdateRedisFunc(eachThread, token);
-                Console.WriteLine("Thread {0}{1}", eachThread.Id, dupl ? ": Duplicate" : "");
-            }
-        }
-        catch (HttpRequestException e) {
-            if (e.StatusCode == HttpStatusCode.TooManyRequests) {
-                Console.WriteLine("[+] Throttling page {0}", pageNo);
-                maxParallel = Math.Max(5, maxParallel / 2);
-            }
-            else {
-                Console.WriteLine("Error, Restarting page {0}; Message: {1}", pageNo, e.Message);
-            }
-
-            await GetEachForumPage(pageNo, token, UpdateRedisFunc);
-        }
-    }
-    
-    public static void InitializeForums(IServiceProvider serviceProvider, string? seedPath = null) {
-        using ForumContext context = new ForumContext(
-            serviceProvider.GetRequiredService<DbContextOptions<ForumContext>>()
-        );
-
-        CacheForums().Wait();
-        GetCachedForums(context).Wait();
-        // if (context.Threads.Any()) return;
-        //
-        // // GetForumsFromJson(seedPath, context);
-        // var threads = GetForumsDirect(context).Result;
-        // context.Threads.AddRange(threads);
-        context.SaveChanges();
-    }
+    // public static async ValueTask GetEachForumPage(int pageNo, CancellationToken token, Func<ForumThread, CancellationToken, Task<bool>> UpdateRedisFunc) {
+    //     try {
+    //
+    //         ForumPage forumPage = await ForumRepo.GetForumPage(pageNo);
+    //         Console.WriteLine("Parsed Page {0}", forumPage.PageNo);
+    //
+    //         foreach (ForumThread eachThread in forumPage.ForumThreads) {
+    //             bool dupl = await UpdateRedisFunc(eachThread, token);
+    //             Console.WriteLine("Thread {0}{1}", eachThread.Id, dupl ? ": Duplicate" : "");
+    //         }
+    //     }
+    //     catch (HttpRequestException e) {
+    //         if (e.StatusCode == HttpStatusCode.TooManyRequests) {
+    //             Console.WriteLine("[+] Throttling page {0}", pageNo);
+    //             maxParallel = Math.Max(5, maxParallel / 2);
+    //         }
+    //         else {
+    //             Console.WriteLine("Error, Restarting page {0}; Message: {1}", pageNo, e.Message);
+    //         }
+    //
+    //         await GetEachForumPage(pageNo, token, UpdateRedisFunc);
+    //     }
+    // }
+    //
+    // public static void InitializeForums(IServiceProvider serviceProvider, string? seedPath = null) {
+    //     using ForumContext context = new ForumContext(
+    //         serviceProvider.GetRequiredService<DbContextOptions<ForumContext>>()
+    //     );
+    //
+    //     CacheForums().Wait();
+    //     GetCachedForums(context).Wait();
+    //     // if (context.Threads.Any()) return;
+    //     //
+    //     // // GetForumsFromJson(seedPath, context);
+    //     // var threads = GetForumsDirect(context).Result;
+    //     // context.Threads.AddRange(threads);
+    //     context.SaveChanges();
+    // }
 
 
 

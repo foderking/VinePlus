@@ -233,7 +233,14 @@ module ThreadParser =
                 Assert.True(x.Thread.Text.Length > 1)
         )
     }
-    
+ module ThreadEndParser =
+    [<Fact>]
+    let ``parsing no of threads works correctly``() = task {
+        let! node = getNodeFromPath "/forums/"
+        let no = Parsers.parsePageEnd node
+        Assert.True(no > 16640)
+    }
+   
 module PostEndParser =
     [<Fact>]
     let ``parsing no of pages in thread works correctly``() = task {
