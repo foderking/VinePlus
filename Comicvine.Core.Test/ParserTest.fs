@@ -2,8 +2,20 @@ module Tests.Parser
 
 open System
 open System.Net.Http
+open System.Text.RegularExpressions
 open Comicvine.Core
 open Xunit
+
+let convertNameRegex (name: string) =
+    let reg (v: string) (pattern: string) (str: string) =
+        Regex.Replace(str, pattern, v)
+    name.ToLower()
+    |> reg "" "&#\d+;"
+    |> reg "" "&[a-z]+;"
+    |> reg ""  "[^- 0-9a-zA-Z]+"
+    |> reg "-" " +"
+    |> reg "-" "-+"
+ 
 
 let makeRequest (path: string) =
     task {
@@ -18,11 +30,67 @@ let getNodeFromPath path = task {
 }
 
 module BlogParser =
-    [<Fact>]
-    let ``valid blog should not be empty sequence``() = task {
-        let! node = getNodeFromPath "/profile/saboyaba/blog"
-        Assert.NotEmpty (Parsers.ParseBlog node)
+    let usersWithBlog: obj[] list =
+        [
+            [|"owie"|]
+            [|"death4bunnies"|]
+            [|"sc"|]
+            [|"cbishop"|]
+        ]
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithBlog))>]
+    let ``valid blog should not be empty sequence``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/blog"
+        let j = Parsers.ParseBlog node
+        Assert.NotEmpty j
     }
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithBlog))>]
+    let ``created dates should be unique``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/blog"
+        let j = Parsers.ParseBlog node
+        let k = j |> Seq.distinctBy (fun x -> x.Created)
+        Assert.Equal(j |> Seq.length, k |> Seq.length)
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithBlog))>]
+    let ``blog id should be unique``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/blog"
+        let j = Parsers.ParseBlog node
+        let k = j |> Seq.distinctBy (fun x -> x.Id)
+        Assert.Equal(j |> Seq.length, k |> Seq.length)
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithBlog))>]
+    let ``threadids that are not null should be unique``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/blog"
+        let j = Parsers.ParseBlog node |> Seq.filter (fun x -> x.ThreadId.HasValue)
+        let k = j |> Seq.distinctBy (fun x -> x.ThreadId.Value)
+        Assert.Equal(j |> Seq.length, k |> Seq.length)
+    }
+    
+       
+        
+        // Regex.Replace(name.ToLower(), , "")
+          
+        
+    [<Theory>]
+    [<MemberData(nameof(usersWithBlog))>]
+    let ``"Blog.Text" should satisfy invariant with "Blog.Link"``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/blog"
+        let j = Parsers.ParseBlog node
+        j
+        |> Seq.iter (
+            fun x ->
+                let name, link = x.Blog.Text, x.Blog.Link
+                let pref, full = link |> (fun x -> x.Split("/").[4]), name |> convertNameRegex
+                Assert.Equal(full[..(pref.Length-1)], pref)
+        )
+    }   
         
 module ThreadParser =
     [<Fact>]
@@ -168,7 +236,12 @@ module ThreadParser =
         )
     }
     let extractBoard (link: string) =
-        link.Split("forums/").[1].Split("/")[0]
+        let s = link.Split("forums/").[1]
+        if  s.Length > 1 then
+            s.Split("/")[0]
+        else
+            link.Split("/").[1]
+        
         
     [<Fact>]
     let ``"Board.Link" should be valid``() = task {
@@ -195,16 +268,17 @@ module ThreadParser =
         |> Seq.iter (
             fun x ->
                 let name, link = x.Board.Text, x.Board.Link
-                let convertNameFormat (name: string) =
-                    name
-                        .ToLower()
-                        .Replace(".", "")
-                        .Replace("&amp; ", "")
-                        .Replace("/", "")
-                        .Replace(" ", "-")
+                // let convertNameFormat (name: string) =
+                //     name
+                //         .ToLower()
+                //         .Replace(".", "")
+                //         .Replace("&amp; ", "")
+                //         .Replace("/", "")
+                //         .Replace(" ", "-")
                         
-                let fullName, prefix = link |> extractBoard, name |> convertNameFormat
-                Assert.True(fullName.StartsWith(prefix))
+                let fullName, prefix = link |> extractBoard, name |> convertNameRegex
+                // Assert.True(fullName.StartsWith(prefix))
+                Assert.Equal(fullName[..(prefix.Length-1)], prefix)
         )
     }   
     

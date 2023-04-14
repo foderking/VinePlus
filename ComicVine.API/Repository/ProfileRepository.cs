@@ -2,24 +2,39 @@
 using ComicVine.API.Controllers;
 using ComicVine.API.Models;
 using ComicVine.API.Repository.Parsers;
+using Comicvine.Core;
 using HtmlAgilityPack;
 
 namespace ComicVine.API.Repository;
 
 public interface IUserRepository<T>
 {
+    public Task<IEnumerable<Comicvine.Core.Parsers.Blog>> GetBlog(string username);
+    
+    
     public Task<Profile> GetProfile(string username, ILogger<T> logger);
     public Task<FollowingPage> GetUserFollowing(string username, int pageNo, ILogger<T> logger);
     public Task<FollowersPage> GetUserFollowers(string username, int pageNo, ILogger<T> logger);
-    public Task<BlogPage> GetUserBlog(string username, int pageNo, ILogger<T> logger);
     public Task<ImagePage> GetUserImages(string username, int pageNo, ILogger<T> logger);
     public Task GetUserForumPosts(string username);
-    public Task<IEnumerable<Comicvine.Core.Parsers.Blog>> GetBlog(string username);
 }
 
 public class UserRepository: IUserRepository<ProfileController>
 {
-   
+ 
+    public async Task<IEnumerable<Comicvine.Core.Parsers.Blog>> GetBlog(string username) {
+        // await using Stream stream = await Repository.GetStream();
+        Stream stream = await Comicvine.Core.Net.getStream($"/profile/{username}/blog");
+        HtmlNode rootNode = Net.getRootNode(stream);
+        return Comicvine.Core.Parsers.ParseBlog(rootNode);
+    }
+    
+    
+    
+    
+    
+    
+  
     public Task<Stream> GetStream(string username) {
         return Repository.GetStream(username);
     }
@@ -75,13 +90,6 @@ public class UserRepository: IUserRepository<ProfileController>
         BlogPage blogPage = BlogParser.Parse(rootNode, pageNo, logger);
 
         return blogPage;
-    }
-
-    public async Task<IEnumerable<Comicvine.Core.Parsers.Blog>> GetBlog(string username) {
-        await using Stream stream = await Repository.GetStream($"/profile/{username}/blog");
-
-        HtmlNode rootNode = Repository.GetRootNode(stream);
-        return Comicvine.Core.Parsers.ParseBlog(rootNode);
     }
 
     public async Task<ImagePage> GetUserImages(string username, int pageNo, ILogger<ProfileController> logger) {
