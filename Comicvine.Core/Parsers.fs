@@ -1,6 +1,7 @@
 ﻿
 namespace Comicvine.Core
 open System
+open System.Collections.Generic
 open FSharp.Control
 open HtmlAgilityPack
 open Microsoft.FSharp.Core
@@ -262,6 +263,7 @@ module Parsers =
                     { IsComment = false; Comment = Unchecked.defaultof<_> ; OP = n }
         )
         
+    // let ParsePostsFull
     let parseAllPosts (path: string) page = taskSeq {
         let id  = path.Split("-") |> Seq.last |> (fun x -> x.Split("/")[0]) |> int
         let! stream = Net.getStreamByPage page path 
@@ -276,14 +278,21 @@ module Parsers =
                 |> Net.getRootNode
                 |> ParsePosts id
     }
+    let unwrapTaskSeq =
+        let _folder state curr =
+            Seq.append state [curr]
+        TaskSeq.map (fun x -> x |> TaskSeq.ofSeq) >>
+        TaskSeq.concat >>
+        TaskSeq.fold _folder (Seq.ofList [])
     
-    let parseA path page =
+    
+    // let parseA page path =
+        // let foldPost state curr =
+        //     Seq.append state [curr]
+        // |> TaskSeq.map (fun x -> x |> TaskSeq.ofSeq)
+        // |> TaskSeq.concat
+        // |> TaskSeq.fold foldPost (Seq.ofList [])
         
-        let foldPost state curr =
-            [curr] |> Seq.ofList |> Seq.append state
-            
-        parseAllPosts path page
-        |> TaskSeq.map (fun x -> x |> TaskSeq.ofSeq)
-        |> TaskSeq.concat
-        |> TaskSeq.fold foldPost (Seq.ofList [])
-        
+    let ParsePostsFull path = 
+        parseAllPosts path 1
+        |> unwrapTaskSeq

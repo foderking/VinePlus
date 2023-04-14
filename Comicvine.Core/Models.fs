@@ -1,2 +1,0 @@
-﻿namespace Comicvine.Core.Models
-
