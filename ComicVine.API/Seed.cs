@@ -163,80 +163,80 @@ public static class Seed
 
 
 
-    public static async Task InitializePosts(IServiceProvider serviceProvider) {
-        await using ForumContext context = new ForumContext(
-            serviceProvider.GetRequiredService<DbContextOptions<ForumContext>>()
-        );
-        
-        PostRepository postRepo = new ();
-        if (!context.Threads.Any()) return;
-
-        // var thread = context.Threads.First();
-        // PostPage? posts = await postRepo.GetPostPage(thread.ThreadLink, 1);
-        // if (posts == null) return;
-        // var allPosts = posts.ForumPosts.Select(each =>
-        // {
-        //     each.Thread = thread;
-        //     each.ThreadId = thread.Id;
-        //     return each;
-        // });
-        //
-        // // thread.Posts = new();
-        // context.Posts.AddRange(allPosts);
-        // foreach (ForumPost postsForumPost in posts.ForumPosts) {
-        //     Console.WriteLine(postsForumPost.PostNo);
-        // }
-        try {
-        
-            await Parallel.ForEachAsync(context.Threads, new ParallelOptions { MaxDegreeOfParallelism = 10 },
-                async (forumThread, token) =>
-                {
-                    // foreach (ForumThread each in context.Threads) {
-                    //// if (each.Posts!= null && each.Posts.Count > 0) return;
-        
-                    Console.WriteLine("Thread {0}, Page {1}", forumThread.Id, 1);
-                    PostPage posts = await postRepo.GetPostPage(forumThread.ThreadLink, 1);
-                    // if (posts == null) return;
-                    
-                     var allPosts = posts.ForumPosts.Select(each =>
-                    {
-                        each.Thread = forumThread;
-                        each.ThreadId = forumThread.Id;
-                        return each;
-                    });       
-                    await context.Posts.AddRangeAsync(allPosts, token);
-                     
-                    //
-                    // if (posts.TotalPages > 1) {
-                    //     // await Parallel.ForEachAsync(Enumerable.Range(2, posts.TotalPages - 2),
-                    //     //     new ParallelOptions { MaxDegreeOfParallelism = 50 },
-                    //     //     async (i, tok) =>
-                    //         for (int i = 2; i < posts.TotalPages; i++) 
-                    //         {
-                    //             posts = await postRepo.GetPostPage(each.ThreadLink, i);
-                    //             if (posts == null) return;
-                    //             
-                    //             each.Posts.AddRange(posts.ForumPosts);
-                    //             Console.WriteLine("Thread {0}, Page {1}", each.Id, i);
-                    //         }
-                    //     // );
-                    // }
-        
-                    //     posts = await postRepo.GetPostPage(each.ThreadLink, i);
-                    //     each.Posts.AddRange(posts.ForumPosts);
-                    //     Console.WriteLine("Thread {0}, Page {1}", each.Id, i);
-                    // }
-        
-        
-                }
-            );
-        
-        }
-        catch (Exception e) {
-            Console.WriteLine("Got an erorr {0}, writing to db", e.Message);
-            
-        }
-
-        await context.SaveChangesAsync();
-    }
+    // public static async Task InitializePosts(IServiceProvider serviceProvider) {
+    //     await using ForumContext context = new ForumContext(
+    //         serviceProvider.GetRequiredService<DbContextOptions<ForumContext>>()
+    //     );
+    //     
+    //     PostRepository postRepo = new ();
+    //     if (!context.Threads.Any()) return;
+    //
+    //     // var thread = context.Threads.First();
+    //     // PostPage? posts = await postRepo.GetPostPage(thread.ThreadLink, 1);
+    //     // if (posts == null) return;
+    //     // var allPosts = posts.ForumPosts.Select(each =>
+    //     // {
+    //     //     each.Thread = thread;
+    //     //     each.ThreadId = thread.Id;
+    //     //     return each;
+    //     // });
+    //     //
+    //     // // thread.Posts = new();
+    //     // context.Posts.AddRange(allPosts);
+    //     // foreach (ForumPost postsForumPost in posts.ForumPosts) {
+    //     //     Console.WriteLine(postsForumPost.PostNo);
+    //     // }
+    //     try {
+    //     
+    //         await Parallel.ForEachAsync(context.Threads, new ParallelOptions { MaxDegreeOfParallelism = 10 },
+    //             async (forumThread, token) =>
+    //             {
+    //                 // foreach (ForumThread each in context.Threads) {
+    //                 //// if (each.Posts!= null && each.Posts.Count > 0) return;
+    //     
+    //                 Console.WriteLine("Thread {0}, Page {1}", forumThread.Id, 1);
+    //                 PostPage posts = await postRepo.GetPostPage(forumThread.ThreadLink, 1);
+    //                 // if (posts == null) return;
+    //                 
+    //                  var allPosts = posts.ForumPosts.Select(each =>
+    //                 {
+    //                     each.Thread = forumThread;
+    //                     each.ThreadId = forumThread.Id;
+    //                     return each;
+    //                 });       
+    //                 await context.Posts.AddRangeAsync(allPosts, token);
+    //                  
+    //                 //
+    //                 // if (posts.TotalPages > 1) {
+    //                 //     // await Parallel.ForEachAsync(Enumerable.Range(2, posts.TotalPages - 2),
+    //                 //     //     new ParallelOptions { MaxDegreeOfParallelism = 50 },
+    //                 //     //     async (i, tok) =>
+    //                 //         for (int i = 2; i < posts.TotalPages; i++) 
+    //                 //         {
+    //                 //             posts = await postRepo.GetPostPage(each.ThreadLink, i);
+    //                 //             if (posts == null) return;
+    //                 //             
+    //                 //             each.Posts.AddRange(posts.ForumPosts);
+    //                 //             Console.WriteLine("Thread {0}, Page {1}", each.Id, i);
+    //                 //         }
+    //                 //     // );
+    //                 // }
+    //     
+    //                 //     posts = await postRepo.GetPostPage(each.ThreadLink, i);
+    //                 //     each.Posts.AddRange(posts.ForumPosts);
+    //                 //     Console.WriteLine("Thread {0}, Page {1}", each.Id, i);
+    //                 // }
+    //     
+    //     
+    //             }
+    //         );
+    //     
+    //     }
+    //     catch (Exception e) {
+    //         Console.WriteLine("Got an erorr {0}, writing to db", e.Message);
+    //         
+    //     }
+    //
+    //     await context.SaveChangesAsync();
+    // }
 }
