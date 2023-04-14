@@ -19,7 +19,7 @@ open HtmlAgilityPack
             // return! client.GetStreamAsync("/forums/battles-7/kotor-sith-lords-vs-cw-sith-lords-1631389/?page=2");
         }
         
-        let getStream = getStreamWithParam (Dictionary<string, string>())
+        let getStream path= getStreamWithParam (Dictionary<string, string>()) path
         
         let getStreamByPage (page: int) path =
             getStreamWithParam (Dictionary[KeyValuePair("page", page |> string)]) path 

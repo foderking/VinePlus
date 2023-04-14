@@ -24,37 +24,50 @@ module Parsers =
         
     type Link =
         { Text: string; Link: string }
-    type Blog =
-        { Blog: Link; Created: DateTime; Comments: int }
-    type About =
-        { DateJoined: DateTime;  Alignment: Alignment; Points: int; Summary: string }
-    type FollowRelationship =
-        { FollowRelationship: Link; AvatarUrl: string }
+        
+    // Threads and Posts section
     type ThreadComments =
-        { Id: int; PostNo: int; Creator: Link; IsEdited: bool
-          Created: DateTime; Content: string; ThreadId: int }
+        {
+            Id: int; PostNo: int; Creator: Link; IsEdited: bool
+            Created: DateTime; Content: string; ThreadId: int
+        }
     type ThreadOP =
         { Creator: Link; IsEdited: bool; Created: DateTime; Content: string; ThreadId: int }
     type ThreadPost =
         | Comment of ThreadComments
         | OP      of ThreadOP
     type Post =
-        { IsComment: bool; Comment: ThreadComments; OP: ThreadOP }
+        { IsComment: bool; Comment: ThreadComments; OP: ThreadOP; IsDeleted: bool }
     type Thread =
-        { Id: int; Thread: Link; Board: Link; IsPinned: bool; IsLocked: bool;
-          Type: ThreadType; LastPostNo: int; LastPostPage: int; Created: DateTime;
-          TotalPosts: int; TotalView: int; Creator: Link; Comments: seq<ThreadComments> }
+        {
+            Id: int; Thread: Link; Board: Link; IsPinned: bool; IsLocked: bool; IsDeleted: bool
+            Type: ThreadType; LastPostNo: int; LastPostPage: int; Created: DateTime;
+            TotalPosts: int; TotalView: int; Creator: Link; Comments: seq<ThreadPost>
+        }
+        
+    // Profile section
     type Activity =
         | Comment of {| Content: string; Topic: Link; Forum: Link |}
         | Image   of {| Url: string |}
         | Follow  of {| User: Link |}
+    type About =
+        { DateJoined: DateTime;  Alignment: Alignment; Points: int; Summary: string }
     type Profile =
-        { UserName: string; Avatar: string; Description: string; Posts: int; WikiPoints: int
-          Following: Link; Followers: Link; Cover: string; Background: string; About: About; Activities: Activity }
-    type Image = obj
-    
+        {
+            UserName: string; Avatar: string; Description: string; Posts: int; WikiPoints: int
+            Following: Link; Followers: Link; Cover: string; Background: string; About: About; Activities: seq<Activity>
+            HasBlogs: bool; HasImages: bool; HasReviews: bool; // forums, wiki are always there
+        }
+        
+    // Extra profile info
+    type Blog =
+        { Blog: Link; Created: DateTime; Comments: int; Id: int; ThreadId: Nullable<int> }
+    type Image = { ObjectId: string; GalleryId: string }
+    type FollowRelationship =
+        { FollowRelationship: Link; AvatarUrl: string }
+        
     let _innerT (node: HtmlNode) = node.InnerText
-    let _trim (s: string) = s.Trim()
+    // let _trim (s: string) = s.Trim()
     let _split (s: string) = s.Split()
     
     let _innerTrim (node: HtmlNode) = node.InnerText.Trim()
@@ -134,11 +147,29 @@ module Parsers =
                 Comments =
                     hNode
                     |> _getFirstChildElem "a"
-                    |> _innerT
-                    |> _trim
+                    |> _innerTrim
                     |> _split
                     |> Seq.head
                     |> int
+                Id =
+                    aNode
+                    |> _getAttrib "href"
+                    |> (fun x -> x.Split("/"))
+                    |> Seq.filter (fun x -> x.Length > 0)
+                    |> Seq.last
+                    |> int
+                    
+                ThreadId =
+                    match
+                        hNode
+                        |> _getFirstChildElem "a"
+                        |> _getAttrib "href"
+                        |> (fun x -> x.Split("-"))
+                        |> Seq.last
+                        |> Int32.TryParse
+                    with
+                    | true,  x -> Nullable x
+                    | false, _ -> Nullable()
             }
             
         getWrapperNode rootNode
@@ -306,7 +337,7 @@ module Parsers =
                 {
                     Thread = { Text = threadName; Link = threadLink }; Board = { Text = boardName; Link = boardLink } ;
                     Id = id; IsPinned = isPinned; IsLocked = isLocked; Type = threadType; LastPostNo = lastPostNo;
-                    LastPostPage = lastPostPage; Created = created; TotalPosts = posts; TotalView = views
+                    LastPostPage = lastPostPage; Created = created; TotalPosts = posts; TotalView = views; IsDeleted = false;
                     Creator = { Text = creatorName; Link = creatorLink }; Comments = Unchecked.defaultof<_> }
                 )
         
@@ -400,9 +431,9 @@ module Parsers =
             fun node ->
                 match node with
                 | ThreadPost.Comment(n) ->
-                    { IsComment = true ; Comment = n; OP = Unchecked.defaultof<_> }
+                    { IsComment = true ; Comment = n; OP = Unchecked.defaultof<_> ; IsDeleted = false}
                 | ThreadPost.OP(n) ->
-                    { IsComment = false; Comment = Unchecked.defaultof<_> ; OP = n }
+                    { IsComment = false; Comment = Unchecked.defaultof<_> ; OP = n; IsDeleted = false}
         )
         
     let parseAllPosts (path: string) page = taskSeq {
