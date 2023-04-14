@@ -29,16 +29,16 @@ open HtmlAgilityPack
             rootNode.Load(htmlStream)
             rootNode.DocumentNode
 
-        let parseAllGeneric parseStream parserData parseEnd (path: string) (page: int) = taskSeq {
-            let! stream = parseStream page path 
-            let node = stream |> getRootNode
-            let last = parseEnd node
-            yield parserData node
-            
-            for page in 2..last do
-                let! stream = parseStream page path 
-                yield stream
-                    |> getRootNode
-                    |> parserData
-        }
+        // let parseAllGeneric parseStream parserData parseEnd (path: string) (page: int) = taskSeq {
+        //     let! stream = parseStream page path 
+        //     let node = stream |> getRootNode
+        //     let last = parseEnd node
+        //     yield parserData node
+        //     
+        //     for page in 2..last do
+        //         let! stream = parseStream page path 
+        //         yield stream
+        //             |> getRootNode
+        //             |> parserData
+        // }
         
