@@ -20,7 +20,7 @@ public class PostController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Parsers.Post>> GetPage([FromQuery(Name = "page")] int pageNo, [FromQuery(Name = "threadPath")] string path) {
+    public async Task<ActionResult<Parsers.Post>> GetPage([FromQuery(Name = "threadPath")] string path) {
         try {
             var postPage = await _postRepo.GetPost(path);
             return Ok(postPage);

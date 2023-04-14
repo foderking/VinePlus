@@ -7,21 +7,20 @@ namespace ComicVine.API.Repository;
 
 public interface IForumRepository
 {
-    public Task<ForumPage> GetForumPage(int pageNo, ILogger<ForumController> logger);
+    public Task<IEnumerable<Comicvine.Core.Parsers.Thread>> GetForumPage(int pageNo, ILogger<ForumController> logger);
 }
 
 public class ForumRepository : IForumRepository
 {
-    public async Task<ForumPage> GetForumPage(int pageNo, ILogger<ForumController>? logger = null) {
+    public async Task<IEnumerable<Comicvine.Core.Parsers.Thread>> GetForumPage(int pageNo, ILogger<ForumController>? logger = null) {
         await using Stream stream = await Repository.GetStream($"/forums", new ( new []
         {
             new KeyValuePair<string, string>("page", pageNo.ToString())
         }) );
         HtmlNode rootNode = Repository.GetRootNode(stream);
-
-        ForumPage forumPage = ForumParser.Parse(rootNode, pageNo, logger);
-
-        return forumPage;
+        //
+        // ForumPage forumPage = ForumParser.Parse(rootNode, pageNo, logger);
+        return Comicvine.Core.Parsers.parseThread(rootNode);
     }
 
 }

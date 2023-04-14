@@ -21,10 +21,10 @@ public class ForumController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ForumPage>> GetPage([FromQuery(Name = "page")] int pageNo) {
+    public async Task<ActionResult<Thread>> GetPage([FromQuery(Name = "page")] int pageNo) {
         try {
-            ForumPage forumPage = await _forumRepo.GetForumPage(Math.Max(1, pageNo), _logger);
-            return forumPage;
+            var ans = await _forumRepo.GetForumPage(Math.Max(1, pageNo), _logger);
+            return Ok(ans);
         }
         catch (HttpRequestException) {
             return NotFound();

@@ -169,6 +169,21 @@ module Parsers =
             |> Some
         else
             None
+            
+    let parsePageEnd rootNode =
+        match rootNode
+            |> getWrapperNode
+            |> _getForumBlockNode
+            |> _unwrapSome "Unknown Thread type"
+            |> _getFirstChildElement (_classPredicate "forum-bar") "div"
+            |> _getFirstChildIfAny (_classPredicate "paginate") "ul" with
+        | Some(x) ->
+            x
+            |> _getChildElements (_attribPredicate "class" "paginate__item") "li"
+            |> Seq.map (fun a -> a.InnerText.Trim())
+            |> Seq.last
+            |> int
+        | None -> 1
         
     let parseThread rootNode =
         rootNode
@@ -295,21 +310,20 @@ module Parsers =
                     Creator = { Text = creatorName; Link = creatorLink }; Comments = Unchecked.defaultof<_> }
                 )
         
-    let parsePageEnd rootNode =
-        match rootNode
-            |> getWrapperNode
-            |> _getForumBlockNode
-            |> _unwrapSome "Unknown Thread type"
-            |> _getFirstChildElement (_classPredicate "forum-bar") "div"
-            |> _getFirstChildIfAny (_classPredicate "paginate") "ul" with
-        | Some(x) ->
-            x
-            |> _getChildElements (_attribPredicate "class" "paginate__item") "li"
-            |> Seq.map (fun a -> a.InnerText.Trim())
-            |> Seq.last
-            |> int
-        | None -> 1
+    let parseAllThreads (path: string) page = taskSeq {
+        let! stream = Net.getStreamByPage page path 
+        let node = stream |> Net.getRootNode
+        let last = parsePageEnd node
+        yield parseThread node
         
+        for p in [2..last] do
+            printfn "%A" p
+            let! s= Net.getStreamByPage p path 
+            yield s
+                |> Net.getRootNode
+                |> parseThread
+    }       
+       
     let parsePosts threadId (rootNode: HtmlNode) =
         rootNode
         |> getWrapperNode
@@ -391,7 +405,6 @@ module Parsers =
                     { IsComment = false; Comment = Unchecked.defaultof<_> ; OP = n }
         )
         
-    // let ParsePostsFull
     let parseAllPosts (path: string) page = taskSeq {
         let id  = path.Split("-") |> Seq.last |> (fun x -> x.Split("/")[0]) |> int
         let! stream = Net.getStreamByPage page path 
