@@ -1,7 +1,7 @@
 ﻿
 namespace Comicvine.Core
 open System
-open System.Collections.Generic
+// open System.Collections.Generic
 open FSharp.Control
 open HtmlAgilityPack
 open Microsoft.FSharp.Core
@@ -20,6 +20,7 @@ module Parsers =
         | Poll     = 2
         | Blog     = 3
         | Question = 4
+        | Answered = 5
         
     type Link =
         { Text: string; Link: string }
@@ -39,7 +40,7 @@ module Parsers =
         | OP      of ThreadOP
     type Post =
         { IsComment: bool; Comment: ThreadComments; OP: ThreadOP }
-    type ThreadOverview =
+    type Thread =
         { Id: int; Thread: Link; Board: Link; IsPinned: bool; IsLocked: bool;
           Type: ThreadType; LastPostNo: int; LastPostPage: int; Created: DateTime;
           TotalPosts: int; TotalView: int; Creator: Link; Comments: seq<ThreadComments> }
@@ -55,6 +56,8 @@ module Parsers =
     let _innerT (node: HtmlNode) = node.InnerText
     let _trim (s: string) = s.Trim()
     let _split (s: string) = s.Split()
+    
+    let _innerTrim (node: HtmlNode) = node.InnerText.Trim()
     
     let _getAttribute (def: string) (attrib: string) (node: HtmlNode) =
         node.GetAttributeValue(attrib, def)
@@ -167,7 +170,132 @@ module Parsers =
         else
             None
         
-    let parsePostEnd rootNode =
+    let parseThread rootNode =
+        rootNode
+        |> getWrapperNode
+        |> _getForumBlockNode
+        |> _unwrapSome "Unknown Thread type"
+        |> _getFirstChildElement (_classPredicate "table-forums") "div"
+        |> _getChildElements (_classPredicate "flexbox-align-stretch") "div"
+        |> Seq.map (
+            fun flexNode ->
+                let views = 
+                    flexNode
+                    |> _getFirstChildElement (_attribPredicate "class" "inner-space-small views hide-mobile") "div"
+                    |> (fun x -> x.InnerText.Trim().Replace(",", ""))
+                    |> int
+                let posts = 
+                    flexNode
+                    |> _getFirstChildElement (_attribPredicate "class" "js-posts inner-space-small views") "div"
+                    |> (fun x -> x.InnerText.Trim().Replace(",", ""))
+                    |> int
+                let lastPostNo =
+                    flexNode
+                    |> _getFirstChildElement (_attribPredicate "class" "inner-space-small last-post hide-mobile") "div"
+                    |> _getFirstChildElement (_classPredicate "info") "span"
+                    |> _getFirstChildElement (_classPredicate "last") "a"
+                    |> _getAttrib "href"
+                    |> (fun x -> x.Split("#").[1].Split("-") |> Seq.last)
+                    |> int
+                let lastPostPage =
+                    flexNode
+                    |> _getFirstChildElement (_attribPredicate "class" "inner-space-small last-post hide-mobile") "div"
+                    |> _getFirstChildElement (_classPredicate "info") "span"
+                    |> _getFirstChildElement (_classPredicate "last") "a"
+                    |> _getAttrib "href"
+                    |> (fun x -> x.Split("#").[0].Split("=")[1])
+                    |> int
+                let created =
+                    flexNode
+                    |>  _getFirstChildElement (_attribPredicate "class" "inner-space-small author hide-laptop") "div"
+                    |> _getFirstChildElement (_classPredicate "info") "span"
+                    |> _innerTrim
+                    |> DateTime.Parse
+                let creatorName = 
+                    flexNode
+                    |>  _getFirstChildElement (_attribPredicate "class" "inner-space-small author hide-laptop") "div"
+                    |> _getFirstChildElem "div"
+                    |> _getFirstChildElem "a"
+                    |> _innerTrim
+                let creatorLink = 
+                    flexNode
+                    |>  _getFirstChildElement (_attribPredicate "class" "inner-space-small author hide-laptop") "div"
+                    |> _getFirstChildElem "div"
+                    |> _getFirstChildElem "a"
+                    |> _getAttrib "href"
+                let boardName =
+                    flexNode
+                    |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                    |> _getFirstChildElement (_classPredicate "board") "a"
+                    |> _innerTrim
+                let boardLink =
+                    flexNode
+                    |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                    |> _getFirstChildElement (_classPredicate "board") "a"
+                    |> _getAttrib "href"
+                let threadName =
+                    flexNode
+                    |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                    |> _getFirstChildElem "div"
+                    
+                    |> _getFirstChildElement (_classPredicate "topic-name") "a"
+                    |> _innerTrim
+                let threadLink =
+                   flexNode
+                   |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                   |> _getFirstChildElem "div"
+                   
+                   |> _getFirstChildElement (_classPredicate "topic-name") "a"
+                   |> _getAttrib "href"
+                   
+                let (|ThreadType|_|) (s: string) =
+                    match s with
+                    | "Poll"     -> Some(ThreadType.Poll)
+                    | "Blog"     -> Some(ThreadType.Blog)
+                    | "Question" -> Some(ThreadType.Question)
+                    | "Answered" -> Some(ThreadType.Answered)
+                    | _  -> None
+                    
+                let threadType =
+                   match 
+                       flexNode
+                       |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                       |> _getFirstChildElem "div"
+                        
+                       |> _getFirstChildIfAny (_classPredicate "type") "span"
+                   with
+                   | Some(node) ->
+                       match (_innerTrim node) with
+                       | ThreadType x -> x
+                       | _            -> ThreadType.Normal
+                   | None -> ThreadType.Normal
+                
+                let id =
+                    flexNode
+                    |> _getFirstChildElement (_classPredicate "js-posts") "div"
+                    |> _getFirstChildElement (_classPredicate "js-post-render-topic") "meta"
+                    |> _getAttrib "data-post-render-value"
+                    |> int
+                let isLocked = 
+                       flexNode
+                       |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                       |> _getFirstChildElem "div"
+                       |> _getFirstChildIfAny (_attribPredicate "src" "https://comicvine.gamespot.com/a/bundles/phoenixsite/images/core/sprites/icons/icn-lock-16x16.png") "img"
+                       |> Option.isSome
+                let isPinned = 
+                       flexNode
+                       |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                       |> _getFirstChildElem "div"
+                       |> _getFirstChildIfAny (_attribPredicate "src" "https://comicvine.gamespot.com/a/bundles/phoenixsite/images/core/sprites/icons/icn-pin-16x16.png") "img"
+                       |> Option.isSome
+                {
+                    Thread = { Text = threadName; Link = threadLink }; Board = { Text = boardName; Link = boardLink } ;
+                    Id = id; IsPinned = isPinned; IsLocked = isLocked; Type = threadType; LastPostNo = lastPostNo;
+                    LastPostPage = lastPostPage; Created = created; TotalPosts = posts; TotalView = views
+                    Creator = { Text = creatorName; Link = creatorLink }; Comments = Unchecked.defaultof<_> }
+                )
+        
+    let parsePageEnd rootNode =
         match rootNode
             |> getWrapperNode
             |> _getForumBlockNode
@@ -268,7 +396,7 @@ module Parsers =
         let id  = path.Split("-") |> Seq.last |> (fun x -> x.Split("/")[0]) |> int
         let! stream = Net.getStreamByPage page path 
         let node = stream |> Net.getRootNode
-        let last = parsePostEnd node
+        let last = parsePageEnd node
         yield ParsePosts id node
         
         for p in [2..last] do
@@ -285,14 +413,6 @@ module Parsers =
         TaskSeq.concat >>
         TaskSeq.fold _folder (Seq.ofList [])
     
-    
-    // let parseA page path =
-        // let foldPost state curr =
-        //     Seq.append state [curr]
-        // |> TaskSeq.map (fun x -> x |> TaskSeq.ofSeq)
-        // |> TaskSeq.concat
-        // |> TaskSeq.fold foldPost (Seq.ofList [])
-        
     let ParsePostsFull path = 
         parseAllPosts path 1
         |> unwrapTaskSeq
