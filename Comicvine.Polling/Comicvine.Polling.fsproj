@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <UserSecretsId>dotnet-Comicvine.Polling-67BD27B0-78C0-4AA6-AEBC-404AE3B9AC07</UserSecretsId>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <Compile Include="Worker.fs"/>
+        <Compile Include="Program.fs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1"/>
+    </ItemGroup>
+</Project>
