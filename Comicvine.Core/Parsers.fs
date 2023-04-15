@@ -2,6 +2,7 @@
 namespace Comicvine.Core
 open System
 // open System.Collections.Generic
+open System.Threading.Tasks
 open FSharp.Control
 open HtmlAgilityPack
 open Microsoft.FSharp.Core
@@ -55,16 +56,21 @@ module Parsers =
     type Profile =
         {
             UserName: string; Avatar: string; Description: string; Posts: int; WikiPoints: int
-            Following: Link; Followers: Link; Cover: string; Background: string; About: About; Activities: seq<Activity>
-            HasBlogs: bool; HasImages: bool; // forums, wiki are always there
+            Following: Link; Followers: Link; CoverImage: string; BackgroundImage: string; About: About;
+            Activities: seq<Activity>; HasBlogs: bool; HasImages: bool; // forums, wiki are always there
         }
         
     // Extra profile info
     type Blog =
         { Blog: Link; Created: DateTime; Comments: int; Id: int; ThreadId: Nullable<int> }
-    type Image = { ObjectId: string; GalleryId: string; TotalImages: int; Tags: seq<Link> }
-    type FollowRelationship =
-        { FollowRelationship: Link; AvatarUrl: string }
+    type Image =
+        { ObjectId: string; GalleryId: string; TotalImages: int; Tags: seq<Link> }
+    type Following =
+        { Following: Link; Avatar: string; Type: string }
+    type Follower =
+        { Follower: Link; Avatar: string }
+        
+        
         
     // helpers
     let _innerT (node: HtmlNode) = node.InnerText
@@ -95,6 +101,9 @@ module Parsers =
         node.Elements name
         |> Seq.filter predicate
         
+    let _getChildElems =
+        _getChildElements (fun _ -> true)
+        
     let _getFirstChildElement predicate name =
         _getChildElements predicate name >> Seq.head
     
@@ -113,16 +122,55 @@ module Parsers =
     
     
     
+          
+    let unwrapTaskSeq t =
+        let _folder state curr =
+            Seq.append state [curr]
+        t
+        |> TaskSeq.map (fun x -> x |> TaskSeq.ofSeq)
+        |> TaskSeq.concat 
+        |> TaskSeq.fold _folder (Seq.ofList [])
    
-    
-    type Page<'T> =
-        { PageNo: int; TotalPages: int; Data: 'T }
     
     type IParsable<'T> =
-        abstract member ParseData: HtmlNode -> 'T
+        abstract member _parseEnd: HtmlNode -> int
+        abstract member _parseAll: string ->  int -> taskSeq<seq<'T>>
+        abstract member ParseSingle: HtmlNode -> 'T
+        abstract member ParseFull  : string -> Task<seq<'T>>
    
-   
-   
+    type ISingle<'T> =
+        interface
+            abstract member ParseSingle: HtmlNode -> 'T
+        end
+        
+    type IMultiple<'T> =
+        interface
+            inherit ISingle<seq<'T>>
+            abstract _parseEnd: HtmlNode -> int
+            abstract ParseAll: string -> Task<seq<'T>>
+        end
+        
+    let yieldMultipleData (path: string) (page: int) (parser: IMultiple<'T>) = taskSeq {
+        let! stream = Net.getStreamByPage page path 
+        let node = stream |> Net.getRootNode
+        let lastPage = parser._parseEnd node
+        yield parser.ParseSingle node
+        
+        for p in [2..lastPage] do
+            let! s = Net.getStreamByPage p path 
+            yield s
+                |> Net.getRootNode
+                |> parser.ParseSingle
+    }
+    
+    let parseMultipleGeneric (path: string) (page: int) (parser: IMultiple<'T>) =
+        yieldMultipleData path page parser
+        |> unwrapTaskSeq
+        
+        
+        
+        
+        
    
     let parseAllData parseData parseEnd (path: string) page = taskSeq {
         let! stream = Net.getStreamByPage page path 
@@ -136,19 +184,16 @@ module Parsers =
                 |> Net.getRootNode
                 |> parseData
     }
-         
-    let unwrapTaskSeq t =
-        let _folder state curr =
-            Seq.append state [curr]
-        t
-        |> TaskSeq.map (fun x -> x |> TaskSeq.ofSeq)
-        |> TaskSeq.concat 
-        |> TaskSeq.fold _folder (Seq.ofList [])
- 
+
     let _unwrapSome message opt =
         match opt with
         | Some x -> x
         | None ->  raise (Exception(message))
+        
+        
+        
+        
+        
         
         
     // commonly used nodes
@@ -207,194 +252,150 @@ module Parsers =
             |> int
         | None -> 1
         
-    let parseBlog (rootNode: HtmlNode) =
-        let parse (node: HtmlNode) =
-            let aNode =
-                node
-                |> _getFirstChildElement (_classPredicate "news-hdr") "section"
-                |> _getFirstChildElem "h1"
-                |> _getFirstChildElem "a"
-            let hNode =
-                node
-                |> _getFirstChildElement (_classPredicate "news-hdr") "section"
-                |> _getFirstChildElem "h4"
-            {
-                Blog =  { Text = aNode.InnerText.Trim(); Link = _getAttrib "href" aNode }
-                Created  =
-                    hNode
-                    |> _getFirstChildElem "time"
-                    |> _getAttrib "datetime"
-                    |> DateTime.Parse
-                Comments =
-                    hNode
-                    |> _getFirstChildElem "a"
-                    |> _innerTrim
-                    |> _split
-                    |> Seq.head
-                    |> int
-                Id =
-                    aNode
-                    |> _getAttrib "href"
-                    |> (fun x -> x.Split("/"))
-                    |> Seq.filter (fun x -> x.Length > 0)
-                    |> Seq.last
-                    |> int
-                    
-                ThreadId =
-                    match
-                        hNode
-                        |> _getFirstChildElem "a"
-                        |> _getAttrib "href"
-                        |> (fun x -> x.Split("-"))
-                        |> Seq.last
-                        |> Int32.TryParse
-                    with
-                    | true,  x -> Nullable x
-                    | false, _ -> Nullable()
-            }
-            
-        _getWrapperNode rootNode
-        |> _getFirstChildElement (_idPredicate "site") "div"
-        |> _getFirstChildElement (_idPredicate "default-content") "div"
-        |> _getFirstChildElement (_classPredicate "primary-content") "div"
-        |> _getChildElements (_classPredicate "profile-blog") "article"
-        |> Seq.map parse
+   
+    // let parseAllBlogs path page =
+    //     parseAllData parseBlog parseBlogEnd path page
         
+    // let ParseBlogsFull path =
+    //     parseAllBlogs path 1
+    //     |> unwrapTaskSeq
     
-    let parseAllBlogs path page =
-        parseAllData parseBlog parseBlogEnd path page
-        
-    let ParseBlogsFull path =
-        parseAllBlogs path 1
-        |> unwrapTaskSeq
-        
-    let parseThread rootNode =
-        rootNode
-        |> _getWrapperNode
-        |> _getForumBlockNode
-        |> _unwrapSome "Unknown Thread type"
-        |> _getFirstChildElement (_classPredicate "table-forums") "div"
-        |> _getChildElements (_classPredicate "flexbox-align-stretch") "div"
-        |> Seq.map (
-            fun flexNode ->
-                let views = 
-                    flexNode
-                    |> _getFirstChildElement (_attribPredicate "class" "inner-space-small views hide-mobile") "div"
-                    |> (fun x -> x.InnerText.Trim().Replace(",", ""))
-                    |> int
-                let posts = 
-                    flexNode
-                    |> _getFirstChildElement (_attribPredicate "class" "js-posts inner-space-small views") "div"
-                    |> (fun x -> x.InnerText.Trim().Replace(",", ""))
-                    |> int
-                let lastPostNo =
-                    flexNode
-                    |> _getFirstChildElement (_attribPredicate "class" "inner-space-small last-post hide-mobile") "div"
-                    |> _getFirstChildElement (_classPredicate "info") "span"
-                    |> _getFirstChildElement (_classPredicate "last") "a"
-                    |> _getAttrib "href"
-                    |> (fun x -> x.Split("#").[1].Split("-") |> Seq.last)
-                    |> int
-                let lastPostPage =
-                    flexNode
-                    |> _getFirstChildElement (_attribPredicate "class" "inner-space-small last-post hide-mobile") "div"
-                    |> _getFirstChildElement (_classPredicate "info") "span"
-                    |> _getFirstChildElement (_classPredicate "last") "a"
-                    |> _getAttrib "href"
-                    |> (fun x -> x.Split("#").[0].Split("=")[1])
-                    |> int
-                let created =
-                    flexNode
-                    |>  _getFirstChildElement (_attribPredicate "class" "inner-space-small author hide-laptop") "div"
-                    |> _getFirstChildElement (_classPredicate "info") "span"
-                    |> _innerTrim
-                    |> DateTime.Parse
-                let creatorName = 
-                    flexNode
-                    |>  _getFirstChildElement (_attribPredicate "class" "inner-space-small author hide-laptop") "div"
-                    |> _getFirstChildElem "div"
-                    |> _getFirstChildElem "a"
-                    |> _innerTrim
-                let creatorLink = 
-                    flexNode
-                    |>  _getFirstChildElement (_attribPredicate "class" "inner-space-small author hide-laptop") "div"
-                    |> _getFirstChildElem "div"
-                    |> _getFirstChildElem "a"
-                    |> _getAttrib "href"
-                let boardName =
-                    flexNode
-                    |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
-                    |> _getFirstChildElement (_classPredicate "board") "a"
-                    |> _innerTrim
-                let boardLink =
-                    flexNode
-                    |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
-                    |> _getFirstChildElement (_classPredicate "board") "a"
-                    |> _getAttrib "href"
-                let threadName =
-                    flexNode
-                    |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
-                    |> _getFirstChildElem "div"
-                    
-                    |> _getFirstChildElement (_classPredicate "topic-name") "a"
-                    |> _innerTrim
-                let threadLink =
-                   flexNode
-                   |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
-                   |> _getFirstChildElem "div"
-                   
-                   |> _getFirstChildElement (_classPredicate "topic-name") "a"
-                   |> _getAttrib "href"
-                   
-                let (|ThreadType|_|) (s: string) =
-                    match s with
-                    | "Poll"     -> Some(ThreadType.Poll)
-                    | "Blog"     -> Some(ThreadType.Blog)
-                    | "Question" -> Some(ThreadType.Question)
-                    | "Answered" -> Some(ThreadType.Answered)
-                    | _  -> None
-                    
-                let threadType =
-                   match 
-                       flexNode
-                       |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
-                       |> _getFirstChildElem "div"
-                        
-                       |> _getFirstChildIfAny (_classPredicate "type") "span"
-                   with
-                   | Some(node) ->
-                       match (_innerTrim node) with
-                       | ThreadType x -> x
-                       | _            -> ThreadType.Normal
-                   | None -> ThreadType.Normal
+    type ThreadParser =
+        interface IMultiple<Thread> with
+            member this.ParseAll(path) =
+                this
+                |> parseMultipleGeneric path 1
                 
-                let id =
-                    flexNode
-                    |> _getFirstChildElement (_classPredicate "js-posts") "div"
-                    |> _getFirstChildElement (_classPredicate "js-post-render-topic") "meta"
-                    |> _getAttrib "data-post-render-value"
-                    |> int
-                let isLocked = 
-                       flexNode
-                       |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
-                       |> _getFirstChildElem "div"
-                       |> _getFirstChildIfAny (_attribPredicate "src" "https://comicvine.gamespot.com/a/bundles/phoenixsite/images/core/sprites/icons/icn-lock-16x16.png") "img"
-                       |> Option.isSome
-                let isPinned = 
-                       flexNode
-                       |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
-                       |> _getFirstChildElem "div"
-                       |> _getFirstChildIfAny (_attribPredicate "src" "https://comicvine.gamespot.com/a/bundles/phoenixsite/images/core/sprites/icons/icn-pin-16x16.png") "img"
-                       |> Option.isSome
-                {
-                    Thread = { Text = threadName; Link = threadLink }; Board = { Text = boardName; Link = boardLink } ;
-                    Id = id; IsPinned = isPinned; IsLocked = isLocked; Type = threadType; LastPostNo = lastPostNo;
-                    LastPostPage = lastPostPage; Created = created; TotalPosts = posts; TotalView = views; IsDeleted = false;
-                    Creator = { Text = creatorName; Link = creatorLink }; Comments = Unchecked.defaultof<_> }
-                )
-        
-    let parseAllThreads path page=
-        parseAllData parseThread parsePageEnd path page
+            member this._parseEnd(rootNode) =
+                parsePageEnd rootNode
+                
+            member this.ParseSingle(rootNode) =
+                rootNode
+                |> _getWrapperNode
+                |> _getForumBlockNode
+                |> _unwrapSome "Unknown Thread type"
+                |> _getFirstChildElement (_classPredicate "table-forums") "div"
+                |> _getChildElements (_classPredicate "flexbox-align-stretch") "div"
+                |> Seq.map (
+                    fun flexNode ->
+                        let views = 
+                            flexNode
+                            |> _getFirstChildElement (_attribPredicate "class" "inner-space-small views hide-mobile") "div"
+                            |> (fun x -> x.InnerText.Trim().Replace(",", ""))
+                            |> int
+                        let posts = 
+                            flexNode
+                            |> _getFirstChildElement (_attribPredicate "class" "js-posts inner-space-small views") "div"
+                            |> (fun x -> x.InnerText.Trim().Replace(",", ""))
+                            |> int
+                        let lastPostNo =
+                            flexNode
+                            |> _getFirstChildElement (_attribPredicate "class" "inner-space-small last-post hide-mobile") "div"
+                            |> _getFirstChildElement (_classPredicate "info") "span"
+                            |> _getFirstChildElement (_classPredicate "last") "a"
+                            |> _getAttrib "href"
+                            |> (fun x -> x.Split("#").[1].Split("-") |> Seq.last)
+                            |> int
+                        let lastPostPage =
+                            flexNode
+                            |> _getFirstChildElement (_attribPredicate "class" "inner-space-small last-post hide-mobile") "div"
+                            |> _getFirstChildElement (_classPredicate "info") "span"
+                            |> _getFirstChildElement (_classPredicate "last") "a"
+                            |> _getAttrib "href"
+                            |> (fun x -> x.Split("#").[0].Split("=")[1])
+                            |> int
+                        let created =
+                            flexNode
+                            |>  _getFirstChildElement (_attribPredicate "class" "inner-space-small author hide-laptop") "div"
+                            |> _getFirstChildElement (_classPredicate "info") "span"
+                            |> _innerTrim
+                            |> DateTime.Parse
+                        let creatorName = 
+                            flexNode
+                            |>  _getFirstChildElement (_attribPredicate "class" "inner-space-small author hide-laptop") "div"
+                            |> _getFirstChildElem "div"
+                            |> _getFirstChildElem "a"
+                            |> _innerTrim
+                        let creatorLink = 
+                            flexNode
+                            |>  _getFirstChildElement (_attribPredicate "class" "inner-space-small author hide-laptop") "div"
+                            |> _getFirstChildElem "div"
+                            |> _getFirstChildElem "a"
+                            |> _getAttrib "href"
+                        let boardName =
+                            flexNode
+                            |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                            |> _getFirstChildElement (_classPredicate "board") "a"
+                            |> _innerTrim
+                        let boardLink =
+                            flexNode
+                            |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                            |> _getFirstChildElement (_classPredicate "board") "a"
+                            |> _getAttrib "href"
+                        let threadName =
+                            flexNode
+                            |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                            |> _getFirstChildElem "div"
+                            
+                            |> _getFirstChildElement (_classPredicate "topic-name") "a"
+                            |> _innerTrim
+                        let threadLink =
+                           flexNode
+                           |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                           |> _getFirstChildElem "div"
+                           
+                           |> _getFirstChildElement (_classPredicate "topic-name") "a"
+                           |> _getAttrib "href"
+                           
+                        let (|ThreadType|_|) (s: string) =
+                            match s with
+                            | "Poll"     -> Some(ThreadType.Poll)
+                            | "Blog"     -> Some(ThreadType.Blog)
+                            | "Question" -> Some(ThreadType.Question)
+                            | "Answered" -> Some(ThreadType.Answered)
+                            | _  -> None
+                            
+                        let threadType =
+                           match 
+                               flexNode
+                               |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                               |> _getFirstChildElem "div"
+                                
+                               |> _getFirstChildIfAny (_classPredicate "type") "span"
+                           with
+                           | Some(node) ->
+                               match (_innerTrim node) with
+                               | ThreadType x -> x
+                               | _            -> ThreadType.Normal
+                           | None -> ThreadType.Normal
+                        
+                        let id =
+                            flexNode
+                            |> _getFirstChildElement (_classPredicate "js-posts") "div"
+                            |> _getFirstChildElement (_classPredicate "js-post-render-topic") "meta"
+                            |> _getAttrib "data-post-render-value"
+                            |> int
+                        let isLocked = 
+                               flexNode
+                               |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                               |> _getFirstChildElem "div"
+                               |> _getFirstChildIfAny (_attribPredicate "src" "https://comicvine.gamespot.com/a/bundles/phoenixsite/images/core/sprites/icons/icn-lock-16x16.png") "img"
+                               |> Option.isSome
+                        let isPinned = 
+                               flexNode
+                               |> _getFirstChildElement (_attribPredicate "class" "inner-space-small forum-topic") "div"
+                               |> _getFirstChildElem "div"
+                               |> _getFirstChildIfAny (_attribPredicate "src" "https://comicvine.gamespot.com/a/bundles/phoenixsite/images/core/sprites/icons/icn-pin-16x16.png") "img"
+                               |> Option.isSome
+                        {
+                            Thread = { Text = threadName; Link = threadLink }; Board = { Text = boardName; Link = boardLink } ;
+                            Id = id; IsPinned = isPinned; IsLocked = isLocked; Type = threadType; LastPostNo = lastPostNo;
+                            LastPostPage = lastPostPage; Created = created; TotalPosts = posts; TotalView = views; IsDeleted = false;
+                            Creator = { Text = creatorName; Link = creatorLink }; Comments = Unchecked.defaultof<_> }
+                        )
+                
+    // let parseAllThreads path page=
+    //     parseAllData parseThread parsePageEnd path page
     // let parseAllThreads (path: string) page = taskSeq {
     //     let! stream = Net.getStreamByPage page path 
     //     let node = stream |> Net.getRootNode
@@ -408,17 +409,26 @@ module Parsers =
     //             |> Net.getRootNode
     //             |> parseThread
     // }
-    let ParseThreadsFull path =
-        parseAllThreads path 1
-        |> unwrapTaskSeq
+    // let ParseThreadsFull path =
+    //     parseAllThreads path 1
+    //     |> unwrapTaskSeq
        
-    let parsePosts threadId (rootNode: HtmlNode) =
-        rootNode
-        |> _getWrapperNode
-        |> _getForumBlockNode
-        |> _unwrapSome "Unknown Thread type"
-        |> _getFirstChildElement (_classPredicate "js-forum-block") "div"
-        |> _getFirstChildElement (_classPredicate "forum-messages") "section"
+       
+    let parsePosts (rootNode: HtmlNode) =
+        let node =
+            rootNode
+            |> _getWrapperNode
+            |> _getForumBlockNode
+            |> _unwrapSome "Unknown Thread type"
+            |> _getFirstChildElement (_classPredicate "js-forum-block") "div"
+            |> _getFirstChildElement (_classPredicate "forum-messages") "section"
+            
+        let threadId =
+            node
+            |> _getFirstChildElement (_attribPredicate "data-post-render-param" "ForumBundle.topicId") "meta"
+            |> _getAttrib "data-post-render-value"
+            |> int
+        node
         |> _getChildElements (_classPredicate "js-message") "div"
         |> Seq.map(
             fun node ->
@@ -482,79 +492,284 @@ module Parsers =
                     { ThreadId = threadId; Content = content; Created = created; IsEdited = edited; Creator = creator }
                     |> ThreadPost.OP
         )
-    let ParsePosts threadId rootNode =
-        parsePosts threadId rootNode
-        |> Seq.map (
-            fun node ->
-                match node with
-                | ThreadPost.Comment(n) ->
-                    { IsComment = true ; Comment = n; OP = Unchecked.defaultof<_> ; IsDeleted = false}
-                | ThreadPost.OP(n) ->
-                    { IsComment = false; Comment = Unchecked.defaultof<_> ; OP = n; IsDeleted = false}
-        )
-        
-    let parseAllPosts (path: string) page = taskSeq {
-        let id  = path.Split("-") |> Seq.last |> (fun x -> x.Split("/")[0]) |> int
-        let! stream = Net.getStreamByPage page path 
-        let node = stream |> Net.getRootNode
-        let last = parsePageEnd node
-        yield ParsePosts id node
-        
-        for p in [2..last] do
-            printfn "%A" p
-            let! s= Net.getStreamByPage p path 
-            yield s
-                |> Net.getRootNode
-                |> ParsePosts id
-    }
-   
-    let ParsePostsFull path = 
-        parseAllPosts path 1
-        |> unwrapTaskSeq
         
         
-    let parseImages rootNode =
-        let xNode =
+        
+    type PostParser =
+        interface IMultiple<Post> with
+            member this.ParseAll(path) =
+                this
+                |> parseMultipleGeneric path 1
+                
+            member this._parseEnd(rootNode) =
+                parsePageEnd rootNode
+                
+            member this.ParseSingle(rootNode) =
+                parsePosts rootNode
+                |> Seq.map (
+                    fun node ->
+                        match node with
+                        | ThreadPost.Comment(n) ->
+                            { IsComment = true ; Comment = n; OP = Unchecked.defaultof<_> ; IsDeleted = false}
+                        | ThreadPost.OP(n) ->
+                            { IsComment = false; Comment = Unchecked.defaultof<_> ; OP = n; IsDeleted = false}
+                )
+    // let parseAllPosts (path: string) page = taskSeq {
+    //     let! stream = Net.getStreamByPage page path 
+    //     let node = stream |> Net.getRootNode
+    //     let last = parsePageEnd node
+    //     yield ParsePosts node
+    //     
+    //     for p in [2..last] do
+    //         printfn "%A" p
+    //         let! s= Net.getStreamByPage p path 
+    //         yield s
+    //             |> Net.getRootNode
+    //             |> ParsePosts
+    // }
+    //
+    // let ParsePostsFull path = 
+    //     parseAllPosts path 1
+    //     |> unwrapTaskSeq
+    //     
+        
+        
+         
+    type BlogParser =
+        interface IMultiple<Blog> with
+            member this.ParseAll(path) =
+                this
+                |> parseMultipleGeneric path 1
+                
+            member this._parseEnd(rootNode) =
+                parseBlogEnd rootNode
+                
+            member this.ParseSingle(rootNode) = 
+                let parse (node: HtmlNode) =
+                    let aNode =
+                        node
+                        |> _getFirstChildElement (_classPredicate "news-hdr") "section"
+                        |> _getFirstChildElem "h1"
+                        |> _getFirstChildElem "a"
+                    let hNode =
+                        node
+                        |> _getFirstChildElement (_classPredicate "news-hdr") "section"
+                        |> _getFirstChildElem "h4"
+                    {
+                        Blog =  { Text = aNode.InnerText.Trim(); Link = _getAttrib "href" aNode }
+                        Created  =
+                            hNode
+                            |> _getFirstChildElem "time"
+                            |> _getAttrib "datetime"
+                            |> DateTime.Parse
+                        Comments =
+                            hNode
+                            |> _getFirstChildElem "a"
+                            |> _innerTrim
+                            |> _split
+                            |> Seq.head
+                            |> int
+                        Id =
+                            aNode
+                            |> _getAttrib "href"
+                            |> (fun x -> x.Split("/"))
+                            |> Seq.filter (fun x -> x.Length > 0)
+                            |> Seq.last
+                            |> int
+                            
+                        ThreadId =
+                            match
+                                hNode
+                                |> _getFirstChildElem "a"
+                                |> _getAttrib "href"
+                                |> (fun x -> x.Split("-"))
+                                |> Seq.last
+                                |> Int32.TryParse
+                            with
+                            | true,  x -> Nullable x
+                            | false, _ -> Nullable()
+                    }
+                    
+                _getWrapperNode rootNode
+                |> _getFirstChildElement (_idPredicate "site") "div"
+                |> _getFirstChildElement (_idPredicate "default-content") "div"
+                |> _getFirstChildElement (_classPredicate "primary-content") "div"
+                |> _getChildElements (_classPredicate "profile-blog") "article"
+                |> Seq.map parse
+        
+        
+    type ImageParser =
+        interface ISingle<Image> with
+            member this.ParseSingle(rootNode) = 
+                let xNode =
+                    rootNode
+                    |> _getWrapperNode
+                    |> _getFirstChildElement (_idPredicate "site") "div"
+                    |> _getFirstChildElement (_idPredicate "gallery-content") "div"
+                    |> _getFirstChildElement (_classPredicate "primary-content") "div"
+                    
+                    |> _getFirstChildElement (_classPredicate "gallery-header") "header"
+                    |> _getFirstChildElement (_classPredicate "isotope-image") "div"
+                    |> _getFirstChildElement (_classPredicate "gallery-tags") "ul"
+                let dataNode =
+                    xNode
+                    |> _getFirstChildElement (_classPredicate "gallery-tags__item") "li"
+                    |> _getFirstChildElement (_idPredicate "galleryMarker") "a"
+
+                {
+                    GalleryId = _getAttrib "data-gallery-id" dataNode
+                    ObjectId  = _getAttrib "data-object-id" dataNode
+                    Tags =
+                        xNode
+                        |> _getChildElements (_classPredicate "gallery-tags__item") "li"
+                        |> Seq.map (fun x ->
+                            {
+                                Link = 
+                                    x
+                                    |> _getFirstChildElem "a"
+                                    |> _getAttrib "href"
+                                Text = 
+                                    x
+                                    |> _getFirstChildElem "a"
+                                    |> _innerTrim
+                            }
+                        )
+                    TotalImages =
+                        rootNode
+                        |> _getWrapperNode
+                        |> _getFirstChildElement (_classPredicate "sub-nav") "nav"
+                        |> _getFirstChildElement (_classPredicate "container") "div"
+                        |> _getFirstChildElem "ul"
+                        |> _getFirstChildElement (fun x -> x.InnerText.Trim().StartsWith("Images") ) "li"
+                        |> _innerTrim
+                        |> (fun x -> x.Split("(").[1].Trim(')') )
+                        |> int
+                }
+
+ 
+    let parseFollowRelationshipEnd rootNode =
+        match
             rootNode
             |> _getWrapperNode
             |> _getFirstChildElement (_idPredicate "site") "div"
-            |> _getFirstChildElement (_idPredicate "gallery-content") "div"
+            |> _getFirstChildElement (_idPredicate "default-content") "div"
             |> _getFirstChildElement (_classPredicate "primary-content") "div"
-            
-            |> _getFirstChildElement (_classPredicate "gallery-header") "header"
-            |> _getFirstChildElement (_classPredicate "isotope-image") "div"
-            |> _getFirstChildElement (_classPredicate "gallery-tags") "ul"
-        let dataNode =
-            xNode
-            |> _getFirstChildElement (_classPredicate "gallery-tags__item") "li"
-            |> _getFirstChildElement (_idPredicate "galleryMarker") "a"
+            |> _getFirstChildElement (_idPredicate "js-sort-filter-results") "div"
+            |> _getFirstChildElement (_classPredicate "navigation") "div"
+            |> _getFirstChildIfAny (fun _ -> true) "ul"
+        with
+        | None -> 1
+        | Some x ->
+            x
+            |> _getChildElements (_attribPredicate "class" "paginate__item") "li"
+            |> Seq.last
+            |> _innerTrim
+            |> int
+    
 
-        {
-            GalleryId = _getAttrib "data-gallery-id" dataNode
-            ObjectId  = _getAttrib "data-object-id" dataNode
-            Tags =
-                xNode
-                |> _getChildElements (_classPredicate "gallery-tags__item") "li"
-                |> Seq.map (fun x ->
+    let parseFollowRelationship parseData rootNode =
+        match
+            rootNode
+            |> _getWrapperNode
+            |> _getFirstChildElement (_idPredicate "site") "div"
+            |> _getFirstChildElement (_idPredicate "default-content") "div"
+            |> _getFirstChildElement (_classPredicate "primary-content") "div"
+            |> _getFirstChildElement (_idPredicate "js-sort-filter-results") "div"
+            |> _getFirstChildElem "table"
+            |> _getFirstChildElem "tbody"
+            |> _getChildElementsIfAny (fun _ -> true) "tr"
+        with
+        | Some n ->
+            n
+            |> Seq.map parseData
+        | None -> []
+        
+    
+    type FollowerParser =
+        interface IMultiple<Follower> with
+            member this.ParseAll(path) =
+                this
+                |> parseMultipleGeneric path 1
+                
+            member this._parseEnd(rootNode) =
+                parseFollowRelationshipEnd rootNode
+                
+            member this.ParseSingle(rootNode) =
+                let parser tr =
                     {
-                        Link = 
-                            x
-                            |> _getFirstChildElem "a"
-                            |> _getAttrib "href"
-                        Text = 
-                            x
-                            |> _getFirstChildElem "a"
-                            |> _innerTrim
+                        Follower =
+                            {
+                                Text =
+                                    tr
+                                    |>  _getFirstChildElem "td"
+                                    |>  _getFirstChildElem "a"
+                                    |> _innerTrim
+                                Link = 
+                                    tr
+                                    |>  _getFirstChildElem "td"
+                                    |>  _getFirstChildElem "a"
+                                    |> _getAttrib "href"
+                            }
+                        Avatar =
+                            tr
+                            |>  _getFirstChildElem "td"
+                            |>  _getFirstChildElem "a"
+                            |>  _getFirstChildElem "img"
+                            |> _getAttrib "src"
                     }
-                )
-            TotalImages =
-                rootNode
-                |> _getWrapperNode
-                |> _getFirstChildElement (_classPredicate "sub-nav") "nav"
-                |> _getFirstChildElement (_classPredicate "container") "div"
-                |> _getFirstChildElem "ul"
-                |> _getFirstChildElement (fun x -> x.InnerText.Trim().StartsWith("Images") ) "li"
-                |> _innerTrim
-                |> (fun x -> x.Split("(").[1].Trim(')') )
-                |> int
-        }
+                parseFollowRelationship parser rootNode
+        
+    
+    type FollowingParser =
+        interface IMultiple<Following> with
+            member this.ParseAll(path) =
+                this
+                |> parseMultipleGeneric path 1
+                
+            member this._parseEnd(rootNode) =
+                parseFollowRelationshipEnd rootNode
+                
+            member this.ParseSingle(rootNode) =
+                let parser (tr: HtmlNode) =
+                    {
+                        Following =
+                            {
+                                Text =
+                                    tr
+                                    |>  _getFirstChildElem "td"
+                                    |>  _getFirstChildElem "a"
+                                    |> _innerTrim
+                                Link = 
+                                    tr
+                                    |>  _getFirstChildElem "td"
+                                    |>  _getFirstChildElem "a"
+                                    |> _getAttrib "href"
+                            }
+                        Avatar =
+                            tr
+                            |>  _getFirstChildElem "td"
+                            |>  _getFirstChildElem "a"
+                            |>  _getFirstChildElem "img"
+                            |> _getAttrib "src"
+                            
+                        Type = 
+                            tr
+                            |>  _getChildElems "td"
+                            |> Seq.last
+                            |>  _innerTrim
+                    }
+                    
+                parseFollowRelationship parser rootNode
+                   
+    // let parseAllFollowRel parseFollowRel path page =
+    //     parseAllData parseFollowRel parseFollowRelationshipEnd path page
+
+    // let parseAllFollowRelFull parseFollowRel path =
+    //     parseAllData parseFollowRel parseFollowRelationshipEnd path 1
+    //     |> unwrapTaskSeq
+    
+    // let ParseFollowersFull path =
+    //     parseAllFollowRelFull parseFollowers path
+        
+    // let ParseFollowingsFull path =
+    //     parseAllFollowRelFull parseFollowings path

@@ -3,7 +3,6 @@ module Tests.Parser
 open System
 open System.Net.Http
 open System.Text.RegularExpressions
-open System.Web
 open Comicvine.Core
 open Xunit
 
@@ -102,7 +101,7 @@ module BlogEndParer =
         Assert.True(no >= 88)
         let! node = getNodeFromPath $"/profile/temsbumbum/blog"
         let no = Parsers.parseBlogEnd node
-        Assert.True( (no = 1) )
+        Assert.Equal(no , 1)
     }
     
 module BlogParser =
@@ -404,7 +403,7 @@ module PostParser =
     [<Fact>]
     let ``valid comments should not be empty``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.parsePosts 2300312 node
+        let j = Parsers.parsePosts node
         Assert.NotEmpty j
     }
     
@@ -412,7 +411,7 @@ module PostParser =
     let ``should correctly show edited posts exists``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
         let j =
-            Parsers.parsePosts 2300312 node
+            Parsers.parsePosts node
             |> Seq.map (fun e ->
                 match e with
                 | Parsers.ThreadPost.OP(n) -> n.IsEdited
@@ -424,7 +423,7 @@ module PostParser =
     [<Fact>]
     let ``date created for each post should be unique``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.parsePosts 2300312 node
+        let j = Parsers.parsePosts node
         let k =
             j
             |> Seq.map (fun e ->
@@ -440,7 +439,7 @@ module PostParser =
     [<Fact>]
     let ``"ThreadId" value should be correct and the same``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.parsePosts 2300312 node
+        let j = Parsers.parsePosts node
         let k =
             j
             |> Seq.map (fun e ->
@@ -456,7 +455,7 @@ module PostParser =
     [<Fact>]
     let ``content of each post should not be empty``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.parsePosts 2300312 node
+        let j = Parsers.parsePosts node
         let k =
             j
             |> Seq.map (fun e ->
@@ -472,7 +471,7 @@ module PostParser =
     [<Fact>]
     let ``creator details should not be empty``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.parsePosts 2300312 node
+        let j = Parsers.parsePosts node
         let k =
             j
             |> Seq.map (fun e ->
@@ -489,7 +488,7 @@ module PostParser =
     let ``comment ids should be distinct``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
         let j =
-            Parsers.parsePosts 2300312 node
+            Parsers.parsePosts node
             |> Seq.map (fun e ->
                 match e with
                 | Parsers.ThreadPost.OP _ -> None
@@ -508,7 +507,7 @@ module PostParser =
     let ``"PostNo" should be distinct``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
         let j =
-            Parsers.parsePosts 2300312 node
+            Parsers.parsePosts node
             |> Seq.map (
                 fun e ->
                     match e with
@@ -597,6 +596,118 @@ module ImageParser =
         let j = Parsers.parseImages node
         Assert.True(j.TotalImages > 1)
     }
+    
+module FollowRelationship =
+    let usersWithFollows: obj[] list =
+        [
+            [|"owie"|]
+            [|"static_shock"|]
+            [|"cbishop"|]
+            [|"death4bunnies"|]
+            [|"sc"|]
+            [|"darthjhawk"|]
+        ]
+        
+    [<Theory>]
+    [<MemberData(nameof(usersWithFollows))>]
+    let ``parsing users followers should not return empty sequence``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/follower"
+        let j = Parsers.parseFollowers node
+        Assert.NotEmpty(j)
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithFollows))>]
+    let ``parsed followers should be valid``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/follower"
+        let j = Parsers.parseFollowers node
+        Assert.All(j, (fun x ->
+            Assert.NotEmpty(x.Avatar)
+            Assert.NotEmpty(x.Follower.Link)
+        ))
+    }
+    
+    [<Fact>]
+    let ``parsing users without followers should return empty sequence``() = task {
+        let! node = getNodeFromPath $"/profile/temsbumbum/follower"
+        let j = Parsers.parseFollowers node
+        Assert.Empty(j)
+    }
+         
+    [<Theory>]
+    [<MemberData(nameof(usersWithFollows))>]
+    let ``parsing users followings should not return empty sequence``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/following"
+        let j = Parsers.parseFollowings node
+        Assert.NotEmpty(j)
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithFollows))>]
+    let ``parsed followings should be valid``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/following"
+        let j = Parsers.parseFollowings node
+        Assert.All(j, (fun x ->
+            Assert.NotEmpty(x.Avatar)
+            Assert.NotEmpty(x.Following.Link)
+            Assert.NotEmpty(x.Type)
+        ))
+    }
+    
+    [<Fact>]
+    let ``parsing users without followings should return empty sequence``() = task {
+        let! node = getNodeFromPath $"/profile/temsbumbum/following"
+        let j = Parsers.parseFollowings node
+        Assert.Empty(j)
+    }
+    
+module FollowRelationshipEndParser =
+    let usersWithManyFollows: obj[] list =
+        [
+            [|"owie"|]
+            [|"static_shock"|]
+            [|"cbishop"|]
+            [|"sc"|]
+        ]
+        
+    [<Fact>]
+    let ``parsing users without followings should only have one page of followings``() = task {
+        let! node = getNodeFromPath $"/profile/temsbumbum/following"
+        Assert.Equal(1, Parsers.parseFollowRelationshipEnd node)
+    }
+    
+    [<Fact>]
+    let ``parsing users without followers should only have one page of followers``() = task {
+        let! node = getNodeFromPath $"/profile/temsbumbum/follower"
+        Assert.Equal(1, Parsers.parseFollowRelationshipEnd node)
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithManyFollows))>]
+    let ``no of pages for users with many followers should more than one``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/follower"
+        Assert.True(Parsers.parseFollowRelationshipEnd node > 1)
+    }
+     
+    [<Theory>]
+    [<MemberData(nameof(usersWithManyFollows))>]
+    let ``no of pages for users with many followings should more than one``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/following"
+        let no = Parsers.parseFollowRelationshipEnd node
+        Assert.True(no > 1)
+    }
+
+module FollowRelationshipFullParser =
+    let sampleUsers: obj[] list =
+        [
+            [|"owie"|]
+            [|"static_shock"|]
+            [|"cbishop"|]
+            [|"death4bunnies"|]
+            [|"sc"|]
+            [|"darthjhawk"|]
+            [|"temsbumbum"|]
+        ]
     
     
 module WikiParser =

@@ -45,10 +45,10 @@ public class ProfileController: ControllerBase
     [HttpGet("{username}/following")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<FollowingPage>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetFollowing(string username, [FromQuery(Name = "page")] int pageNo) {
+    public async Task<IActionResult> GetFollowing(string username) {
         try {
 
-            FollowingPage following = await _userRepository.GetUserFollowing(username, Math.Max(pageNo, 1), _logger);
+            var following = await _userRepository.GetUserFollowing(username);
             return Ok(following);
         }
         catch (HttpRequestException) {
@@ -65,9 +65,9 @@ public class ProfileController: ControllerBase
     [HttpGet("{username}/followers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<FollowersPage>> GetFollowers(string username, [FromQuery(Name = "page")] int pageNo) {
+    public async Task<ActionResult<FollowersPage>> GetFollowers(string username) {
         try {
-            FollowersPage followers = await _userRepository.GetUserFollowers(username, Math.Max(pageNo, 1), _logger);
+            var followers = await _userRepository.GetUserFollowers(username);
             return Ok(followers);
         }
         catch (HttpRequestException) {
@@ -109,7 +109,7 @@ public class ProfileController: ControllerBase
     /// <param name="pageNo">page number</param>
     /// <returns></returns>
     [HttpGet("{username}/images")]
-    public async Task<ActionResult<Parsers.Image>> GetImages(string username, [FromQuery(Name = "page")] int pageNo) {
+    public async Task<ActionResult<Parsers.Image>> GetImages(string username) {
         try {
             var imagePage = await _userRepository.GetImage(username);
             return Ok(imagePage);
