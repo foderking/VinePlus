@@ -40,7 +40,6 @@ public class ProfileController: ControllerBase
     /// Produces a 404 if the page does not exist
     /// </summary>
     /// <param name="username"></param>
-    /// <param name="pageNo">the current page</param>
     /// <returns></returns>
     [HttpGet("{username}/following")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<FollowingPage>))]
@@ -60,7 +59,6 @@ public class ProfileController: ControllerBase
     /// Gets a comicvine user's followers
     /// </summary>
     /// <param name="username"></param>
-    /// <param name="pageNo">the page number</param>
     /// <returns></returns>
     [HttpGet("{username}/followers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -79,18 +77,7 @@ public class ProfileController: ControllerBase
     /// Gets all the blog posts by a comicvine user
     /// </summary>
     /// <param name="username"></param>
-    /// <param name="pageNo">the page number</param>
     /// <returns></returns>
-    // [HttpGet("{username}/blog")]
-    // public async Task<ActionResult<BlogPage>> GetBlog(string username, [FromQuery(Name = "page")] int pageNo) {
-    //     try {
-    //         BlogPage blogPage = await _userRepository.GetUserBlog(username, Math.Max(pageNo, 1), _logger);
-    //         return Ok(blogPage);
-    //     }
-    //     catch (HttpRequestException) {
-    //         return NotFound();
-    //     }
-    // }
     [HttpGet("{username}/blog")]
     public async Task<ActionResult<Parsers.Blog>> GetBlog(string username) {
         try {
@@ -106,7 +93,6 @@ public class ProfileController: ControllerBase
     /// Gets all images a comicvine user has posted
     /// </summary>
     /// <param name="username"></param>
-    /// <param name="pageNo">page number</param>
     /// <returns></returns>
     [HttpGet("{username}/images")]
     public async Task<ActionResult<Parsers.Image>> GetImages(string username) {

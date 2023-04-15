@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using ComicVine.API.Models;
-using ComicVine.API.Repository;
-using ComicVine.API.Scripts;
+﻿using ComicVine.API.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ComicVine.API.Controllers;
@@ -23,7 +20,7 @@ public class ForumController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<Thread>> GetPage([FromQuery(Name = "page")] int pageNo) {
         try {
-            var ans = await _forumRepo.GetForumPage(Math.Max(1, pageNo), _logger);
+            var ans = await _forumRepo.GetForumPage(Math.Max(1, pageNo));
             return Ok(ans);
         }
         catch (HttpRequestException) {
