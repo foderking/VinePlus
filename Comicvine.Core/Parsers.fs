@@ -47,12 +47,18 @@ module Parsers =
         }
         
     // Profile section
+    type ActivityType =
+        | Comment = 1
+        | Image   = 2
+        | Follow  = 3
     type Activity =
-        | Comment of {| Content: string; Topic: Link; Forum: Link |}
-        | Image   of {| Url: string |}
-        | Follow  of {| User: Link |}
+        { Type: ActivityType;  }
+    //     | Comment of {| Content: string; Topic: Link; Forum: Link |}
+    //     | Image   of {| Url: string |}
+    //     | Follow  of {| User: Link |}
     type About =
         { DateJoined: DateTime;  Alignment: Alignment; Points: int; Summary: string }
+        
     type Profile =
         {
             UserName: string; Avatar: string; Description: string; Posts: int; WikiPoints: int
@@ -891,9 +897,14 @@ module Parsers =
                         | _         -> Alignment.None
                             
                     let description =
-                        asidePodNode
-                        |> _getFirstChildElement (_classPredicate "about-me") "div"
-                        |> _innerTrim
+                        match
+                            asidePodNode
+                            |> _getFirstChildIfAny (_classPredicate "about-me") "div"
+                        with
+                        | None -> ""
+                        | Some n ->
+                            n
+                            |> (fun x -> x.InnerHtml.Trim())
                     let stats =
                         asidePodNode
                         |> _getFirstChildElem "ul"
@@ -913,9 +924,10 @@ module Parsers =
                     match
                         mainNode
                         |> _getFirstChildElement (_classPredicate "secondary-content") "aside"
-                        |> _getFirstChildElement
-                            (fun x -> x |> _getFirstChildIfAny (_classPredicate "about-me") "div" |> Option.isSome )
-                            "div"
+                        |> _getFirstChildElement (_classPredicate "aside-pod") "div"
+                        // |> _getFirstChildElement
+                        //     (fun x -> x |> _getFirstChildIfAny (_classPredicate "about-me") "div" |> Option.isSome )
+                        //     "div"
                     with
                     | About n -> n
                     

@@ -41,7 +41,7 @@ public class UserRepository: IUserRepository<ProfileController>
     }
    
     public async Task<Comicvine.Core.Parsers.Profile> GetProfile(string username) {
-        Stream stream = await Net.getStream($"/profile/{username}/images");
+        Stream stream = await Net.getStream($"/profile/{username}");
         HtmlNode rootNode = Net.getRootNode(stream);
         return _profileParser.ParseSingle(rootNode);
     }

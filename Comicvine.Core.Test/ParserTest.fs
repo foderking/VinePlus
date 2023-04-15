@@ -722,6 +722,12 @@ module WikiParser =
 module ProfileParsers =
     let parser = Parsers.ProfileParser()
     
+    let usersWithoutAboutSummary: obj[] list =
+        [
+            [|"estrelladeleon"|]
+            [|"temsbumbum"|]
+        ]
+        
     let sampleUsers: obj[] list =
         [
             [|"owie"|]
@@ -819,3 +825,10 @@ module ProfileParsers =
         Assert.True(j.HasBlogs)
     }
     
+    [<Theory>]
+    [<MemberData(nameof(usersWithoutAboutSummary))>]
+    let ``users without about summary should have empty field``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}"
+        let j = parser.ParseSingle node
+        Assert.True(j.About.Summary.Length = 0)
+    }   
