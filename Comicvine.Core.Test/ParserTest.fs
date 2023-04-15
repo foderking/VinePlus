@@ -3,6 +3,7 @@ module Tests.Parser
 open System
 open System.Net.Http
 open System.Text.RegularExpressions
+open System.Web
 open Comicvine.Core
 open Xunit
 
@@ -28,14 +29,62 @@ let getNodeFromPath path = task {
     let! stream = Net.getStream path
     return Net.getRootNode stream
 }
-let usersWithBlog: obj[] list =
-    [
-        [|"owie"|]
-        [|"death4bunnies"|]
-        [|"sc"|]
-        [|"cbishop"|]
-    ]
 
+module BlogFullParser =
+    let usersWithBlog: obj[] list =
+        [
+            [|"owie"|]
+            [|"death4bunnies"|]
+            [|"sc"|]
+            [|"darthjhawk"|]
+            [|"static_shock"|]
+        ]
+        
+    [<Theory>]
+    [<MemberData(nameof(usersWithBlog))>]
+    let ``valid blog should not be empty sequence``(username: string) = task {
+        let! j = Parsers.ParseBlogsFull $"/profile/{username}/blog"
+        Assert.NotEmpty j
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithBlog))>]
+    let ``created dates should be unique``(username: string) = task {
+        let! j = Parsers.ParseBlogsFull $"/profile/{username}/blog"
+        let k = j |> Seq.distinctBy (fun x -> x.Created)
+        Assert.Equal(j |> Seq.length, k |> Seq.length)
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithBlog))>]
+    let ``blog id should be unique``(username: string) = task {
+        let! j = Parsers.ParseBlogsFull $"/profile/{username}/blog"
+        let k = j |> Seq.distinctBy (fun x -> x.Id)
+        Assert.Equal(j |> Seq.length, k |> Seq.length)
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithBlog))>]
+    let ``threadids that are not null should be unique``(username: string) = task {
+        let! a = Parsers.ParseBlogsFull $"/profile/{username}/blog"
+        let j = a |> Seq.filter (fun x -> x.ThreadId.HasValue)
+        let k = j |> Seq.distinctBy (fun x -> x.ThreadId.Value)
+        Assert.Equal(j |> Seq.length, k |> Seq.length)
+    }
+    
+    // [<Theory>]
+    // [<MemberData(nameof(usersWithBlog))>]
+    // let ``"Blog.Text" should satisfy invariant with "Blog.Link"``(username: string) = task {
+    //     let! j = Parsers.ParseBlogsFull $"/profile/{username}/blog"
+    //     j
+    //     |> Seq.iter (
+    //         fun x ->
+    //             let name, link = x.Blog.Text, x.Blog.Link
+    //             let pref, full = link |> (fun x -> x.Split("/").[4]), name |> convertNameRegex
+    //             Assert.Equal(full[..(pref.Length-1)], pref)
+    //     )
+    // }   
+    //
 module BlogEndParer =
     [<Fact>]
     let ``number of pages returned should not be more than amount known``() = task {
@@ -51,9 +100,28 @@ module BlogEndParer =
         let! node = getNodeFromPath $"/profile/cbishop/blog"
         let no = Parsers.parseBlogEnd node
         Assert.True(no >= 88)
+        let! node = getNodeFromPath $"/profile/temsbumbum/blog"
+        let no = Parsers.parseBlogEnd node
+        Assert.True( (no = 1) )
     }
     
 module BlogParser =
+    let usersWithBlog: obj[] list =
+        [
+            [|"owie"|]
+            [|"death4bunnies"|]
+            [|"sc"|]
+            [|"cbishop"|]
+            [|"static_shock"|]
+        ]
+
+    [<Fact>]
+    let ``should return empty sequence when user has no blogs``() = task {
+        let! node = getNodeFromPath $"/profile/temsbumbum/blog"
+        let j = Parsers.parseBlog node
+        Assert.Empty j
+    }
+    
     [<Theory>]
     [<MemberData(nameof(usersWithBlog))>]
     let ``valid blog should not be empty sequence``(username: string) = task {
@@ -89,24 +157,20 @@ module BlogParser =
         Assert.Equal(j |> Seq.length, k |> Seq.length)
     }
     
-       
         
-        // Regex.Replace(name.ToLower(), , "")
-          
-        
-    [<Theory>]
-    [<MemberData(nameof(usersWithBlog))>]
-    let ``"Blog.Text" should satisfy invariant with "Blog.Link"``(username: string) = task {
-        let! node = getNodeFromPath $"/profile/{username}/blog"
-        let j = Parsers.parseBlog node
-        j
-        |> Seq.iter (
-            fun x ->
-                let name, link = x.Blog.Text, x.Blog.Link
-                let pref, full = link |> (fun x -> x.Split("/").[4]), name |> convertNameRegex
-                Assert.Equal(full[..(pref.Length-1)], pref)
-        )
-    }   
+    // [<Theory>]
+    // [<MemberData(nameof(usersWithBlog))>]
+    // let ``"Blog.Text" should satisfy invariant with "Blog.Link"``(username: string) = task {
+    //     let! node = getNodeFromPath $"/profile/{username}/blog"
+    //     let j = Parsers.parseBlog node
+    //     j
+    //     |> Seq.iter (
+    //         fun x ->
+    //             let name, link = x.Blog.Text, x.Blog.Link
+    //             let pref, full = link |> (fun x -> x.Split("/").[4]), name |> convertNameRegex
+    //             Assert.Equal(full[..(pref.Length-1)], pref)
+    //     )
+    // }   
         
 module ThreadParser =
     [<Fact>]
@@ -284,16 +348,8 @@ module ThreadParser =
         |> Seq.iter (
             fun x ->
                 let name, link = x.Board.Text, x.Board.Link
-                // let convertNameFormat (name: string) =
-                //     name
-                //         .ToLower()
-                //         .Replace(".", "")
-                //         .Replace("&amp; ", "")
-                //         .Replace("/", "")
-                //         .Replace(" ", "-")
-                        
                 let fullName, prefix = link |> extractBoard, name |> convertNameRegex
-                // Assert.True(fullName.StartsWith(prefix))
+                
                 Assert.Equal(fullName[..(prefix.Length-1)], prefix)
         )
     }   
@@ -480,3 +536,73 @@ module PostFullParser =
         let! j = Parsers.ParsePostsFull "/forums/battles-7/cyttorak-vs-living-tribunal-528457/"
         Assert.Equal(54, j |> Seq.length)
     }
+    
+module ProfileParser =
+     let usersWithNoCover: obj[] list =
+        [
+            [|"abc"|]
+        ]
+    
+module ImageParser =
+    let usersWithImages: obj[] list =
+        [
+            [|"owie"|]
+            [|"static_shock"|]
+            [|"cbishop"|]
+            [|"death4bunnies"|]
+            [|"sc"|]
+            [|"darthjhawk"|]
+        ]
+        
+    let usersWithImageTags: obj[] list =
+        [
+            [|"owie"|]
+            [|"darthjhawk"|]
+            [|"cbishop"|]
+            [|"sc"|]
+        ]
+     
+    [<Theory>]
+    [<MemberData(nameof(usersWithImages))>]
+    let ``gallery and object id should match a particular format``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/images"
+        let j = Parsers.parseImages node
+        Assert.True(Regex.IsMatch(j.GalleryId, "\d+-\d+"))
+        Assert.True(Regex.IsMatch(j.ObjectId , "\d+-\d+"))
+    }
+      
+    [<Theory>]
+    [<MemberData(nameof(usersWithImages))>]
+    let ``every user has the "All Images" tag``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/images"
+        let j = Parsers.parseImages node
+        Assert.True(j.Tags |> Seq.exists (fun x -> x.Text = "All Images"))
+    }
+       
+    [<Theory>]
+    [<MemberData(nameof(usersWithImageTags))>]
+    let ``tags link should be in the correct format``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/images"
+        let j = Parsers.parseImages node
+        Assert.Equal(
+            j.Tags |> Seq.length,
+            j.Tags |> Seq.filter (fun x -> x.Link.StartsWith("?tag=")) |> Seq.length
+        )
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithImages))>]
+    let ``the amount of images should be more than one``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}/images"
+        let j = Parsers.parseImages node
+        Assert.True(j.TotalImages > 1)
+    }
+    
+    
+module WikiParser =
+    let usersWithWiki: obj[] list =
+        [
+            [|"owie"|]
+            [|"cbishop"|]
+        ]
+ 

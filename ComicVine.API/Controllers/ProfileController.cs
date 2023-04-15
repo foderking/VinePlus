@@ -109,9 +109,9 @@ public class ProfileController: ControllerBase
     /// <param name="pageNo">page number</param>
     /// <returns></returns>
     [HttpGet("{username}/images")]
-    public async Task<ActionResult<ImagePage>> GetImages(string username, [FromQuery(Name = "page")] int pageNo) {
+    public async Task<ActionResult<Parsers.Image>> GetImages(string username, [FromQuery(Name = "page")] int pageNo) {
         try {
-            ImagePage imagePage = await _userRepository.GetUserImages(username, Math.Max(pageNo, 1), _logger);
+            var imagePage = await _userRepository.GetImage(username);
             return Ok(imagePage);
         }
         catch (HttpRequestException) {
