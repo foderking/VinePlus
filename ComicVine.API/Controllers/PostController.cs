@@ -1,5 +1,4 @@
-﻿using ComicVine.API.Models;
-using ComicVine.API.Repository;
+﻿using ComicVine.API.Repository;
 using Comicvine.Core;
 using Microsoft.AspNetCore.Mvc;
 

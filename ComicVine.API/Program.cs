@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using ComicVine.API;
 using ComicVine.API.Controllers;
-using ComicVine.API.Database;
+// using ComicVine.API.Database;
 using ComicVine.API.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,13 +30,14 @@ builder.Services.AddScoped<IUserRepository<ProfileController>, UserRepository>()
 builder.Services.AddScoped<IForumRepository, ForumRepository>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 
-builder.Services.AddDbContext<ForumContext>(o => o.UseNpgsql(connectionString));
+// builder.Services.AddDbContext<ForumContext>(o => o.UseNpgsql(connectionString));
+
 // builder.Services.AddStackExchangeRedisCache(o => { o.Configuration = builder.Configuration["RedisCacheUrl"]; });
 
 
 
 var app = builder.Build();
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+// AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // using (var scope = app.Services.CreateScope()) {
 //     var service = scope.ServiceProvider;
