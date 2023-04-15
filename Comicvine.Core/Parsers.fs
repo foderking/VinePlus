@@ -132,11 +132,6 @@ module Parsers =
         |> TaskSeq.fold _folder (Seq.ofList [])
    
     
-    type IParsable<'T> =
-        abstract member _parseEnd: HtmlNode -> int
-        abstract member _parseAll: string ->  int -> taskSeq<seq<'T>>
-        abstract member ParseSingle: HtmlNode -> 'T
-        abstract member ParseFull  : string -> Task<seq<'T>>
    
     type ISingle<'T> =
         interface
@@ -172,18 +167,18 @@ module Parsers =
         
         
    
-    let parseAllData parseData parseEnd (path: string) page = taskSeq {
-        let! stream = Net.getStreamByPage page path 
-        let node = stream |> Net.getRootNode
-        let last = parseEnd node
-        yield parseData node
-        
-        for p in [2..last] do
-            let! s = Net.getStreamByPage p path 
-            yield s
-                |> Net.getRootNode
-                |> parseData
-    }
+    // let parseAllData parseData parseEnd (path: string) page = taskSeq {
+    //     let! stream = Net.getStreamByPage page path 
+    //     let node = stream |> Net.getRootNode
+    //     let last = parseEnd node
+    //     yield parseData node
+    //     
+    //     for p in [2..last] do
+    //         let! s = Net.getStreamByPage p path 
+    //         yield s
+    //             |> Net.getRootNode
+    //             |> parseData
+    // }
 
     let _unwrapSome message opt =
         match opt with
@@ -260,7 +255,14 @@ module Parsers =
     //     parseAllBlogs path 1
     //     |> unwrapTaskSeq
     
-    type ThreadParser =
+    type ThreadParser() =
+        member this._parseEnd(path) =
+            (this :> IMultiple<Thread>)._parseEnd(path)
+        member this.ParseAll(path) =
+            (this :> IMultiple<Thread>).ParseAll(path)
+        member this.ParseSingle(node) =
+            (this :> IMultiple<Thread>).ParseSingle(node)
+            
         interface IMultiple<Thread> with
             member this.ParseAll(path) =
                 this
@@ -495,7 +497,14 @@ module Parsers =
         
         
         
-    type PostParser =
+    type PostParser() =
+        member this._parseEnd(path) =
+            (this :> IMultiple<Post>)._parseEnd(path)
+        member this.ParseAll(path) =
+            (this :> IMultiple<Post>).ParseAll(path)
+        member this.ParseSingle(node) =
+            (this :> IMultiple<Post>).ParseSingle(node)
+            
         interface IMultiple<Post> with
             member this.ParseAll(path) =
                 this
@@ -535,7 +544,14 @@ module Parsers =
         
         
          
-    type BlogParser =
+    type BlogParser() =
+        member this._parseEnd(path) =
+            (this :> IMultiple<Blog>)._parseEnd(path)
+        member this.ParseAll(path) =
+            (this :> IMultiple<Blog>).ParseAll(path)
+        member this.ParseSingle(node) =
+            (this :> IMultiple<Blog>).ParseSingle(node)
+            
         interface IMultiple<Blog> with
             member this.ParseAll(path) =
                 this
@@ -598,7 +614,10 @@ module Parsers =
                 |> Seq.map parse
         
         
-    type ImageParser =
+    type ImageParser() =
+        member this.ParseSingle(node) =
+            (this :> ISingle<Image>).ParseSingle(node)
+            
         interface ISingle<Image> with
             member this.ParseSingle(rootNode) = 
                 let xNode =
@@ -685,7 +704,14 @@ module Parsers =
         | None -> []
         
     
-    type FollowerParser =
+    type FollowerParser() =
+        member this._parseEnd(path) =
+            (this :> IMultiple<Follower>)._parseEnd(path)
+        member this.ParseAll(path) =
+            (this :> IMultiple<Follower>).ParseAll(path)
+        member this.ParseSingle(node) =
+            (this :> IMultiple<Follower>).ParseSingle(node)
+            
         interface IMultiple<Follower> with
             member this.ParseAll(path) =
                 this
@@ -720,7 +746,14 @@ module Parsers =
                 parseFollowRelationship parser rootNode
         
     
-    type FollowingParser =
+    type FollowingParser() =
+        member this._parseEnd(path) =
+            (this :> IMultiple<Following>)._parseEnd(path)
+        member this.ParseAll(path) =
+            (this :> IMultiple<Following>).ParseAll(path)
+        member this.ParseSingle(node) =
+            (this :> IMultiple<Following>).ParseSingle(node)
+            
         interface IMultiple<Following> with
             member this.ParseAll(path) =
                 this
@@ -761,15 +794,3 @@ module Parsers =
                     
                 parseFollowRelationship parser rootNode
                    
-    // let parseAllFollowRel parseFollowRel path page =
-    //     parseAllData parseFollowRel parseFollowRelationshipEnd path page
-
-    // let parseAllFollowRelFull parseFollowRel path =
-    //     parseAllData parseFollowRel parseFollowRelationshipEnd path 1
-    //     |> unwrapTaskSeq
-    
-    // let ParseFollowersFull path =
-    //     parseAllFollowRelFull parseFollowers path
-        
-    // let ParseFollowingsFull path =
-    //     parseAllFollowRelFull parseFollowings path

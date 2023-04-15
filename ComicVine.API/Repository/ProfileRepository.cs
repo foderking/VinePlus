@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using ComicVine.API.Controllers;
+﻿using ComicVine.API.Controllers;
 using ComicVine.API.Models;
 using ComicVine.API.Repository.Parsers;
 using Comicvine.Core;
@@ -20,45 +19,26 @@ public interface IUserRepository<T>
 
 public class UserRepository: IUserRepository<ProfileController>
 {
+    private static Comicvine.Core.Parsers.ImageParser _imageParser = new();
+    private static Comicvine.Core.Parsers.BlogParser _blogParser = new();
+    private static Comicvine.Core.Parsers.FollowerParser _followerParser = new();
+    private static Comicvine.Core.Parsers.FollowingParser _followingParser = new();
  
     public Task<IEnumerable<Comicvine.Core.Parsers.Blog>> GetBlog(string username) {
-        // Stream stream = await Comicvine.Core.Net.getStream($"/profile/{username}/blog");
-        // HtmlNode rootNode = Net.getRootNode(stream);
-        return Comicvine.Core.Parsers.ParseBlogsFull($"/profile/{username}/blog");
-        // return Comicvine.Core.Parsers.ParseBlogsFull(rootNode);
+        return _blogParser.ParseAll($"/profile/{username}/blog");
     }
      public async Task<Comicvine.Core.Parsers.Image> GetImage(string username) {
         Stream stream = await Net.getStream($"/profile/{username}/images");
-        
         HtmlNode rootNode = Net.getRootNode(stream);
-        Comicvine.Core.Parsers.Image image = Comicvine.Core.Parsers.parseImages(rootNode);
-
-        return image;
-    }
+        return _imageParser.ParseSingle(rootNode);
+     }
    
- 
-    public async Task<IEnumerable<Comicvine.Core.Parsers.Following>> GetUserFollowing(string username) {
-        // Stopwatch timer   = Stopwatch.StartNew();
-        
-        // await using Stream stream = await Repository.GetStream($"/profile/{username}/following", new ( new []
-        Stream stream = await Net.getStream($"/profile/{username}/following");
-        HtmlNode rootNode = Net.getRootNode(stream);
-
-        var followings = Comicvine.Core.Parsers.parseFollowings(rootNode);
-        
-        // timer.Stop();
-        // logger.LogInformation("Request to /profile/{Username} completed in {Elapsed}", username, Repository.GetElapsed(timer.Elapsed));
-        return followings;
+    public Task<IEnumerable<Comicvine.Core.Parsers.Following>> GetUserFollowing(string username) {
+        return _followingParser.ParseAll($"/profile/{username}/following");
     }
 
-    public async Task<IEnumerable<Comicvine.Core.Parsers.Follower>> GetUserFollowers(string username) {
-                
-        Stream stream = await Net.getStream($"/profile/{username}/follower");
-        HtmlNode rootNode = Net.getRootNode(stream);
-
-        var followers = Comicvine.Core.Parsers.parseFollowers(rootNode);
-
-        return followers;
+    public Task<IEnumerable<Comicvine.Core.Parsers.Follower>> GetUserFollowers(string username) {
+        return _followerParser.ParseAll($"/profile/{username}/follower");
     }
    
     
@@ -73,6 +53,4 @@ public class UserRepository: IUserRepository<ProfileController>
         
         return parsedProfile;
     }
-
-
 }    
