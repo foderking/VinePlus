@@ -1,5 +1,4 @@
-﻿using ComicVine.API.Models;
-using ComicVine.API.Repository;
+﻿using ComicVine.API.Repository;
 using Comicvine.Core;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +6,7 @@ namespace ComicVine.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProfileController: ControllerBase
+public class ProfileController : ControllerBase
 {
     private readonly IUserRepository<ProfileController> _userRepository;
     private readonly ILogger<ProfileController> _logger;
@@ -16,18 +15,18 @@ public class ProfileController: ControllerBase
         _userRepository = userRepository;
         _logger = logger;
     }
-    
+
     /// <summary>
     /// Gets the default profile view for a comicvine user
     /// </summary>
     /// <param name="username">The username</param>
     /// <returns></returns>
     [HttpGet("{username}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Profile))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Parsers.Profile))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUser(string username) {
         try {
-            Profile profile = await _userRepository.GetProfile(username, _logger);
+            Parsers.Profile profile = await _userRepository.GetProfile(username);
             return Ok(profile);
         }
         catch (HttpRequestException) {
@@ -42,12 +41,11 @@ public class ProfileController: ControllerBase
     /// <param name="username"></param>
     /// <returns></returns>
     [HttpGet("{username}/following")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<FollowingPage>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Parsers.Following>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetFollowing(string username) {
         try {
-
-            var following = await _userRepository.GetUserFollowing(username);
+            IEnumerable<Parsers.Following> following = await _userRepository.GetUserFollowing(username);
             return Ok(following);
         }
         catch (HttpRequestException) {
@@ -63,9 +61,9 @@ public class ProfileController: ControllerBase
     [HttpGet("{username}/followers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<FollowersPage>> GetFollowers(string username) {
+    public async Task<ActionResult> GetFollowers(string username) {
         try {
-            var followers = await _userRepository.GetUserFollowers(username);
+            IEnumerable<Parsers.Follower> followers = await _userRepository.GetUserFollowers(username);
             return Ok(followers);
         }
         catch (HttpRequestException) {
@@ -79,9 +77,9 @@ public class ProfileController: ControllerBase
     /// <param name="username"></param>
     /// <returns></returns>
     [HttpGet("{username}/blog")]
-    public async Task<ActionResult<Parsers.Blog>> GetBlog(string username) {
+    public async Task<ActionResult> GetBlog(string username) {
         try {
-            var blogPage = await _userRepository.GetBlog(username);
+            IEnumerable<Parsers.Blog> blogPage = await _userRepository.GetBlog(username);
             return Ok(blogPage);
         }
         catch (HttpRequestException) {
@@ -97,51 +95,11 @@ public class ProfileController: ControllerBase
     [HttpGet("{username}/images")]
     public async Task<ActionResult<Parsers.Image>> GetImages(string username) {
         try {
-            var imagePage = await _userRepository.GetImage(username);
+            Parsers.Image imagePage = await _userRepository.GetImage(username);
             return Ok(imagePage);
         }
         catch (HttpRequestException) {
             return NotFound();
         }
     }
-
-    // /// <summary>
-    // /// Gets all forums posts by a comicvine user
-    // /// </summary>
-    // /// <param name="username"></param>
-    // /// <returns></returns>
-    // [HttpGet("{username}/forums")]
-    // public Task GetForum(string username) {
-    //     return _userRepository.GetUserForumPosts(username);
-    // }
-
-    // /// <summary>
-    // /// Gets a comicvine users wiki submissions
-    // /// </summary>
-    // /// <param name="username"></param>
-    // /// <returns></returns>
-    // [HttpGet("{username}/wiki-submissions")]
-    // public Task GetWiki(string username) {
-    //     return _userRepository.GetWikiPosts(username);
-    // }
-    //
-    // /// <summary>
-    // /// Gets all lists made by a comicvine user
-    // /// </summary>
-    // /// <param name="username"></param>
-    // /// <returns></returns>
-    // [HttpGet("{username}/lists")]
-    // public Task GetLists(string username) {
-    //     return _userRepository.GetUserLists(username);
-    // }
-    //
-    // /// <summary>
-    // /// Gets all reviews made by a comicvine user
-    // /// </summary>
-    // /// <param name="username"></param>
-    // /// <returns></returns>
-    // [HttpGet("{username}/reviews")]
-    // public Task GetReviews(string username) {
-    //     return _userRepository.GetUserReviews(username);
-    // }
 }

@@ -1,6 +1,4 @@
 ﻿using ComicVine.API.Controllers;
-using ComicVine.API.Models;
-using ComicVine.API.Repository.Parsers;
 using Comicvine.Core;
 using HtmlAgilityPack;
 
@@ -14,7 +12,7 @@ public interface IUserRepository<T>
     public Task<IEnumerable<Comicvine.Core.Parsers.Follower>> GetUserFollowers(string username);
     
     
-    public Task<Profile> GetProfile(string username, ILogger<T> logger);
+    public Task<Comicvine.Core.Parsers.Profile> GetProfile(string username);
 }
 
 public class UserRepository: IUserRepository<ProfileController>
@@ -23,6 +21,7 @@ public class UserRepository: IUserRepository<ProfileController>
     private static Comicvine.Core.Parsers.BlogParser _blogParser = new();
     private static Comicvine.Core.Parsers.FollowerParser _followerParser = new();
     private static Comicvine.Core.Parsers.FollowingParser _followingParser = new();
+    private static Comicvine.Core.Parsers.ProfileParser _profileParser = new();
  
     public Task<IEnumerable<Comicvine.Core.Parsers.Blog>> GetBlog(string username) {
         return _blogParser.ParseAll($"/profile/{username}/blog");
@@ -41,16 +40,9 @@ public class UserRepository: IUserRepository<ProfileController>
         return _followerParser.ParseAll($"/profile/{username}/follower");
     }
    
-    
-    
-    
-  
-    public async Task<Profile> GetProfile(string username, ILogger<ProfileController> logger) {
-        
-        await using Stream stream     = await Repository.GetStream($"/profile/{username}");
-        HtmlNode rootNode = Repository.GetRootNode(stream);
-        Profile parsedProfile   = ProfileParser.Parse(rootNode, logger);
-        
-        return parsedProfile;
+    public async Task<Comicvine.Core.Parsers.Profile> GetProfile(string username) {
+        Stream stream = await Net.getStream($"/profile/{username}/images");
+        HtmlNode rootNode = Net.getRootNode(stream);
+        return _profileParser.ParseSingle(rootNode);
     }
 }    
