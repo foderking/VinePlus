@@ -1,8 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI", "WebAPI\WebAPI.csproj", "{D1B7435D-CA3B-4F83-B0BD-ACB104B3FC3F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComicVine.API", "ComicVine.API\ComicVine.API.csproj", "{D1B7435D-CA3B-4F83-B0BD-ACB104B3FC3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI.Test", "WebAPI.Test\WebAPI.Test.csproj", "{9A18A0A0-9E61-42AE-B24A-11A34CA198D7}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Comicvine.Core", "Comicvine.Core\Comicvine.Core.fsproj", "{982F2F07-DE25-4DF0-B8DE-F22DB30FF9F7}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Comicvine.Core.Test", "Comicvine.Core.Test\Comicvine.Core.Test.fsproj", "{94DB75BC-2C7C-4655-8102-CDD6CAE08967}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Comicvine.Polling", "Comicvine.Polling\Comicvine.Polling.fsproj", "{E7B0CD05-B996-42A5-A271-69E394A25EE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +18,17 @@ Global
 		{D1B7435D-CA3B-4F83-B0BD-ACB104B3FC3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1B7435D-CA3B-4F83-B0BD-ACB104B3FC3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1B7435D-CA3B-4F83-B0BD-ACB104B3FC3F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9A18A0A0-9E61-42AE-B24A-11A34CA198D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9A18A0A0-9E61-42AE-B24A-11A34CA198D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9A18A0A0-9E61-42AE-B24A-11A34CA198D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9A18A0A0-9E61-42AE-B24A-11A34CA198D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{982F2F07-DE25-4DF0-B8DE-F22DB30FF9F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{982F2F07-DE25-4DF0-B8DE-F22DB30FF9F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{982F2F07-DE25-4DF0-B8DE-F22DB30FF9F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{982F2F07-DE25-4DF0-B8DE-F22DB30FF9F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94DB75BC-2C7C-4655-8102-CDD6CAE08967}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94DB75BC-2C7C-4655-8102-CDD6CAE08967}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94DB75BC-2C7C-4655-8102-CDD6CAE08967}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94DB75BC-2C7C-4655-8102-CDD6CAE08967}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7B0CD05-B996-42A5-A271-69E394A25EE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7B0CD05-B996-42A5-A271-69E394A25EE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7B0CD05-B996-42A5-A271-69E394A25EE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7B0CD05-B996-42A5-A271-69E394A25EE9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
