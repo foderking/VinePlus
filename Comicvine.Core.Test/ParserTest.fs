@@ -539,12 +539,6 @@ module PostFullParser =
         Assert.Equal(54, j |> Seq.length)
     }
     
-module ProfileParser =
-     let usersWithNoCover: obj[] list =
-        [
-            [|"abc"|]
-        ]
-    
 module ImageParser =
     let parser = Parsers.ImageParser()
     let usersWithImages: obj[] list =
@@ -724,3 +718,104 @@ module WikiParser =
             [|"cbishop"|]
         ]
  
+
+module ProfileParsers =
+    let parser = Parsers.ProfileParser()
+    
+    let sampleUsers: obj[] list =
+        [
+            [|"owie"|]
+            [|"static_shock"|]
+            [|"cbishop"|]
+            [|"death4bunnies"|]
+            [|"sc"|]
+            [|"darthjhawk"|]
+            [|"temsbumbum"|]
+        ]
+    let usersWithCover: obj[] list =
+        [
+            [|"static_shock"|]
+            [|"cbishop"|]
+            [|"death4bunnies"|]
+            [|"sc"|]
+            [|"darthjhawk"|]
+        ]
+        
+    let usersWithImage: obj[] list =
+        [
+            [|"owie"|]
+            [|"static_shock"|]
+            [|"cbishop"|]
+            [|"death4bunnies"|]
+            [|"sc"|]
+            [|"darthjhawk"|]
+        ]
+    let usersWithBlog: obj[] list =
+        [
+            [|"owie"|]
+            [|"death4bunnies"|]
+            [|"sc"|]
+            [|"cbishop"|]
+            [|"static_shock"|]
+        ]
+    let usersWithNoCover: obj[] list =
+        [
+            [|"abc"|]
+        ]
+ 
+    [<Theory>]
+    [<MemberData(nameof(sampleUsers))>]
+    let ``background images should have correct format``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}"
+        let j = parser.ParseSingle node
+        Assert.True(j.BackgroundImage.StartsWith(@"https://comicvine.gamespot.com/a/"))
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(sampleUsers))>]
+    let ``avatar should have correct format``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}"
+        let j = parser.ParseSingle node
+        Assert.True(j.Avatar.StartsWith(@"https://comicvine.gamespot.com/a/"))
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithCover))>]
+    let ``cover should have correct format``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}"
+        let j = parser.ParseSingle node
+        Assert.True(j.CoverImage.StartsWith(@"https://comicvine.gamespot.com/a/"))
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(sampleUsers))>]
+    let ``description should contain something``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}"
+        let j = parser.ParseSingle node
+        Assert.True(j.Description.Length > 0)
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(sampleUsers))>]
+    let ``username should contain something``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}"
+        let j = parser.ParseSingle node
+        Assert.True(j.UserName.Length > 0)
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithImage))>]
+    let ``users with images should have the corresponding flag set``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}"
+        let j = parser.ParseSingle node
+        Assert.True(j.HasImages)
+    }
+    
+    [<Theory>]
+    [<MemberData(nameof(usersWithBlog))>]
+    let ``users with blogs should have the corresponding flag set``(username: string) = task {
+        let! node = getNodeFromPath $"/profile/{username}"
+        let j = parser.ParseSingle node
+        Assert.True(j.HasBlogs)
+    }
+    

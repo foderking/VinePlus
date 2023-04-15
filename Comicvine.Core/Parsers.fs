@@ -56,7 +56,7 @@ module Parsers =
     type Profile =
         {
             UserName: string; Avatar: string; Description: string; Posts: int; WikiPoints: int
-            Following: Link; Followers: Link; CoverImage: string; BackgroundImage: string; About: About;
+            Following: int; Followers: int; CoverImage: string; BackgroundImage: string; About: About;
             Activities: seq<Activity>; HasBlogs: bool; HasImages: bool; // forums, wiki are always there
         }
         
@@ -794,3 +794,141 @@ module Parsers =
                     
                 parseFollowRelationship parser rootNode
                    
+    
+    type ProfileParser() =
+        member this.ParseSingle(rootNode) =
+            (this :> ISingle<Profile>).ParseSingle(rootNode)
+            
+        interface ISingle<Profile> with
+            member this.ParseSingle(rootNode) =
+                let mainNode =
+                    rootNode
+                    |> _getWrapperNode
+                    |> _getFirstChildElement (_idPredicate "site") "div"
+                    |> _getFirstChildElement (_idPredicate "default-content") "div"
+                    
+                let headerNode =
+                    rootNode
+                    |> _getWrapperNode
+                    |> _getFirstChildElement (_idPredicate "js-kubrick-lead") "div"
+                
+                let background =
+                    headerNode
+                    |> _getAttrib "style"
+                    |> (fun x -> x.Split("background-image: url(")[1])
+                    |> (fun x -> x.TrimEnd(')'))
+                    
+                let avatar =
+                    headerNode
+                    |> _getFirstChildElement (_classPredicate "profile-header") "div"
+                    |> _getFirstChildElement (_classPredicate "container") "div"
+                    |> _getFirstChildElement (_classPredicate "profile-avatar") "section"
+                    |> _getFirstChildElement (_classPredicate "avatar") "div"
+                    |> _getFirstChildElem "img"
+                    |> _getAttrib "src"
+                    
+                let description =
+                    headerNode
+                    |> _getFirstChildElement (_classPredicate "profile-header") "div"
+                    |> _getFirstChildElement (_classPredicate "container") "div"
+                    |> _getFirstChildElement (_classPredicate "profile-title-hold") "div"
+                    |> _getFirstChildElement (_classPredicate "profile-title") "section"
+                    |> _getFirstChildElement (_classPredicate "js-status-message") "h4"
+                    |> _innerTrim
+                    
+                let username =
+                    headerNode
+                    |> _getFirstChildElement (_classPredicate "profile-header") "div"
+                    |> _getFirstChildElement (_classPredicate "container") "div"
+                    |> _getFirstChildElement (_classPredicate "profile-title-hold") "div"
+                    |> _getFirstChildElement (_classPredicate "profile-title") "section"
+                    |> _getFirstChildElem "h1"
+                    |> _innerTrim
+                    
+                let stats =
+                    headerNode
+                    |> _getFirstChildElement (_classPredicate "profile-header") "div"
+                    |> _getFirstChildElement (_classPredicate "container") "div"
+                    |> _getFirstChildElement (_classPredicate "profile-title-hold") "div"
+                    |> _getFirstChildElement (_classPredicate "profile-follow") "section"
+                    |> _getFirstChildElem "table"
+                    |> _getFirstChildElem "tr"
+                    |> _getChildElems "td"
+                    |> Seq.map (fun x -> x |> _innerTrim |> int)
+                    
+                let navItems =
+                    rootNode
+                    |> _getWrapperNode
+                    |> _getFirstChildElement (_classPredicate "sub-nav") "nav"
+                    |> _getFirstChildElement (_classPredicate "container") "div"
+                    |> _getFirstChildElem "ul"
+                    |> _getChildElems "li"
+                    |> Seq.map _innerTrim
+                    
+                let navPredicate (prefix: string) (nav: string) =
+                    nav.StartsWith(prefix)
+                    
+                let cover =
+                    match
+                        mainNode
+                        |> _getFirstChildElement (_classPredicate "secondary-content") "aside"
+                        |> _getFirstChildIfAny (_classPredicate "profile-image") "div"
+                    with
+                    | None -> ""
+                    | Some n ->
+                        n
+                        |> _getFirstChildElement (_classPredicate "img") "div"
+                        |> _getFirstChildElement (_classPredicate "imgflare") "a"
+                        |> _getFirstChildElem "img"
+                        |> _getAttrib "src"
+                
+                let (|About|) (asidePodNode: HtmlNode) =
+                    let (|Alignment|) (s: string) =
+                        match s with
+                        | "Neutral" -> Alignment.Neutral
+                        | "Good"    -> Alignment.Good
+                        | "Evil"    -> Alignment.Evil
+                        | _         -> Alignment.None
+                            
+                    let description =
+                        asidePodNode
+                        |> _getFirstChildElement (_classPredicate "about-me") "div"
+                        |> _innerTrim
+                    let stats =
+                        asidePodNode
+                        |> _getFirstChildElem "ul"
+                        |> _getChildElems "li"
+                        |> Seq.map _innerTrim
+                        |> Seq.map (fun x -> x.Split(":")[1])
+                        |> Seq.map (fun x -> x.Trim())
+                        
+                    {
+                        DateJoined = stats |> Seq.item 0 |> DateTime.Parse
+                        Alignment = match stats |> Seq.item 1 with | Alignment ali -> ali
+                        Points = stats |> Seq.item 2 |> (fun x -> x.Split(" Points")[0])|> int
+                        Summary = description
+                    }
+                
+                let about =
+                    match
+                        mainNode
+                        |> _getFirstChildElement (_classPredicate "secondary-content") "aside"
+                        |> _getFirstChildElement
+                            (fun x -> x |> _getFirstChildIfAny (_classPredicate "about-me") "div" |> Option.isSome )
+                            "div"
+                    with
+                    | About n -> n
+                    
+                {
+                    UserName = username; Avatar = avatar; Description = description; Posts = stats |> Seq.item 0; WikiPoints = stats |> Seq.item 1
+                    Following = stats |> Seq.item 2; Followers = stats |> Seq.item 3; CoverImage = cover; BackgroundImage = background; 
+                    About = about; Activities = [] |> Seq.ofList; HasBlogs = navItems |> Seq.exists (navPredicate "Images"); HasImages = navItems |> Seq.exists (navPredicate "Images");
+                }
+             
+                
+                    
+        
+        
+            
+        
+        
