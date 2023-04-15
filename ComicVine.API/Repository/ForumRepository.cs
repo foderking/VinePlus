@@ -14,7 +14,7 @@ public class ForumRepository : IForumRepository
     
     public async Task<IEnumerable<Comicvine.Core.Parsers.Thread>> GetForumPage(int pageNo) {
         Stream stream = await Net.getStreamByPage(pageNo, "forums");
-        HtmlNode rootNode = Repository.GetRootNode(stream);
+        HtmlNode rootNode = Net.getRootNode(stream);
         return _parser.ParseSingle(rootNode);
     }
 
