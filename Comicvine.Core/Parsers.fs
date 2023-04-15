@@ -56,20 +56,19 @@ module Parsers =
         {
             UserName: string; Avatar: string; Description: string; Posts: int; WikiPoints: int
             Following: Link; Followers: Link; Cover: string; Background: string; About: About; Activities: seq<Activity>
-            HasBlogs: bool; HasImages: bool; HasReviews: bool; // forums, wiki are always there
+            HasBlogs: bool; HasImages: bool; // forums, wiki are always there
         }
         
     // Extra profile info
     type Blog =
         { Blog: Link; Created: DateTime; Comments: int; Id: int; ThreadId: Nullable<int> }
-    type Image = { ObjectId: string; GalleryId: string }
+    type Image = { ObjectId: string; GalleryId: string; TotalImages: int; Tags: seq<Link> }
     type FollowRelationship =
         { FollowRelationship: Link; AvatarUrl: string }
         
+    // helpers
     let _innerT (node: HtmlNode) = node.InnerText
-    // let _trim (s: string) = s.Trim()
     let _split (s: string) = s.Split()
-    
     let _innerTrim (node: HtmlNode) = node.InnerText.Trim()
     
     let _getAttribute (def: string) (attrib: string) (node: HtmlNode) =
@@ -78,6 +77,7 @@ module Parsers =
     let _getAttrib =
         _getAttribute ""
         
+    // functions for selecting html nodes
     let _getChildElementsIfAny predicate name (node: HtmlNode) =
         let elems = node.Elements name |> Seq.filter predicate
         if (elems |> Seq.length) < 1 then
@@ -101,7 +101,7 @@ module Parsers =
     let _getFirstChildElem =
         _getFirstChildElement (fun _ -> true)
         
-        
+    // predicates for filtering html nodes
     let _idPredicate id (node: HtmlNode) =
         _getAttrib "id" node = id
        
@@ -111,19 +111,18 @@ module Parsers =
     let _attribPredicate attrib value node =
         (node |> _getAttrib attrib) = value
     
-    let getWrapperNode node =
-        _getFirstChildElem "html" node
-        |> _getFirstChildElem "body"
-        |> _getFirstChildElement (_idPredicate "site-main") "div"
-        |> _getFirstChildElement (_idPredicate "wrapper"  ) "div"
-        
     
+    
+   
     
     type Page<'T> =
         { PageNo: int; TotalPages: int; Data: 'T }
     
     type IParsable<'T> =
         abstract member ParseData: HtmlNode -> 'T
+   
+   
+   
    
     let parseAllData parseData parseEnd (path: string) page = taskSeq {
         let! stream = Net.getStreamByPage page path 
@@ -137,12 +136,27 @@ module Parsers =
                 |> Net.getRootNode
                 |> parseData
     }
+         
+    let unwrapTaskSeq t =
+        let _folder state curr =
+            Seq.append state [curr]
+        t
+        |> TaskSeq.map (fun x -> x |> TaskSeq.ofSeq)
+        |> TaskSeq.concat 
+        |> TaskSeq.fold _folder (Seq.ofList [])
  
     let _unwrapSome message opt =
         match opt with
         | Some x -> x
         | None ->  raise (Exception(message))
         
+        
+    // commonly used nodes
+    let _getWrapperNode node =
+        _getFirstChildElem "html" node
+        |> _getFirstChildElem "body"
+        |> _getFirstChildElement (_idPredicate "site-main") "div"
+        |> _getFirstChildElement (_idPredicate "wrapper"  ) "div"
         
     let _getForumBlockNode wrapperNode =
         if Option.isSome (_getFirstChildIfAny (_idPredicate "forum-content") "div" wrapperNode) then
@@ -162,7 +176,7 @@ module Parsers =
             
     let parsePageEnd rootNode =
         match rootNode
-            |> getWrapperNode
+            |> _getWrapperNode
             |> _getForumBlockNode
             |> _unwrapSome "Unknown Thread type"
             |> _getFirstChildElement (_classPredicate "forum-bar") "div"
@@ -175,19 +189,11 @@ module Parsers =
             |> int
         | None -> 1
         
-    let unwrapTaskSeq t =
-        let _folder state curr =
-            Seq.append state [curr]
-        t
-        |> TaskSeq.map (fun x -> x |> TaskSeq.ofSeq)
-        |> TaskSeq.concat 
-        |> TaskSeq.fold _folder (Seq.ofList [])
-         
         
     let parseBlogEnd (rootNode: HtmlNode) =
         match
             rootNode
-            |> getWrapperNode
+            |> _getWrapperNode
             |> _getFirstChildElement (_idPredicate "site") "div"
             |> _getFirstChildElement (_idPredicate "default-content") "div"
             |> _getFirstChildElement (_classPredicate "primary-content") "div"
@@ -247,7 +253,7 @@ module Parsers =
                     | false, _ -> Nullable()
             }
             
-        getWrapperNode rootNode
+        _getWrapperNode rootNode
         |> _getFirstChildElement (_idPredicate "site") "div"
         |> _getFirstChildElement (_idPredicate "default-content") "div"
         |> _getFirstChildElement (_classPredicate "primary-content") "div"
@@ -264,7 +270,7 @@ module Parsers =
         
     let parseThread rootNode =
         rootNode
-        |> getWrapperNode
+        |> _getWrapperNode
         |> _getForumBlockNode
         |> _unwrapSome "Unknown Thread type"
         |> _getFirstChildElement (_classPredicate "table-forums") "div"
@@ -408,7 +414,7 @@ module Parsers =
        
     let parsePosts threadId (rootNode: HtmlNode) =
         rootNode
-        |> getWrapperNode
+        |> _getWrapperNode
         |> _getForumBlockNode
         |> _unwrapSome "Unknown Thread type"
         |> _getFirstChildElement (_classPredicate "js-forum-block") "div"
@@ -505,3 +511,50 @@ module Parsers =
     let ParsePostsFull path = 
         parseAllPosts path 1
         |> unwrapTaskSeq
+        
+        
+    let parseImages rootNode =
+        let xNode =
+            rootNode
+            |> _getWrapperNode
+            |> _getFirstChildElement (_idPredicate "site") "div"
+            |> _getFirstChildElement (_idPredicate "gallery-content") "div"
+            |> _getFirstChildElement (_classPredicate "primary-content") "div"
+            
+            |> _getFirstChildElement (_classPredicate "gallery-header") "header"
+            |> _getFirstChildElement (_classPredicate "isotope-image") "div"
+            |> _getFirstChildElement (_classPredicate "gallery-tags") "ul"
+        let dataNode =
+            xNode
+            |> _getFirstChildElement (_classPredicate "gallery-tags__item") "li"
+            |> _getFirstChildElement (_idPredicate "galleryMarker") "a"
+
+        {
+            GalleryId = _getAttrib "data-gallery-id" dataNode
+            ObjectId  = _getAttrib "data-object-id" dataNode
+            Tags =
+                xNode
+                |> _getChildElements (_classPredicate "gallery-tags__item") "li"
+                |> Seq.map (fun x ->
+                    {
+                        Link = 
+                            x
+                            |> _getFirstChildElem "a"
+                            |> _getAttrib "href"
+                        Text = 
+                            x
+                            |> _getFirstChildElem "a"
+                            |> _innerTrim
+                    }
+                )
+            TotalImages =
+                rootNode
+                |> _getWrapperNode
+                |> _getFirstChildElement (_classPredicate "sub-nav") "nav"
+                |> _getFirstChildElement (_classPredicate "container") "div"
+                |> _getFirstChildElem "ul"
+                |> _getFirstChildElement (fun x -> x.InnerText.Trim().StartsWith("Images") ) "li"
+                |> _innerTrim
+                |> (fun x -> x.Split("(").[1].Trim(')') )
+                |> int
+        }
