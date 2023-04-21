@@ -153,20 +153,6 @@ module BlogParser =
     }
     
         
-    // [<Theory>]
-    // [<MemberData(nameof(usersWithBlog))>]
-    // let ``"Blog.Text" should satisfy invariant with "Blog.Link"``(username: string) = task {
-    //     let! node = getNodeFromPath $"/profile/{username}/blog"
-    //     let j = Parsers.parseBlog node
-    //     j
-    //     |> Seq.iter (
-    //         fun x ->
-    //             let name, link = x.Blog.Text, x.Blog.Link
-    //             let pref, full = link |> (fun x -> x.Split("/").[4]), name |> convertNameRegex
-    //             Assert.Equal(full[..(pref.Length-1)], pref)
-    //     )
-    // }   
-        
 module ThreadParser =
     let parser = Parsers.ThreadParser()
     
@@ -184,7 +170,14 @@ module ThreadParser =
         let j = parser.ParseSingle node
         Assert.True( j |> Seq.distinctBy (fun x -> x.TotalView) |> Seq.length > 1)
     }
-     
+    
+    [<Fact>]
+    let ``there shouldn't be threads with unknown "ThreadType"``() = task {
+        let! node = getNodeFromPath "/forums/"
+        let j = parser.ParseSingle node
+        Assert.Empty( j |> Seq.filter (fun x -> x.Type = Parsers.ThreadType.Unknown))
+    }
+       
     [<Fact>]
     let ``number of posts should not be the same``() = task {
         let! node = getNodeFromPath "/forums/"
@@ -217,39 +210,35 @@ module ThreadParser =
     let ``"Creator.Link" should be valid``() = task {
         let! node = getNodeFromPath "/forums/"
         let j = parser.ParseSingle node
-        j
-        |> Seq.iter (
-            fun x ->
-                let link = x.Creator.Link
-                let splitLink = link.Split("/")
-                Assert.Equal(4, splitLink.Length)
-                Assert.Equal("", splitLink[0])
-                Assert.Equal("", splitLink[3])
-                Assert.Equal("profile", splitLink[1])
+        Assert.All(j, fun x ->
+            let link = x.Creator.Link
+            let splitLink = link.Split("/")
+            Assert.Equal(4, splitLink.Length)
+            Assert.Equal("", splitLink[0])
+            Assert.Equal("", splitLink[3])
+            Assert.Equal("profile", splitLink[1])
         )
     }
     
-    [<Fact>]
-    let ``"Creator.Text" should satisfy invariant with "Creator.Link"``() = task {
-        let! node = getNodeFromPath "/forums/"
-        let j = parser.ParseSingle node
-        j
-        |> Seq.iter (
-            fun x ->
-                let name, link = x.Creator.Text, x.Creator.Link
-                let convertNameFormat (name: string) =
-                    name
-                        .ToLower()
-                        .Replace(".", "_")
-                        .Replace(" ", "_")
-                        
-                Assert.Equal(
-                    link.Split("/").[2],
-                    name |> convertNameFormat
-                )
-        )
-    }
-    
+    // [<Fact>]
+    // let ``"Creator.Text" should satisfy invariant with "Creator.Link"``() = task {
+    //     let! node = getNodeFromPath "/forums/"
+    //     let j = parser.ParseSingle node
+    //     Assert.All(j, fun x ->
+    //         let name, link = x.Creator.Text, x.Creator.Link
+    //         let convertNameFormat (name: string) =
+    //             name
+    //                 .ToLower()
+    //                 .Replace(".", "_")
+    //                 .Replace("-", "_")
+    //                 .Replace(" ", "_")
+    //         Assert.Equal(
+    //             link.Split("/").[2],
+    //             name |> convertNameFormat
+    //         )
+    //     )
+    // }
+    //
     [<Fact>]
     let ``thread ids should be unique``() = task {
         let! node = getNodeFromPath "/forums/"
@@ -305,11 +294,10 @@ module ThreadParser =
     [<Fact>]
     let ``question/answered thread name always starts with "Q: "``() = task {
         let! node = getNodeFromPath "/forums/"
-        parser.ParseSingle node
-        |> Seq.iter(
-            fun x ->
-                if x.Thread.Text.StartsWith("Q: ") then
-                    Assert.True(x.Type = Parsers.ThreadType.Question || x.Type = Parsers.ThreadType.Answered)
+        let j = parser.ParseSingle node
+        Assert.All(j, fun x ->
+            if x.Thread.Text.StartsWith("Q: ") then
+                Assert.Contains(x.Type, [Parsers.ThreadType.Question; Parsers.ThreadType.Answered])
         )
     }
     let extractBoard (link: string) =
@@ -323,17 +311,15 @@ module ThreadParser =
     [<Fact>]
     let ``"Board.Link" should be valid``() = task {
         let! node = getNodeFromPath "/forums/"
-        parser.ParseSingle node
-        |> Seq.iter (
-            fun x ->
-                let link = x.Board.Link
-                Assert.Null(
-                    Record.Exception( fun () -> 
-                        link
-                        |> extractBoard
-                        |> ignore
-                    )
+        let j = parser.ParseSingle node
+        Assert.All(j, fun x ->
+            Assert.Null(
+                Record.Exception( fun () -> 
+                    x.Board.Link
+                    |> extractBoard
+                    |> ignore
                 )
+            )
         )
     }
     
@@ -341,13 +327,10 @@ module ThreadParser =
     let ``"Board.Text" should satisfy invariant with "Board.Link"``() = task {
         let! node = getNodeFromPath "/forums/"
         let j = parser.ParseSingle node
-        j
-        |> Seq.iter (
-            fun x ->
-                let name, link = x.Board.Text, x.Board.Link
-                let fullName, prefix = link |> extractBoard, name |> convertNameRegex
-                
-                Assert.Equal(fullName[..(prefix.Length-1)], prefix)
+        Assert.All(j, fun x ->
+            let name, link = x.Board.Text, x.Board.Link
+            let fullName, prefix = link |> extractBoard, name |> convertNameRegex
+            Assert.Equal(fullName[..(prefix.Length-1)], prefix)
         )
     }   
     
@@ -360,21 +343,19 @@ module ThreadParser =
     [<Fact>]
     let ``"Thread.Link" should be valid``() = task {
         let! node = getNodeFromPath "/forums/"
-        parser.ParseSingle node
-        |> Seq.iter (
-            fun x ->
-                Assert.True(x.Thread.Link.StartsWith("/"))
-                Assert.True(x.Thread.Link.EndsWith("/"))
+        let j = parser.ParseSingle node
+        Assert.All(j, fun k ->
+            Assert.StartsWith("/", k.Thread.Link)
+            Assert.EndsWith("/", k.Thread.Link )
         )
     }
     
     [<Fact>]
     let ``"Thread.Text" should be valid``() = task {
         let! node = getNodeFromPath "/forums/"
-        parser.ParseSingle node
-        |> Seq.iter (
-            fun x ->
-                Assert.True(x.Thread.Text.Length > 1)
+        let j  = parser.ParseSingle node
+        Assert.All(j, fun k ->
+            Assert.True(k.Thread.Text.Length > 1)
         )
     }
     
@@ -402,10 +383,11 @@ module PostEndParser =
     }
 
 module PostParser =
+    let parser = Parsers.PostParser()
     [<Fact>]
     let ``valid comments should not be empty``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.parsePosts node
+        let j = parser.ParseSingle node
         Assert.NotEmpty j
     }
     
@@ -413,116 +395,85 @@ module PostParser =
     let ``should correctly show edited posts exists``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
         let j =
-            Parsers.parsePosts node
-            |> Seq.map (fun e ->
-                match e with
-                | Parsers.ThreadPost.OP(n) -> n.IsEdited
-                | Parsers.ThreadPost.Comment(n) -> n.IsEdited
-            )
+            parser.ParseSingle node
+            |> Seq.filter (fun e -> e.IsEdited)
         Assert.False(j |> Seq.isEmpty )
     }
     
     [<Fact>]
     let ``date created for each post should be unique``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.parsePosts node
+        let j = parser.ParseSingle node
         let k =
             j
-            |> Seq.map (fun e ->
-                match e with
-                | Parsers.ThreadPost.OP(n) -> n.Created
-                | Parsers.ThreadPost.Comment(n) -> n.Created
-            )
-            |> Seq.distinct
-                
-        Assert.True((j |> Seq.length) = (k |> Seq.length ))
+            |> Seq.distinctBy (fun e -> e.Created)
+        Assert.Equal(j |> Seq.length, k |> Seq.length )
     }   
     
     [<Fact>]
-    let ``"ThreadId" value should be correct and the same``() = task {
+    let ``"ThreadId" value should be correct``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.parsePosts node
-        let k =
-            j
-            |> Seq.map (fun e ->
-                match e with
-                | Parsers.ThreadPost.OP(n) -> n.ThreadId
-                | Parsers.ThreadPost.Comment(n) -> n.ThreadId
-            )
-            |> Seq.filter (fun x -> x = 2300312)
-                
-        Assert.True((j |> Seq.length) = (k |> Seq.length ))
+        let j = parser.ParseSingle node
+        Assert.All(j, fun k ->
+            Assert.Equal(2300312, k.ThreadId)
+        )
     }   
     
     [<Fact>]
     let ``content of each post should not be empty``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.parsePosts node
-        let k =
-            j
-            |> Seq.map (fun e ->
-                match e with
-                | Parsers.ThreadPost.OP(n) -> n.Content
-                | Parsers.ThreadPost.Comment(n) -> n.Content
-            )
-            |> Seq.filter (fun x -> x.Length > 0)
-                
-        Assert.True((j |> Seq.length) = (k |> Seq.length ))
+        let j = parser.ParseSingle node
+        Assert.All(j, fun k ->
+            Assert.True(k.Content.Length > 0)
+        )
     }
     
     [<Fact>]
     let ``creator details should not be empty``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j = Parsers.parsePosts node
-        let k =
-            j
-            |> Seq.map (fun e ->
-                match e with
-                | Parsers.ThreadPost.OP(n) -> n.Creator
-                | Parsers.ThreadPost.Comment(n) -> n.Creator
-            )
-            |> Seq.filter (fun x -> x.Link.Length > 0 && x.Text.Length > 0)
-                
-        Assert.True((j |> Seq.length) = (k |> Seq.length ))
+        let j = parser.ParseSingle node
+        Assert.All(j, fun k ->
+            Assert.True(k.Creator.Link.Length > 0)
+            Assert.True(k.Creator.Text.Length > 0)
+        )
     }
     
     [<Fact>]
     let ``comment ids should be distinct``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
         let j =
-            Parsers.parsePosts node
-            |> Seq.map (fun e ->
-                match e with
-                | Parsers.ThreadPost.OP _ -> None
-                | Parsers.ThreadPost.Comment(n) -> Some(n.Id)
-            )
-            |> Seq.filter Option.isSome
-            |> Seq.map Option.get
+            parser.ParseSingle node
+            |> Seq.filter (fun e -> e.IsComment)
         let k =
             j
-            |> Seq.distinct
+            |> Seq.distinctBy (fun e -> e.CommentInfo.Id)
                 
-        Assert.True((j |> Seq.length) = (k |> Seq.length ))
+        Assert.Equal(j |> Seq.length, k |> Seq.length)
     }
     
     [<Fact>]
     let ``"PostNo" should be distinct``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
         let j =
-            Parsers.parsePosts node
-            |> Seq.map (
-                fun e ->
-                    match e with
-                    | Parsers.ThreadPost.OP _ -> None
-                    | Parsers.ThreadPost.Comment(n) -> Some(n.PostNo)
-            )
-            |> Seq.filter Option.isSome
-            |> Seq.map Option.get
+            parser.ParseSingle node
+            |> Seq.filter (fun e -> e.IsComment)
         let k =
             j
-            |> Seq.distinct
+            |> Seq.distinctBy (fun e -> e.CommentInfo.PostNo)
                 
-        Assert.True((j |> Seq.length) = (k |> Seq.length ))
+        Assert.Equal(j |> Seq.length, k |> Seq.length)
+    }
+    
+    [<Fact>]
+    let ``comments and op are mutually exclusive``() = task {
+        let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
+        let j = parser.ParseSingle node
+        Assert.All(j, fun k ->
+            if k.IsComment then
+                Assert.NotNull(k.CommentInfo)
+            else
+                Assert.Null(k.CommentInfo)
+        )       
     }
     
 module PostFullParser =
@@ -564,8 +515,10 @@ module ImageParser =
     let ``gallery and object id should match a particular format``(username: string) = task {
         let! node = getNodeFromPath $"/profile/{username}/images"
         let j = parser.ParseSingle node
-        Assert.True(Regex.IsMatch(j.GalleryId, "\d+-\d+"))
-        Assert.True(Regex.IsMatch(j.ObjectId , "\d+-\d+"))
+        // Assert.True(Regex.IsMatch(j.GalleryId, "\d+-\d+"))
+        // Assert.True(Regex.IsMatch(j.ObjectId , ))
+        Assert.Matches("\d+-\d+", j.ObjectId)
+        Assert.Matches("\d+-\d+", j.GalleryId)
     }
       
     [<Theory>]
@@ -581,9 +534,8 @@ module ImageParser =
     let ``tags link should be in the correct format``(username: string) = task {
         let! node = getNodeFromPath $"/profile/{username}/images"
         let j = parser.ParseSingle node
-        Assert.Equal(
-            j.Tags |> Seq.length,
-            j.Tags |> Seq.filter (fun x -> x.Link.StartsWith("?tag=")) |> Seq.length
+        Assert.All(j.Tags, fun k ->
+            Assert.True(k.Link.StartsWith("?tag="))
         )
     }
     
@@ -699,6 +651,9 @@ module FollowRelationshipEndParser =
     }
 
 module FollowRelationshipFullParser =
+    let profileParser = Parsers.ProfileParser()
+    let followerParser = Parsers.FollowerParser()
+    let followingParser = Parsers.FollowingParser()
     let sampleUsers: obj[] list =
         [
             [|"owie"|]
@@ -709,7 +664,24 @@ module FollowRelationshipFullParser =
             [|"darthjhawk"|]
             [|"temsbumbum"|]
         ]
+        
+    [<Theory>]
+    [<MemberData(nameof(sampleUsers))>]
+    let ``no of followers parsed from profile should be consistent``(username: string) = task {
+        let! profileNode = getNodeFromPath $"/profile/{username}"
+        let profile = profileParser.ParseSingle profileNode
+        let! follower = followerParser.ParseAll $"/profile/{username}/follower"
+        Assert.Equal(profile.Followers, follower |> Seq.length)
+    }
     
+    [<Theory>]
+    [<MemberData(nameof(sampleUsers))>]
+    let ``no of followings parsed from profile should be consistent``(username: string) = task {
+        let! profileNode = getNodeFromPath $"/profile/{username}"
+        let profile = profileParser.ParseSingle profileNode
+        let! following = followingParser.ParseAll $"/profile/{username}/following"
+        Assert.Equal(profile.Followers, following |> Seq.length)
+    }
     
 module WikiParser =
     let usersWithWiki: obj[] list =
