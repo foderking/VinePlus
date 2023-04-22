@@ -34,11 +34,12 @@ module Parsers =
             IsComment: bool; IsDeleted: bool; CommentId: Nullable<int>; PostNo: int
             Creator: Link; IsEdited: bool; Created: DateTime; Content: string; ThreadId: int
         }
+    [<CLIMutable>]
     type Thread =
         {
             Id: int; Thread: Link; Board: Link; IsPinned: bool; IsLocked: bool; IsDeleted: bool
             Type: ThreadType; LastPostNo: int; LastPostPage: int; Created: DateTime;
-            TotalPosts: int; TotalView: int; Creator: Link; Comments: List<int>
+            TotalPosts: int; TotalView: int; Creator: Link; Comments: int[]
         }
         
     // Profile section
@@ -391,7 +392,7 @@ module Parsers =
                             Thread = { Text = threadName; Link = threadLink }; Board = { Text = boardName; Link = boardLink } ;
                             Id = id; IsPinned = isPinned; IsLocked = isLocked; Type = threadType; LastPostNo = lastPostNo;
                             LastPostPage = lastPostPage; Created = created; TotalPosts = posts; TotalView = views; IsDeleted = false;
-                            Creator = { Text = creatorName; Link = creatorLink }; Comments = List.Empty }
+                            Creator = { Text = creatorName; Link = creatorLink }; Comments = [||] }
                         )
                 
        
