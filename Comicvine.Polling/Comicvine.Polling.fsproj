@@ -27,4 +27,8 @@
     <ItemGroup>
       <ProjectReference Include="..\Comicvine.Core\Comicvine.Core.fsproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Content Include=".gitignore" />
+    </ItemGroup>
 </Project>
