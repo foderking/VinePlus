@@ -28,29 +28,17 @@ module Parsers =
         { Text: string; Link: string }
         
     // Threads and Posts section
-    type CommentInfo = { Id: int; PostNo: int }
-    // type ThreadComments =
-    //     {
-    //         Id: int; PostNo: int; Creator: Link; IsEdited: bool
-    //         Created: DateTime; Content: string; ThreadId: int
-    //     }
-    // type ThreadOP =
-    //     { Creator: Link; IsEdited: bool; Created: DateTime; Content: string; ThreadId: int }
-    // type ThreadPost =
-    //     | Comment of ThreadComments
-    //     | OP      of ThreadOP
-    // type Post =
-    //     { IsComment: bool; Comment: ThreadComments; OP: ThreadOP; IsDeleted: bool }
+    // type CommentInfo = { Id: int; PostNo: int }
     type Post =
         {
-            IsComment: bool; IsDeleted: bool; CommentInfo: CommentInfo;
+            IsComment: bool; IsDeleted: bool; CommentId: Nullable<int>; PostNo: int
             Creator: Link; IsEdited: bool; Created: DateTime; Content: string; ThreadId: int
         }
     type Thread =
         {
             Id: int; Thread: Link; Board: Link; IsPinned: bool; IsLocked: bool; IsDeleted: bool
             Type: ThreadType; LastPostNo: int; LastPostPage: int; Created: DateTime;
-            TotalPosts: int; TotalView: int; Creator: Link; Comments: seq<Post>
+            TotalPosts: int; TotalView: int; Creator: Link; Comments: List<int>
         }
         
     // Profile section
@@ -403,7 +391,7 @@ module Parsers =
                             Thread = { Text = threadName; Link = threadLink }; Board = { Text = boardName; Link = boardLink } ;
                             Id = id; IsPinned = isPinned; IsLocked = isLocked; Type = threadType; LastPostNo = lastPostNo;
                             LastPostPage = lastPostPage; Created = created; TotalPosts = posts; TotalView = views; IsDeleted = false;
-                            Creator = { Text = creatorName; Link = creatorLink }; Comments = Unchecked.defaultof<_> }
+                            Creator = { Text = creatorName; Link = creatorLink }; Comments = List.Empty }
                         )
                 
        
@@ -563,26 +551,27 @@ module Parsers =
                         {
                             IsDeleted = false; IsComment = isComment; IsEdited = edited; Creator = creator
                             Created = created; Content = content; ThreadId = threadId
-                            CommentInfo =
+                            CommentId =
                                 if not isComment then
-                                    Unchecked.defaultof<_>
+                                    Nullable()
                                 else
-                                    {
-                                        Id =
-                                            messageNode
-                                            |> _getFirstChildElement (_classPredicate "message-title") "div"
-                                            |> _getFirstChildElement (fun n -> n.Attributes.Contains("name")) "a"
-                                            |> _getAttrib "name"
-                                            |> (fun x -> x.Split("-"))
-                                            |> Seq.last
-                                            |> int;
-                                        PostNo =
-                                            messageNode
-                                            |> _getFirstChildElement (_classPredicate "message-title") "div"
-                                            |> _getFirstChildElement (fun n -> n.Attributes.Contains("name")) "a"
-                                            |> (fun x -> x.InnerText.Trim()[1..])
-                                            |> int
-                                    }
+                                    messageNode
+                                    |> _getFirstChildElement (_classPredicate "message-title") "div"
+                                    |> _getFirstChildElement (fun n -> n.Attributes.Contains("name")) "a"
+                                    |> _getAttrib "name"
+                                    |> (fun x -> x.Split("-"))
+                                    |> Seq.last
+                                    |> int
+                                    |> Nullable
+                            PostNo =
+                                if not isComment then
+                                    0
+                                else
+                                    messageNode
+                                    |> _getFirstChildElement (_classPredicate "message-title") "div"
+                                    |> _getFirstChildElement (fun n -> n.Attributes.Contains("name")) "a"
+                                    |> (fun x -> x.InnerText.Trim()[1..])
+                                    |> int
                         }                                   
                                     
                         

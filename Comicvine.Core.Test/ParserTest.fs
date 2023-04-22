@@ -446,7 +446,7 @@ module PostParser =
             |> Seq.filter (fun e -> e.IsComment)
         let k =
             j
-            |> Seq.distinctBy (fun e -> e.CommentInfo.Id)
+            |> Seq.distinctBy (fun e -> e.CommentId)
                 
         Assert.Equal(j |> Seq.length, k |> Seq.length)
     }
@@ -454,12 +454,10 @@ module PostParser =
     [<Fact>]
     let ``"PostNo" should be distinct``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
-        let j =
-            parser.ParseSingle node
-            |> Seq.filter (fun e -> e.IsComment)
+        let j = parser.ParseSingle node
         let k =
             j
-            |> Seq.distinctBy (fun e -> e.CommentInfo.PostNo)
+            |> Seq.distinctBy (fun e -> e.PostNo)
                 
         Assert.Equal(j |> Seq.length, k |> Seq.length)
     }
@@ -470,9 +468,9 @@ module PostParser =
         let j = parser.ParseSingle node
         Assert.All(j, fun k ->
             if k.IsComment then
-                Assert.NotNull(k.CommentInfo)
+                Assert.NotNull(k.CommentId)
             else
-                Assert.Null(k.CommentInfo)
+                Assert.Null(k.CommentId)
         )       
     }
     
