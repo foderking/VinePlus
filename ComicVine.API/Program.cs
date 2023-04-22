@@ -1,14 +1,13 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
+// using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using ComicVine.API;
+// using ComicVine.API;
 using ComicVine.API.Controllers;
 // using ComicVine.API.Database;
 using ComicVine.API.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
-string? connectionString = builder.Configuration.GetConnectionString("Comicvine");
 
 // Add services to the container.
 

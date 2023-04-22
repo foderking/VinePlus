@@ -7,13 +7,18 @@ open System.Linq
 open System.Threading
 open System.Threading.Tasks
 open Comicvine.Core
-open Comicvine.Polling.Context
+open Comicvine.Database
 open FSharp.Control
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.EntityFrameworkCore
 
-type Worker(logger: ILogger<Worker>) =
+type ThreadOp =
+    | New
+    | Update
+    | None
+    
+type Worker(logger: ILogger<Worker>, factory: ComicvineContextFactory) =
     inherit BackgroundService()
     let timer = new PeriodicTimer(TimeSpan.FromMinutes(1))
     let threadParser = Parsers.ThreadParser()
@@ -27,9 +32,15 @@ type Worker(logger: ILogger<Worker>) =
         let filterThread (thread: Parsers.Thread) = task {
             printfn "a) got thread: %A - %A" thread.Id DateTime.Now
             let! dbResult = db.Threads.FindAsync(thread.Id)
-            let predicate =  obj.ReferenceEquals(dbResult, null) || dbResult.LastPostNo < thread.LastPostNo
-            printfn "b) is thread stale: %A - %A" predicate DateTime.Now
-            return predicate
+            let newThreadPredicate = obj.ReferenceEquals(dbResult, null)
+            let updatePredicate = not newThreadPredicate && dbResult.LastPostNo < thread.LastPostNo
+            
+            let pred = newThreadPredicate || updatePredicate
+            
+            if updatePredicate then db.Threads.Remove(dbResult) |> ignore
+            
+            printfn "b) is thread update: %A, %A" pred DateTime.Now
+            return pred
         }
         //  
         // let consumeThread (thread: Parsers.Thread) = task {
@@ -96,12 +107,13 @@ type Worker(logger: ILogger<Worker>) =
                 |> TaskSeq.ofSeq
                 |> TaskSeq.filterAsync filterThread
                 |> TaskSeq.toArray
-                // |> TaskSeq.iterAsync consumeThread
-                // |> Seq.map filterThread
-                // |> Seq.map consumeThread
-                // |> Seq.map getPosts
-                // |> Task.WhenAll
+            // batchedThreads
+            // |> Array.Parallel.iter relevantThreads.Add
+            let batchedPosts =
+                batchedThreads
+            
             logger.LogInformation("{0} new threads", batchedThreads.Length)
+            do! db.Threads.AddRangeAsync(batchedThreads)
             // let! z =
             //     batchedThreads
             //     |> Seq.filter Option.isSome
@@ -120,10 +132,12 @@ type Worker(logger: ILogger<Worker>) =
         task {
             while not ct.IsCancellationRequested do
                 let! r = timer.WaitForNextTickAsync(ct)
-                use dbCtx = new ComicvineContext()
+                use dbCtx = factory.CreateDbContext([||])
                 logger.LogInformation("starting new task at: {time}", DateTimeOffset.Now)
                 if r then
                     do! pollThread ct dbCtx
                     logger.LogInformation("completed at {time}", DateTimeOffset.Now)
+                    let! o = dbCtx.SaveChangesAsync ct
+                    logger.LogInformation("{0} changes", o)
         }
         :> Task // need to convert into the parameter-less task

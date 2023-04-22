@@ -18,6 +18,7 @@ public class ComicvineContextFactory: IDesignTimeDbContextFactory<ComicvineConte
         var optionsBuilder = new DbContextOptionsBuilder<ComicvineContext>();
         optionsBuilder
             .UseNpgsql(config.GetConnectionString("comicvine_db"))
+            //.EnableSensitiveDataLogging() // TODO
             .UseSnakeCaseNamingConvention();
         return new ComicvineContext(optionsBuilder.Options);
     }
