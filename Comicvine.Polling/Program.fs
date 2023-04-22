@@ -9,12 +9,14 @@ open Microsoft.Extensions.Hosting
 
 module Program =
     let createHostBuilder args =
-        Host.CreateDefaultBuilder(args)
+        Host
+            .CreateDefaultBuilder(args)
             .ConfigureServices(fun hostContext services ->
-                services.AddHostedService<Worker>() |> ignore)
+                services.AddDbContext<Context.ComicvineContext>() |> ignore
+                services.AddHostedService<Worker>() |> ignore
+            )
 
     [<EntryPoint>]
     let main args =
         createHostBuilder(args).Build().Run()
-
         0 // exit code
