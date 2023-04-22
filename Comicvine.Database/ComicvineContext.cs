@@ -11,15 +11,6 @@ public class ComicvineContext: DbContext
     
     public ComicvineContext(DbContextOptions<ComicvineContext> options): base(options) {}
     
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-        var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("settings.json", false, true)
-            .Build();
-        optionsBuilder
-            .UseNpgsql(config.GetConnectionString("comicvine_db"))
-            .UseSnakeCaseNamingConvention();
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         modelBuilder.Entity<Parsers.Thread>()
@@ -31,6 +22,5 @@ public class ComicvineContext: DbContext
         modelBuilder.Entity<Parsers.Thread>()
             .Property(x => x.Creator)
             .HasColumnType("jsonb");
- 
     }
 }
