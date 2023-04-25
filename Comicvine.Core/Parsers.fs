@@ -461,7 +461,6 @@ module Parsers =
           let isComment = 
             messageNode
             |> Nodes.getFirstChild "div" (Predicates.classAttrib "message-title")
-            // |> Nodes.getChildren "a" (fun n -> n.Attributes.Contains("name"))
             |> Nodes.getChildren "a" (Predicates.hasAttrib "name")
             |> Seq.exists Predicates.identity
           
@@ -716,7 +715,6 @@ module Parsers =
         let background =
           headerNode
           |> Helpers.getAttrib "style"
-          // |> (fun x -> x.Split("background-image: url(")[1])
           |> Helpers.split "background-image: url("
           |> Seq.item 1
           |> (fun x -> x.TrimEnd(')'))
