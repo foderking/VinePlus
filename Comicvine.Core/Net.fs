@@ -42,7 +42,16 @@ open HtmlAgilityPack
             let rootNode = HtmlDocument()
             rootNode.Load(htmlStream)
             rootNode.DocumentNode
-
+            
+        let unwrapTaskSeq t =
+            let _folder state curr =
+              Seq.append state [curr]
+            t
+            |> TaskSeq.map (fun x -> x |> TaskSeq.ofSeq)
+            |> TaskSeq.concat 
+            |> TaskSeq.fold _folder (Seq.ofList [])
+      
+ 
         // let parseAllGeneric parseStream parserData parseEnd (path: string) (page: int) = taskSeq {
         //     let! stream = parseStream page path 
         //     let node = stream |> getRootNode
