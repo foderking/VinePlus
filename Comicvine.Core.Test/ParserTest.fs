@@ -624,27 +624,27 @@ module FollowRelationshipEndParser =
     [<Fact>]
     let ``parsing users without followings should only have one page of followings``() = task {
         let! node = getNodeFromPath $"/profile/temsbumbum/following"
-        Assert.Equal(1, Parsers.parseFollowRelationshipEnd node)
+        Assert.Equal(1, Parsers.Common.parseFollowRelationshipEnd node)
     }
     
     [<Fact>]
     let ``parsing users without followers should only have one page of followers``() = task {
         let! node = getNodeFromPath $"/profile/temsbumbum/follower"
-        Assert.Equal(1, Parsers.parseFollowRelationshipEnd node)
+        Assert.Equal(1, Parsers.Common.parseFollowRelationshipEnd node)
     }
     
     [<Theory>]
     [<MemberData(nameof(usersWithManyFollows))>]
     let ``no of pages for users with many followers should more than one``(username: string) = task {
         let! node = getNodeFromPath $"/profile/{username}/follower"
-        Assert.True(Parsers.parseFollowRelationshipEnd node > 1)
+        Assert.True(Parsers.Common.parseFollowRelationshipEnd node > 1)
     }
      
     [<Theory>]
     [<MemberData(nameof(usersWithManyFollows))>]
     let ``no of pages for users with many followings should more than one``(username: string) = task {
         let! node = getNodeFromPath $"/profile/{username}/following"
-        let no = Parsers.parseFollowRelationshipEnd node
+        let no = Parsers.Common.parseFollowRelationshipEnd node
         Assert.True(no > 1)
     }
 
@@ -678,7 +678,7 @@ module FollowRelationshipFullParser =
         let! profileNode = getNodeFromPath $"/profile/{username}"
         let profile = profileParser.ParseSingle profileNode
         let! following = followingParser.ParseAll $"/profile/{username}/following"
-        Assert.Equal(profile.Followers, following |> Seq.length)
+        Assert.Equal(profile.Following, following |> Seq.length)
     }
     
 module WikiParser =
