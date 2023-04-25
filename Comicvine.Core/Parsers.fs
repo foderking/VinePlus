@@ -71,7 +71,20 @@ module Parsers =
   type Follower =
     { Follower: Link; Avatar: string }
   
+  // interface for the parsers 
+  type ISingle<'T> =
+    interface
+      abstract member ParseSingle: HtmlNode -> 'T
+    end
   
+  type IMultiple<'T> =
+    interface
+      inherit ISingle<seq<'T>>
+      abstract _parseEnd: HtmlNode -> int
+      abstract ParseAll: string -> Task<seq<'T>>
+    end
+    
+    
   // general purpose helpers
   module Helpers =
     let replace (oldS: string) (newS: string) (s: string) =
@@ -113,7 +126,6 @@ module Parsers =
       getChildrenIfAny name predicate node
       |> Option.map Seq.head
       
-      
   module Predicates =
     let identity =
       (fun _ -> true)
@@ -130,54 +142,26 @@ module Parsers =
     let hasAttrib (attrib: string) (node: HtmlNode) =
       node.Attributes.Contains(attrib)
   
-
- 
-  
-  type ISingle<'T> =
-    interface
-      abstract member ParseSingle: HtmlNode -> 'T
-    end
-  
-  type IMultiple<'T> =
-    interface
-      inherit ISingle<seq<'T>>
-      abstract _parseEnd: HtmlNode -> int
-      abstract ParseAll: string -> Task<seq<'T>>
-    end
-  
-  
-  
-  
-  
-  
-  
-  
-  let yieldMultipleData (path: string) (page: int) (parser: IMultiple<'T>) = taskSeq {
-    let! stream = Net.getStreamByPage page path 
-    let node = stream |> Net.getRootNode
-    let lastPage = parser._parseEnd node
-    yield parser.ParseSingle node
-    
-    for p in [2..lastPage] do
-      let! s = Net.getStreamByPage p path 
-      yield s
-        |> Net.getRootNode
-        |> parser.ParseSingle
-  }
-
-  
-  let parseMultipleGeneric (path: string) (page: int) (parser: IMultiple<'T>) =
-    yieldMultipleData path page parser
-    |> Net.unwrapTaskSeq
-  
-  
-  
-  
-  
-
-  
   // commonly used node functions
   module Common =
+    let parseAll (path: string) (page: int) (parser: IMultiple<'T>) = task {
+      let getNodeFromPage path page = task {
+        let! stream = Net.getStreamByPage page path 
+        return stream |> Net.getRootNode
+      }
+      let! node = getNodeFromPage path page
+      let lastPage = parser._parseEnd node
+      
+      let! batchedReqs =
+        seq {page..lastPage}
+        |> Seq.map (getNodeFromPage path)
+        |> Seq.map (Net.map parser.ParseSingle)
+        |> Task.WhenAll
+      return
+        batchedReqs
+        |> Seq.concat
+    }
+    
     let getWrapperNode node =
       Nodes.getFirstChild "html" Predicates.identity node
       |> Nodes.getFirstChild "body" Predicates.identity 
@@ -216,7 +200,6 @@ module Parsers =
         |> Seq.last
         |> int
     
-    
     let parseBlogEnd (rootNode: HtmlNode) =
       match
         rootNode
@@ -252,7 +235,6 @@ module Parsers =
         |> Seq.last
         |> Helpers.innerTrim
         |> int
-      
 
     let parseFollowRelationship parseData rootNode =
       match
@@ -270,9 +252,7 @@ module Parsers =
         | Some n ->
           n |> Seq.map parseData
           
-      
-        
-
+          
   type ThreadParser() =
     member this._parseEnd(path) =
       (this :> IMultiple<Thread>)._parseEnd(path)
@@ -284,7 +264,7 @@ module Parsers =
     interface IMultiple<Thread> with
       member this.ParseAll(path) =
         this
-        |> parseMultipleGeneric path 1
+        |> Common.parseAll path 1
       
       member this._parseEnd(rootNode) =
         Common.parsePageEnd rootNode
@@ -426,7 +406,7 @@ module Parsers =
     interface IMultiple<Post> with
       member this.ParseAll(path) =
         this
-        |> parseMultipleGeneric path 1
+        |> Common.parseAll path 1
       
       member this._parseEnd(rootNode) =
         Common.parsePageEnd rootNode
@@ -512,7 +492,6 @@ module Parsers =
                 0
           }                                   
         )
-    
 
   type BlogParser() =
     member this._parseEnd(path) =
@@ -525,7 +504,7 @@ module Parsers =
     interface IMultiple<Blog> with
       member this.ParseAll(path) =
         this
-        |> parseMultipleGeneric path 1
+        |> Common.parseAll path 1
       
       member this._parseEnd(rootNode) =
         Common.parseBlogEnd rootNode
@@ -582,7 +561,6 @@ module Parsers =
         |> Nodes.getChildren "article" (Predicates.classAttrib "profile-blog")
         |> Seq.map parse
       
-      
   type ImageParser() =
     member this.ParseSingle(node: HtmlNode) =
       (this :> ISingle<Image>).ParseSingle(node)
@@ -632,7 +610,6 @@ module Parsers =
             |> (fun x -> x.Split("(").[1].Trim(')') )
             |> int
         }
-
  
   type FollowerParser() =
     member this._parseEnd(path) =
@@ -645,7 +622,7 @@ module Parsers =
     interface IMultiple<Follower> with
       member this.ParseAll(path) =
         this
-        |> parseMultipleGeneric path 1
+        |> Common.parseAll path 1
       member this._parseEnd(rootNode) =
         Common.parseFollowRelationshipEnd rootNode
       member this.ParseSingle(rootNode) =
@@ -674,7 +651,6 @@ module Parsers =
           
         Common.parseFollowRelationship parser rootNode
       
-  
   type FollowingParser() =
     member this._parseEnd(path) =
       (this :> IMultiple<Following>)._parseEnd(path)
@@ -686,7 +662,7 @@ module Parsers =
     interface IMultiple<Following> with
       member this.ParseAll(path) =
         this
-        |> parseMultipleGeneric path 1
+        |> Common.parseAll path 1
       
       member this._parseEnd(rootNode) =
         Common.parseFollowRelationshipEnd rootNode
@@ -721,8 +697,7 @@ module Parsers =
             }
           
         Common.parseFollowRelationship parser rootNode
-      
-  
+        
   type ProfileParser() =
     member this.ParseSingle(rootNode) =
       (this :> ISingle<Profile>).ParseSingle(rootNode)

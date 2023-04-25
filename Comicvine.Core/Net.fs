@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.IO
 open System.Net.Http
 open System.Threading
+open System.Threading.Tasks
 open FSharp.Control
 open HtmlAgilityPack
 
@@ -43,14 +44,18 @@ open HtmlAgilityPack
             rootNode.Load(htmlStream)
             rootNode.DocumentNode
             
-        let unwrapTaskSeq t =
-            let _folder state curr =
-              Seq.append state [curr]
-            t
-            |> TaskSeq.map (fun x -> x |> TaskSeq.ofSeq)
-            |> TaskSeq.concat 
-            |> TaskSeq.fold _folder (Seq.ofList [])
+        // let unwrapTaskSeq t =
+        //     let _folder state curr =
+        //       Seq.append state [curr]
+        //     t
+        //     |> TaskSeq.map (fun x -> x |> TaskSeq.ofSeq)
+        //     |> TaskSeq.concat 
+        //     |> TaskSeq.fold _folder (Seq.ofList [])
       
+        let map (mapper: 'T -> 'U) (task_: Task<'T>) = task {
+            let! t = task_
+            return mapper t
+        }
  
         // let parseAllGeneric parseStream parserData parseEnd (path: string) (page: int) = taskSeq {
         //     let! stream = parseStream page path 
