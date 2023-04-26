@@ -24,6 +24,7 @@ builder.Services.AddSwaggerGen(
         var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
     });
+builder.Services.AddRazorPages();
         
 builder.Services.AddScoped<Parsers.IMultiple<Parsers.Thread>, Parsers.ThreadParser>();
 builder.Services.AddScoped<Parsers.IMultiple<Parsers.Post>, Parsers.PostParser>();
@@ -34,7 +35,6 @@ builder.Services.AddScoped<Parsers.ISingle<Parsers.Profile>, Parsers.ProfilePars
 builder.Services.AddScoped<Parsers.ISingle<Parsers.Image>, Parsers.ImageParser>();
 
 // builder.Services.AddDbContext<ForumContext>(o => o.UseNpgsql(connectionString));
-
 // builder.Services.AddStackExchangeRedisCache(o => { o.Configuration = builder.Configuration["RedisCacheUrl"]; });
 
 
@@ -71,8 +71,8 @@ app.UseSwagger();
 // app.UseAuthorization();
 
 app.UseStaticFiles();
-    
-// app.MapControllers();
+
+app.MapRazorPages();
 app.AddEndpoints();
 
 app.Run();
