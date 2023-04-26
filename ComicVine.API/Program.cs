@@ -1,11 +1,11 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
+using ComicVine.API;
 // using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 // using ComicVine.API;
-using ComicVine.API.Controllers;
 // using ComicVine.API.Database;
-using ComicVine.API.Repository;
+using Comicvine.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,9 +25,13 @@ builder.Services.AddSwaggerGen(
         c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
     });
         
-builder.Services.AddScoped<IUserRepository<ProfileController>, UserRepository>();
-builder.Services.AddScoped<IForumRepository, ForumRepository>();
-builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<Parsers.IMultiple<Parsers.Thread>, Parsers.ThreadParser>();
+builder.Services.AddScoped<Parsers.IMultiple<Parsers.Post>, Parsers.PostParser>();
+builder.Services.AddScoped<Parsers.IMultiple<Parsers.Blog>, Parsers.BlogParser>();
+builder.Services.AddScoped<Parsers.IMultiple<Parsers.Follower>, Parsers.FollowerParser>();
+builder.Services.AddScoped<Parsers.IMultiple<Parsers.Following>, Parsers.FollowingParser>();
+builder.Services.AddScoped<Parsers.ISingle<Parsers.Profile>, Parsers.ProfileParser>();
+builder.Services.AddScoped<Parsers.ISingle<Parsers.Image>, Parsers.ImageParser>();
 
 // builder.Services.AddDbContext<ForumContext>(o => o.UseNpgsql(connectionString));
 
@@ -36,16 +40,7 @@ builder.Services.AddScoped<IPostRepository, PostRepository>();
 
 
 var app = builder.Build();
-// AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-// using (var scope = app.Services.CreateScope()) {
-//     var service = scope.ServiceProvider;
-//     string? path = builder.Configuration.GetSection("SeedPath").Value;
-
-    // Seed.InitializeForums(service);
-    // Seed.InitializeForums(service, path);
-    // Seed.InitializePosts(service).Wait();
-// }
 var port = Environment.GetEnvironmentVariable("PORT");
 
 if (!string.IsNullOrWhiteSpace(port)) {
@@ -69,12 +64,15 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction()) {
     });
 }
 
+// https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/openapi?view=aspnetcore-7.0
+app.UseSwaggerUI();
+app.UseSwagger();
 
-
-app.UseAuthorization();
+// app.UseAuthorization();
 
 app.UseStaticFiles();
     
-app.MapControllers();
+// app.MapControllers();
+app.AddEndpoints();
 
 app.Run();
