@@ -1,0 +1,44 @@
+﻿@page "{pag:int?}"
+@using Comicvine.Core
+@model ComicVine.API.Pages.Forum
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Comicvine</title>
+</head>
+<body>
+<div>
+    <table>
+        <thead>
+        <tr>
+            <td>#</td>
+            <td>Id</td>
+            <td>Title</td>
+            <td>Board</td>
+            <td>Creator</td>
+            <td>Views</td>
+        </tr>
+        </thead>
+        <tbody>
+        @if (Model.Threads != null) {
+            @foreach (var (index, thread) in Model.Threads.Select((t, i) => (i,t)) ) {
+                <tr>
+                    <td>@index</td>
+                    <td>@thread.Id</td>
+                    <td>@thread.Thread.Text</td>
+                    <td>@thread.Board.Text</td>
+                    <td>@thread.Creator.Text</td>
+                    <td>@thread.TotalView</td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
