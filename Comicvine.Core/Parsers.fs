@@ -25,9 +25,10 @@ module Parsers =
   type Link =
     { Text: string; Link: string }
     
+  [<CLIMutable>]
   type Post =
     {
-      IsComment: bool; IsDeleted: bool; CommentId: Nullable<int>; PostNo: int
+      Id: string; IsComment: bool; IsDeleted: bool; IsModComment: bool; PostNo: int;
       Creator: Link; IsEdited: bool; Created: DateTime; Content: string; ThreadId: int
     }
     
@@ -36,7 +37,7 @@ module Parsers =
     {
       Id: int; Thread: Link; Board: Link; IsPinned: bool; IsLocked: bool; IsDeleted: bool
       Type: ThreadType; LastPostNo: int; LastPostPage: int; Created: DateTime;
-      TotalPosts: int; TotalView: int; Creator: Link; Comments: int[]
+      TotalPosts: int; TotalView: int; Creator: Link; Posts: Post seq
     }
   
   // Profile section
@@ -70,7 +71,13 @@ module Parsers =
     
   type Follower =
     { Follower: Link; Avatar: string }
-  
+     
+  // type PollInfo =
+  //   {
+  //     NewThreads: int
+  //     NewPosts: int
+  //     DeletedPosts: int
+  //   } 
   // interface for the parsers 
   type ISingle<'T> =
     interface
@@ -155,11 +162,12 @@ module Parsers =
       let! batchedReqs =
         seq {page..lastPage}
         |> Seq.map (getNodeFromPage path)
-        |> Seq.map (Net.map parser.ParseSingle)
+        |> Seq.map (Task.map parser.ParseSingle)
         |> Task.WhenAll
       return
         batchedReqs
-        |> Seq.concat
+        // |> Array.Parallel.map parser.ParseSingle
+        |> Seq.concat 
     }
     
     let getWrapperNode node =
@@ -391,7 +399,7 @@ module Parsers =
             Thread = { Text = threadName; Link = threadLink }; Board = { Text = boardName; Link = boardLink } ;
             Id = id; IsPinned = isPinned; IsLocked = isLocked; Type = threadType; LastPostNo = lastPostNo;
             LastPostPage = lastPostPage; Created = created; TotalPosts = posts; TotalView = views; IsDeleted = false;
-            Creator = { Text = creatorName; Link = creatorLink }; Comments = [||]
+            Creator = { Text = creatorName; Link = creatorLink }; Posts = Seq.empty
           }
         )
   
@@ -463,13 +471,18 @@ module Parsers =
             |> Nodes.getFirstChild "div" (Predicates.classAttrib "message-title")
             |> Nodes.getChildren "a" (Predicates.hasAttrib "name")
             |> Seq.exists Predicates.identity
+          let modComment =
+              messageNode
+              |> Nodes.getFirstChild "div" (Predicates.classAttrib "message-title")
+              |> Nodes.getFirstChildIfAny "span" (Predicates.classAttrib "role-mod")
+              |> Option.isSome
           
           {
             IsDeleted = false; IsComment = isComment; IsEdited = edited; Creator = creator
             Created = created; Content = content; ThreadId = threadId
-            CommentId =
+            Id =
               if not isComment then
-                Nullable()
+                $"Tx{threadId}"
               else
                 messageNode
                 |> Nodes.getFirstChild "div" (Predicates.classAttrib "message-title")
@@ -478,7 +491,8 @@ module Parsers =
                 |> Helpers.split "-"
                 |> Seq.last
                 |> int
-                |> Nullable
+                |> (fun id -> $"Cx{id}")
+            IsModComment = modComment;
             PostNo =
               if isComment then
                 messageNode

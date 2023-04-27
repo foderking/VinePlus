@@ -46,3 +46,6 @@ module Net =
       let! t = task_
       return mapper t
   }
+  let mapSeq (mapper: 'T -> 'U) (s: Task<'T> seq)  =
+      s
+      |> Seq.map (map mapper)

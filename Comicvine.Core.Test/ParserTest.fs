@@ -29,6 +29,11 @@ let getNodeFromPath path = task {
     return Net.getRootNode stream
 }
 
+let getNodeFromPage page path = task {
+    let! stream = Net.getStreamByPage page path
+    return Net.getRootNode stream
+}
+
 
 module BlogFullParser =
     let parser = Parsers.BlogParser()
@@ -443,10 +448,9 @@ module PostParser =
         let! node = getNodeFromPath "/forums/gen-discussion-1/new-mcu-captain-marvel-statement-2300312/"
         let j =
             parser.ParseSingle node
-            |> Seq.filter (fun e -> e.IsComment)
         let k =
             j
-            |> Seq.distinctBy (fun e -> e.CommentId)
+            |> Seq.distinctBy (fun e -> e.Id)
                 
         Assert.Equal(j |> Seq.length, k |> Seq.length)
     }
@@ -468,10 +472,28 @@ module PostParser =
         let j = parser.ParseSingle node
         Assert.All(j, fun k ->
             if k.IsComment then
-                Assert.NotNull(k.CommentId)
+                Assert.StartsWith("Cx", k.Id)
+                Assert.True(k.PostNo > 0)
             else
-                Assert.Null(k.CommentId)
+                Assert.StartsWith("Tx", k.Id)
+                Assert.Equal(0, k.PostNo)
         )       
+    }
+    
+    [<Theory>]
+    [<InlineData(1, 0, "/forums/battles-7/tai-lung-vs-alex-madagascar-2281381/")>]
+    [<InlineData(1, 0, "/forums/battles-7/thanos-vs-superman-3155/")>]
+    [<InlineData(2, 4, "/forums/battles-7/thanos-vs-superman-3155/")>]
+    [<InlineData(1, 1, "/forums/battles-7/cyttorak-vs-living-tribunal-528457/")>]
+    [<InlineData(2, 0, "/forums/battles-7/cyttorak-vs-living-tribunal-528457/")>]
+    let ``the correct amount of moderator comments should be parsed``(page: int, expected: int, path: string) = task {
+        let! node = getNodeFromPage page path
+        let j =
+            parser.ParseSingle node
+            |> Seq.filter (fun x -> x.IsModComment)
+            |> Seq.length
+        
+        Assert.Equal(expected, j)
     }
     
 module PostFullParser =

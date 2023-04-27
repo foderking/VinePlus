@@ -12,13 +12,13 @@ public static class Controller
      * - add proper restful errors
      */
     public static void AddEndpoints(this IEndpointRouteBuilder app) {
-        app.MapGet("/api/post", (
+        app.MapGet("/api/post", async (
             Parsers.IMultiple<Parsers.Post> parser,
             [FromQuery] string path
         ) =>
         {
             try {
-                var res = parser.ParseAll(path);
+                var res = await parser.ParseAll(path);
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
