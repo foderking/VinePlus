@@ -12,120 +12,136 @@ open FSharp.Control
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.EntityFrameworkCore
+open Microsoft.FSharp.Collections
 
 type ThreadOp =
-    | New
-    | Update
+    | New    of Parsers.Thread
+    | Update of Parsers.Thread
     | None
     
+type PollInfo =
+    {
+        NewThreads: int
+        NewPosts: int
+        DeletedPosts: int
+    }
 type Worker(logger: ILogger<Worker>, factory: ComicvineContextFactory) =
     inherit BackgroundService()
     let timer = new PeriodicTimer(TimeSpan.FromMinutes(1))
     let threadParser = Parsers.ThreadParser()
     let postParser = Parsers.PostParser()
 
-    let relevantThreads = ConcurrentBag<Parsers.Thread>()
-    let relevantPosts = ConcurrentBag<Parsers.Post>()
+    let newThread = ConcurrentBag<Parsers.Thread>()
+    let newPost = ConcurrentBag<Parsers.Post>()
+    let updateThread = ConcurrentBag<Parsers.Thread>()
+    let updatePost = ConcurrentBag<Parsers.Post>()
 
          
     let pollThread ct (db: ComicvineContext) = task {
-        let filterThread (thread: Parsers.Thread) = task {
-            printfn "a) got thread: %A - %A" thread.Id DateTime.Now
+        let updateThreads(thread: Parsers.Thread) = task {
             let! dbResult = db.Threads.FindAsync(thread.Id)
-            let newThreadPredicate = obj.ReferenceEquals(dbResult, null)
-            let updatePredicate = not newThreadPredicate && dbResult.LastPostNo < thread.LastPostNo
             
-            let pred = newThreadPredicate || updatePredicate
-            
-            if updatePredicate then db.Threads.Remove(dbResult) |> ignore
-            
-            printfn "b) is thread update: %A, %A" pred DateTime.Now
-            return pred
+            // new thread
+            if obj.ReferenceEquals(dbResult, null) then
+                // add thread to db
+                newThread.Add(thread)
+                // let! _ = db.Threads.AddAsync(thread)
+                do! Console.Out.WriteLineAsync($"id {thread.Id}; State: New")
+                // add all posts to db since they are new
+                let! posts = postParser.ParseAll(thread.Thread.Link)
+                return {NewPosts = 0; NewThreads = 1; DeletedPosts = 0}
+            // thread to update
+            elif dbResult.LastPostNo < thread.LastPostNo then
+                let threadToAdd =
+                    {
+                        dbResult with
+                            Thread = { dbResult.Thread with Text = thread.Thread.Text}
+                            IsPinned = thread.IsPinned
+                            IsLocked = thread.IsLocked
+                            LastPostNo = thread.LastPostNo
+                            LastPostPage = thread.LastPostPage
+                            TotalPosts = thread.TotalPosts
+                            TotalView = thread.TotalView
+                    }
+                // stop tracking returned result so we can add updated thread
+                db.Entry(dbResult).State <- EntityState.Detached
+                // let _ = db.Threads.Update(threadToAdd)
+                updateThread.Add(threadToAdd)
+                do! Console.Out.WriteLineAsync($"id {thread.Id}; State: Update" )
+                 
+                let! parsedPosts = postParser.ParseAll(thread.Thread.Link)
+                // get posts already in db
+                let dbPosts: Parsers.Post seq = Seq.empty
+                
+                let idSelector = (fun (x: Parsers.Post) -> x.PostNo)
+                let pid = parsedPosts |> Seq.map idSelector
+                let did     = dbPosts |> Seq.map idSelector
+                let postsNotInDb =
+                    pid.Except(did)
+                // mark posts not in parsed post as deleted
+                let postsToDelete =
+                    dbPosts.ExceptBy(pid, idSelector)
+                
+                
+                let updatePosts (orig: Parsers.Post) =
+                    // if the post is edited, update contents
+                    if orig.IsEdited then
+                        { orig with IsEdited = true; Content = orig.Content }
+                    else
+                        orig
+                
+                        
+                let postsToAdd  =
+                    dbPosts
+                    |> Seq.map updatePosts
+                    |> Seq.append postsToDelete
+                    
+                return
+                    {
+                       NewPosts = postsNotInDb.Count()
+                       NewThreads = 0
+                       DeletedPosts = postsToDelete.Count()
+                    }
+            else
+                return {NewPosts = 0; NewThreads = 0; DeletedPosts = 0}
         }
-        //  
-        // let consumeThread (thread: Parsers.Thread) = task {
-        //     relevantThreads.Add(thread)
-        //     relevantThreads.
-        // }
-        //
-        // let getPosts(thread: Task<Parsers.Thread option>) = task {
-        //     let! t = thread
-        //     if t.IsSome then
-        //         let! p = postParser.ParseAll(t.Value.Thread.Link)
-        //         return Some p
-        //     else
-        //         return None
-        // }
-        //
-        // let filterPost (post: Parsers.Post) = task {
-        //     let! dbResult = db.FindAsync(thread.Id)
-        //     let predicate =  obj.ReferenceEquals(dbResult, null) || dbResult.LastPostNo < thread.LastPostNo
-        //     printfn "d"
-        //     return
-        //         if predic then
-        //             Some post
-        //         else None
-        // }
-        //
-        // let consumePost (post: Task<seq<Parsers.Post>>) = task {
-        //     let consume (post: Task<Parsers.Post option>) = task {
-        //         let! p = post
-        //         if p.IsSome then
-        //             printfn "e %A" (if p.Value.IsComment then p.Value.CommentInfo.Id else p.Value.ThreadId)
-        //             relevantPosts.Add(p.Value)
-        //         else
-        //             printfn "e"
-        //     }
-        //         
-        //     let! p = post
-        //     printfn "c"
-        //     let! z =
-        //         p
-        //         |> Seq.map filterPost
-        //         |> Seq.map consume
-        //         |> Task.WhenAll
-        //     z |> ignore
-        // }
-        //
-        //
+        
+        
+        
         
         let mutable page = 1
         let mutable finished = false
         
         while not finished do
-            // relevantPosts.Clear()
-            // relevantThreads.Clear()
-            
             logger.LogInformation("making request to page {0}", page)
             let! stream = Net.getStreamByPageCt ct page "/forums/"
-            let threads =
+            let! batched =
                 Net.getRootNode stream
                 |> threadParser.ParseSingle
+                |> Seq.map updateThreads
+                |> Task.WhenAll
             
-            let batchedThreads = 
-                threads
-                |> TaskSeq.ofSeq
-                |> TaskSeq.filterAsync filterThread
-                |> TaskSeq.toArray
-            // batchedThreads
-            // |> Array.Parallel.iter relevantThreads.Add
-            let batchedPosts =
-                batchedThreads
+            let folder (curr: int * int * int) (record: PollInfo) =
+                let (a,b,c) = curr
+                record.NewThreads+a, record.NewPosts+b, record.DeletedPosts+c
+                
+            let nT, nP, dP =
+                batched
+                |> Seq.fold folder (0,0,0)
+            // for t in batchedThreads do
+            //     let! tt = t
+            //     let! g = updatePosts tt
+            //     dP <- g.DeletedPosts + dP
+            //     nP <- g.NewPosts + nP
+            //     nT <- g.NewThreads + nT
+            let! _ = db.Threads.AddRangeAsync(newThread)
+            do db.Threads.UpdateRange(updateThread)
             
-            logger.LogInformation("{0} new threads", batchedThreads.Length)
-            do! db.Threads.AddRangeAsync(batchedThreads)
-            // let! z =
-            //     batchedThreads
-            //     |> Seq.filter Option.isSome
-            //     |> Seq.map Option.get
-            //     |> Seq.map (fun x -> postParser.ParseAll(x.Thread.Link))
-            //     |> Seq.map consumePost
-            //     |> Task.WhenAll
-                // |> Seq.map consumePost
+            logger.LogInformation($"{nP} new posts; {nT} new threads; {dP} deleted posts")
+            logger.LogInformation("finished updating db")
             
-            finished <- true//x |> Seq.forall id
+            finished <- nT < 50//x |> Seq.forall id
             page <- page + 1
-            // logger.LogInformation("{0} new posts", relevantPosts.Count)
     }
     
     override _.ExecuteAsync( ct) =
