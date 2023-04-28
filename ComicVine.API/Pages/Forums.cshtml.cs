@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ComicVine.API.Pages;
 
-public class Forum : PageModel
+public class Forums : PageModel
 {
     private Parsers.IMultiple<Parsers.Thread> _parser;
     public IEnumerable<Parsers.Thread>? Threads;
 
-    public Forum(Parsers.IMultiple<Parsers.Thread> p) {
+    public Forums(Parsers.IMultiple<Parsers.Thread> p) {
         _parser = p;
     }
     public async Task OnGet(int p) {
