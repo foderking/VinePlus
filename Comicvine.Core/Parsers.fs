@@ -81,14 +81,13 @@ module Parsers =
   // interface for the parsers 
   type ISingle<'T> =
     interface
-      abstract member ParseSingle: HtmlNode -> 'T
+      abstract ParseSingle: HtmlNode -> 'T
     end
   
   type IMultiple<'T> =
     interface
       inherit ISingle<seq<'T>>
-      abstract _parseEnd: HtmlNode -> int
-      abstract ParseAll: string -> Task<seq<'T>>
+      abstract ParseEnd: HtmlNode -> int
     end
     
     
@@ -152,16 +151,12 @@ module Parsers =
   // commonly used node functions
   module Common =
     let parseAll (path: string) (page: int) (parser: IMultiple<'T>) = task {
-      let getNodeFromPage path page = task {
-        let! stream = Net.getStreamByPage page path 
-        return stream |> Net.getRootNode
-      }
-      let! node = getNodeFromPage path page
-      let lastPage = parser._parseEnd node
+      let! node = Net.getNodeFromPage path page
+      let lastPage = parser.ParseEnd node
       
       let! batchedReqs =
         seq {page..lastPage}
-        |> Seq.map (getNodeFromPage path)
+        |> Seq.map (Net.getNodeFromPage path)
         |> Seq.map (Task.map parser.ParseSingle)
         |> Task.WhenAll
       return
@@ -259,22 +254,30 @@ module Parsers =
         | None -> Seq.empty
         | Some n ->
           n |> Seq.map parseData
-          
+    
+    // let parsePage(parser: 'T IMultiple)(page: int)(path: string) =
+    //   Net.getNodeFromPage path page
+    //   |> Task.map parser.ParseSingle
+      
+    let ParseDefault(parser: 'T ISingle)(path: string) =
+      Net.getNode path
+      |> Task.map parser.ParseSingle
+      
+    let ParseSingle(parser: 'T IMultiple)(page: int)(path: string) =
+      Net.getNodeFromPage path page
+      |> Task.map parser.ParseSingle
+      
+    let ParseMultiple(parser: 'T IMultiple)(path: string) =
+      parseAll path 1 parser
           
   type ThreadParser() =
-    member this._parseEnd(path) =
-      (this :> IMultiple<Thread>)._parseEnd(path)
-    member this.ParseAll(path) =
-      (this :> IMultiple<Thread>).ParseAll(path)
+    member this.ParseEnd(path) =
+      (this :> IMultiple<Thread>).ParseEnd(path)
     member this.ParseSingle(node: HtmlNode) =
       (this :> IMultiple<Thread>).ParseSingle(node)
       
     interface IMultiple<Thread> with
-      member this.ParseAll(path) =
-        this
-        |> Common.parseAll path 1
-      
-      member this._parseEnd(rootNode) =
+      member this.ParseEnd(rootNode) =
         Common.parsePageEnd rootNode
       
       member this.ParseSingle(rootNode) =
@@ -404,19 +407,13 @@ module Parsers =
         )
   
   type PostParser() =
-    member this._parseEnd(path) =
-      (this :> IMultiple<Post>)._parseEnd(path)
-    member this.ParseAll(path) =
-      (this :> IMultiple<Post>).ParseAll(path)
+    member this.ParseEnd(path) =
+      (this :> IMultiple<Post>).ParseEnd(path)
     member this.ParseSingle(node: HtmlNode) =
       (this :> IMultiple<Post>).ParseSingle(node)
     
     interface IMultiple<Post> with
-      member this.ParseAll(path) =
-        this
-        |> Common.parseAll path 1
-      
-      member this._parseEnd(rootNode) =
+      member this.ParseEnd(rootNode) =
         Common.parsePageEnd rootNode
       
       member this.ParseSingle(rootNode) =
@@ -507,19 +504,13 @@ module Parsers =
         )
 
   type BlogParser() =
-    member this._parseEnd(path) =
-      (this :> IMultiple<Blog>)._parseEnd(path)
-    member this.ParseAll(path) =
-      (this :> IMultiple<Blog>).ParseAll(path)
+    member this.ParseEnd(path) =
+      (this :> IMultiple<Blog>).ParseEnd(path)
     member this.ParseSingle(node: HtmlNode) =
       (this :> IMultiple<Blog>).ParseSingle(node)
     
     interface IMultiple<Blog> with
-      member this.ParseAll(path) =
-        this
-        |> Common.parseAll path 1
-      
-      member this._parseEnd(rootNode) =
+      member this.ParseEnd(rootNode) =
         Common.parseBlogEnd rootNode
       
       member this.ParseSingle(rootNode) = 
@@ -625,18 +616,13 @@ module Parsers =
         }
  
   type FollowerParser() =
-    member this._parseEnd(path) =
-      (this :> IMultiple<Follower>)._parseEnd(path)
-    member this.ParseAll(path) =
-      (this :> IMultiple<Follower>).ParseAll(path)
+    member this.ParseEnd(path) =
+      (this :> IMultiple<Follower>).ParseEnd(path)
     member this.ParseSingle(node) =
       (this :> IMultiple<Follower>).ParseSingle(node)
     
     interface IMultiple<Follower> with
-      member this.ParseAll(path) =
-        this
-        |> Common.parseAll path 1
-      member this._parseEnd(rootNode) =
+      member this.ParseEnd(rootNode) =
         Common.parseFollowRelationshipEnd rootNode
       member this.ParseSingle(rootNode) =
         let parser tr =
@@ -665,19 +651,13 @@ module Parsers =
         Common.parseFollowRelationship parser rootNode
       
   type FollowingParser() =
-    member this._parseEnd(path) =
-      (this :> IMultiple<Following>)._parseEnd(path)
-    member this.ParseAll(path) =
-      (this :> IMultiple<Following>).ParseAll(path)
+    member this.ParseEnd(path) =
+      (this :> IMultiple<Following>).ParseEnd(path)
     member this.ParseSingle(node) =
       (this :> IMultiple<Following>).ParseSingle(node)
       
     interface IMultiple<Following> with
-      member this.ParseAll(path) =
-        this
-        |> Common.parseAll path 1
-      
-      member this._parseEnd(rootNode) =
+      member this.ParseEnd(rootNode) =
         Common.parseFollowRelationshipEnd rootNode
       
       member this.ParseSingle(rootNode) =

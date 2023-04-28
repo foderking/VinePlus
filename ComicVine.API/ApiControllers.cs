@@ -18,7 +18,7 @@ public static class Controller
         ) =>
         {
             try {
-                var res = await parser.ParseAll(path);
+                var res = await Parsers.Common.ParseMultiple(parser, path);
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -33,9 +33,10 @@ public static class Controller
         ) =>
         {
             try {
-                Stream stream = await Net.getStreamByPage(page, path);
-                HtmlNode rootNode = Net.getRootNode(stream);
-                var res = parser.ParseSingle(rootNode);
+                // Stream stream = await Net.getStreamByPage(page, path);
+                // HtmlNode rootNode = Net.getRootNode(stream);
+                // var res = parser.ParseSingle(rootNode);
+                var res = await Parsers.Common.ParseSingle(parser, page, path);
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -49,9 +50,10 @@ public static class Controller
         ) =>
         {
             try {
-                Stream stream = await Net.getStreamByPage(1, "forums");
-                HtmlNode rootNode = Net.getRootNode(stream);
-                var res = parser.ParseSingle(rootNode);
+                // Stream stream = await Net.getStreamByPage(1, "forums");
+                // HtmlNode rootNode = Net.getRootNode(stream);
+                // var res = parser.ParseSingle(rootNode);
+                var res = await Parsers.Common.ParseSingle(parser, 1, "forums");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -67,9 +69,10 @@ public static class Controller
         ) =>
         {
             try {
-                Stream stream = await Net.getStreamByPage(page, "forums");
-                HtmlNode rootNode = Net.getRootNode(stream);
-                var res = parser.ParseSingle(rootNode);
+                // Stream stream = await Net.getStreamByPage(page, "forums");
+                // HtmlNode rootNode = Net.getRootNode(stream);
+                // var res = parser.ParseSingle(rootNode);
+                var res = await Parsers.Common.ParseSingle(parser, page, "forums");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -84,9 +87,10 @@ public static class Controller
         ) =>
         {
             try {
-                Stream stream = await Net.getStream($"/profile/{username}");
-                HtmlNode rootNode = Net.getRootNode(stream);
-                var res = parser.ParseSingle(rootNode);
+                // Stream stream = await Net.getStream($"/profile/{username}");
+                // HtmlNode rootNode = Net.getRootNode(stream);
+                // var res = parser.ParseSingle(rootNode);
+                var res = await Parsers.Common.ParseDefault(parser, $"/profile/{username}");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -101,9 +105,10 @@ public static class Controller
         ) =>
         {
             try {
-                Stream stream = await Net.getStream($"/profile/{username}/images");
-                HtmlNode rootNode = Net.getRootNode(stream);
-                var res = parser.ParseSingle(rootNode);
+                // Stream stream = await Net.getStream($"/profile/{username}/images");
+                // HtmlNode rootNode = Net.getRootNode(stream);
+                // var res = parser.ParseSingle(rootNode);
+                var res = await Parsers.Common.ParseDefault(parser, $"/profile/{username}/images");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -118,7 +123,7 @@ public static class Controller
         ) =>
         {
             try {
-                var res = await parser.ParseAll($"/profile/{username}/blog");
+                var res = await Parsers.Common.ParseMultiple(parser, $"/profile/{username}/blog");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -133,7 +138,7 @@ public static class Controller
         ) =>
         {
             try {
-                var res = await parser.ParseAll($"/profile/{username}/follower");
+                var res = await Parsers.Common.ParseMultiple(parser, $"/profile/{username}/follower");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -148,7 +153,7 @@ public static class Controller
         ) =>
         {
             try {
-                var res = await parser.ParseAll($"/profile/{username}/following");
+                var res = await Parsers.Common.ParseMultiple(parser, $"/profile/{username}/following");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
