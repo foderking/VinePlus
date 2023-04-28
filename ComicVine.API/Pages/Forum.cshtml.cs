@@ -12,10 +12,9 @@ public class Forum : PageModel
     public Forum(Parsers.IMultiple<Parsers.Thread> p) {
         _parser = p;
     }
-    public async Task OnGet(int? pag) {
-        int p = pag ?? 1;
-        Stream stream = await Net.getStreamByPage(p, "forums");
-        HtmlNode rootNode = Net.getRootNode(stream);
+    public async Task OnGet(int p) {
+        // Stream stream = await Net.getStreamByPage(p, "forums");
+        HtmlNode rootNode = await Net.getNodeFromPage("forums", p);
         Threads = _parser.ParseSingle(rootNode);
     }
 }

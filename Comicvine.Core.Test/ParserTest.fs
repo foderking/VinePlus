@@ -50,14 +50,14 @@ module BlogFullParser =
     [<Theory>]
     [<MemberData(nameof(usersWithBlog))>]
     let ``valid blog should not be empty sequence``(username: string) = task {
-        let! j = parser.ParseAll $"/profile/{username}/blog"
+        let! j = Parsers.Common.ParseMultiple parser $"/profile/{username}/blog"
         Assert.NotEmpty j
     }
     
     [<Theory>]
     [<MemberData(nameof(usersWithBlog))>]
     let ``created dates should be unique``(username: string) = task {
-        let! j = parser.ParseAll $"/profile/{username}/blog"
+        let! j = Parsers.Common.ParseMultiple parser $"/profile/{username}/blog"
         let k = j |> Seq.distinctBy (fun x -> x.Created)
         Assert.Equal(j |> Seq.length, k |> Seq.length)
     }
@@ -65,7 +65,7 @@ module BlogFullParser =
     [<Theory>]
     [<MemberData(nameof(usersWithBlog))>]
     let ``blog id should be unique``(username: string) = task {
-        let! j = parser.ParseAll $"/profile/{username}/blog"
+        let! j = Parsers.Common.ParseMultiple parser $"/profile/{username}/blog"
         let k = j |> Seq.distinctBy (fun x -> x.Id)
         Assert.Equal(j |> Seq.length, k |> Seq.length)
     }
@@ -73,7 +73,7 @@ module BlogFullParser =
     [<Theory>]
     [<MemberData(nameof(usersWithBlog))>]
     let ``threadids that are not null should be unique``(username: string) = task {
-        let! a = parser.ParseAll $"/profile/{username}/blog"
+        let! a = Parsers.Common.ParseMultiple parser $"/profile/{username}/blog"
         let j = a |> Seq.filter (fun x -> x.ThreadId.HasValue)
         let k = j |> Seq.distinctBy (fun x -> x.ThreadId.Value)
         Assert.Equal(j |> Seq.length, k |> Seq.length)
@@ -87,19 +87,19 @@ module BlogEndParer =
     [<Fact>]
     let ``number of pages returned should not be more than amount known``() = task {
         let! node = getNodeFromPath $"/profile/owie/blog"
-        let no = parser._parseEnd node
+        let no = parser.ParseEnd node
         Assert.True(no >= 4)
         let! node = getNodeFromPath $"/profile/death4bunnies/blog"
-        let no = parser._parseEnd node
+        let no = parser.ParseEnd node
         Assert.True(no >= 2)
         let! node = getNodeFromPath $"/profile/sc/blog"
-        let no = parser._parseEnd node
+        let no = parser.ParseEnd node
         Assert.True(no >= 2)
         let! node = getNodeFromPath $"/profile/cbishop/blog"
-        let no = parser._parseEnd node
+        let no = parser.ParseEnd node
         Assert.True(no >= 88)
         let! node = getNodeFromPath $"/profile/temsbumbum/blog"
-        let no = parser._parseEnd node
+        let no = parser.ParseEnd node
         Assert.Equal(no , 1)
     }
     
@@ -370,7 +370,7 @@ module ThreadParser =
     [<Fact>]
     let ``parsing no of threads works correctly``() = task {
         let! node = getNodeFromPath "/forums/"
-        let no = parser._parseEnd node
+        let no = parser.ParseEnd node
         Assert.True(no > 16640)
     }
    
@@ -380,11 +380,11 @@ module PostEndParser =
     [<Fact>]
     let ``parsing no of pages in thread works correctly``() = task {
         let! node = getNodeFromPath "/forums/gen-discussion-1/site-rules-and-faqs-669033/"
-        Assert.Equal(parser._parseEnd node, 1)
+        Assert.Equal(parser.ParseEnd node, 1)
         let! node = getNodeFromPath "/forums/bug-reporting-2/important-new-bug-reporting-procedure-2052355/"
-        Assert.Equal(parser._parseEnd node, 6)
+        Assert.Equal(parser.ParseEnd node, 6)
         let! node = getNodeFromPath "/forums/battles-7/mcu-thor-iw-vs-lord-boros-opm-1946556/"
-        Assert.Equal(parser._parseEnd node, 7)
+        Assert.Equal(parser.ParseEnd node, 7)
     }
 
 module PostParser =
@@ -500,13 +500,13 @@ module PostFullParser =
     let parser = Parsers.PostParser()
     [<Fact>]
     let ``parsing full posts return the correct number of comments``() = task {
-        let! j = parser.ParseAll "/forums/battles-7/tai-lung-vs-alex-madagascar-2281381/"
+        let! j = Parsers.Common.ParseMultiple parser "/forums/battles-7/tai-lung-vs-alex-madagascar-2281381/"
         Assert.Equal(12, j |> Seq.length)
-        let! j = parser.ParseAll "/forums/gen-discussion-1/your-magical-racer-and-of-course-will-be-talking-1776966/"
+        let! j = Parsers.Common.ParseMultiple parser "/forums/gen-discussion-1/your-magical-racer-and-of-course-will-be-talking-1776966/"
         Assert.Equal(1, j |> Seq.length)
-        let! j = parser.ParseAll "/forums/battles-7/thanos-vs-superman-3155/"
+        let! j = Parsers.Common.ParseMultiple parser "/forums/battles-7/thanos-vs-superman-3155/"
         Assert.Equal(1759, j |> Seq.length)
-        let! j = parser.ParseAll "/forums/battles-7/cyttorak-vs-living-tribunal-528457/"
+        let! j = Parsers.Common.ParseMultiple parser "/forums/battles-7/cyttorak-vs-living-tribunal-528457/"
         Assert.Equal(54, j |> Seq.length)
     }
     
@@ -690,7 +690,7 @@ module FollowRelationshipFullParser =
     let ``no of followers parsed from profile should be consistent``(username: string) = task {
         let! profileNode = getNodeFromPath $"/profile/{username}"
         let profile = profileParser.ParseSingle profileNode
-        let! follower = followerParser.ParseAll $"/profile/{username}/follower"
+        let! follower = Parsers.Common.ParseMultiple followerParser $"/profile/{username}/follower"
         Assert.Equal(profile.Followers, follower |> Seq.length)
     }
     
@@ -699,7 +699,7 @@ module FollowRelationshipFullParser =
     let ``no of followings parsed from profile should be consistent``(username: string) = task {
         let! profileNode = getNodeFromPath $"/profile/{username}"
         let profile = profileParser.ParseSingle profileNode
-        let! following = followingParser.ParseAll $"/profile/{username}/following"
+        let! following = Parsers.Common.ParseMultiple followingParser $"/profile/{username}/following"
         Assert.Equal(profile.Following, following |> Seq.length)
     }
     
