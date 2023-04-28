@@ -1,0 +1,50 @@
+﻿
+html {
+    background-color: rgb(242, 242, 242);
+}
+body {
+    font-family: "Segoe UI" ,"Helvetica", sans-serif;
+    margin: 0;
+}
+/*navigation*/
+nav {
+    height: 3em;
+    background-color: rgb(255, 255, 255);
+}
+#nav-root {
+    height: inherit;
+    display: flex;
+    margin-left: 5em;
+}
+.nav-item > a {
+    text-decoration: none ;
+    color: black;
+}
+.nav-item {
+    font-size: 17px;
+    align-self: center;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+.nav-highlight > a {
+    color: rgb(1, 124, 55);
+}
+/** footer */
+footer {
+    min-height: 5em;
+}
+
+/** thread view */
+.heading {
+    font-size: 40px;
+    margin-top: 30px;
+    border-bottom: 1px solid #bfbfbf;
+    color: #105e10;
+}
+
+#thread {
+    margin: 1em 5em ;
+}
+#thread-container {
+    padding: 1em;
+}

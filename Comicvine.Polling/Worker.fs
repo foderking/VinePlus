@@ -4,6 +4,7 @@ open System
 open System.Collections.Concurrent
 open System.Collections.Generic
 open System.Linq
+open System.Net.Http
 open System.Threading
 open System.Threading.Tasks
 open Comicvine.Core
@@ -177,8 +178,15 @@ type Worker(logger: ILogger<Worker>, factory: ComicvineContextFactory) =
             //     |> Seq.map Option.get
                 // |> db.Threads.BulkMergeAsync
                 do
-                    let! thread = t
-                    ()
+                    try
+                        let! thread = t
+                        ()
+                    with
+                        
+                        | :? HttpRequestException as e ->
+                            printfn "%A %A" e.StatusCode e.TargetSite
+                        | _ ->
+                            ()
             // do!
             //     batched
             //     |> Seq.filter Option.isSome

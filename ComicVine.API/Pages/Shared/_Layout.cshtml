@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>@ViewData["title"]</title>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<header>
+    <nav>
+        <div id="nav-root">
+            @{var x = new[] { "","nav-highlight"};}
+            <span class="@Url.Content($"nav-item {x[Convert.ToInt32(ViewData["highlight"] != null && (string)ViewData["highlight"]! =="vine")]}")"><a href="/forums">Vine</a></span>
+            <span class="@Url.Content($"nav-item {x[Convert.ToInt32(ViewData["highlight"] != null && (string)ViewData["highlight"]! =="arch")]}")"><a href="/archives/forums">Archives</a></span>
+            <span class="@Url.Content($"nav-item {x[Convert.ToInt32(ViewData["highlight"] != null && (string)ViewData["highlight"]! =="search")]}")"><a href="/search">Search</a></span>
+            <span class="@Url.Content($"nav-item {x[Convert.ToInt32(ViewData["highlight"] != null && (string)ViewData["highlight"]! =="stat")]}")"><a href="/stats">Stats</a></span>
+        </div>
+    </nav>
+</header>
+<main id="container"></main>
+    @RenderBody()
+<footer></footer>
+</body>
+</html>
