@@ -2,42 +2,46 @@
 @model ComicVine.API.Pages.Archives.Forums
 
 @{
-    Layout = null;
+    Layout = "Shared/_Layout";
+    ViewData["title"] = "Archived Topics";
+    ViewData["highlight"] = "arch";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Comicvine</title>
-</head>
-<body>
-<div>
-    <table>
-        <thead>
-        <tr>
-            <td>#</td>
-            <td>Id</td>
-            <td>Title</td>
-            <td>Board</td>
-            <td>Creator</td>
-            <td>Views</td>
-        </tr>
-        </thead>
-        <tbody>
-        @if (Model.Threads != null) {
-            @foreach (var (index, thread) in Model.Threads.Select((t, i) => (i,t)) ) {
-                <tr>
-                    <td>@index</td>
-                    <td>@thread.Id</td>
-                    <td>@thread.Thread.Text</td>
-                    <td>@thread.Board.Text</td>
-                    <td>@thread.Creator.Text</td>
-                    <td>@thread.TotalView</td>
-                </tr>
+<div id="thread">
+    <h1 class="heading">Recent discussions from archive</h1>
+    <div id="thread-container">
+        <table>
+            <thead>
+            <tr>
+                <td>#</td>
+                <td>Id</td>
+                <td>Title</td>
+                <td>Board</td>
+                <td>Creator</td>
+                <td>Views</td>
+                <td>Posts</td>
+            </tr>
+            </thead>
+            <tbody>
+            @if (Model.Threads != null) {
+                @foreach (var (index, thread) in Model.Threads.Select((t, i) => (i,t)) ) {
+                    <tr>
+                        <td>@index</td>
+                        <td>@thread.Id</td>
+                        <td><a href="@Url.Content($"/archives/thread/{thread.Id}")">
+                            @Html.Raw(Model.GetLock(thread.IsLocked))
+                            @Html.Raw(Model.GetPin(thread.IsPinned))
+                            @thread.Thread.Text
+                        </a></td>
+                        <td>@thread.Board.Text</td>
+                        <td>@thread.Creator.Text</td>
+                        <td>@thread.TotalView</td>
+                        @{ var x =  thread.Posts?.Count ?? 0;}
+                        <td>@x</td>
+                    </tr>
+                }
             }
-        }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </div>
-</body>
-</html>

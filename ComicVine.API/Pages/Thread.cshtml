@@ -1,19 +1,16 @@
-﻿@page "{id:int}/{p=1}"
+﻿@page
 @using Microsoft.AspNetCore.Html
-@model ComicVine.API.Pages.Archives.Thread
+@model ComicVine.API.Pages.Thread
 
 @{
     Layout = "Shared/_Layout";
-
-    ViewData["title"] = Model.Thread_?.Thread.Text ?? "titty db";
+    ViewData["title"] = "titty";
 }
 
-@{ var a = Model.Thread_?.Thread.Text ?? "";}
-<h2 style="text-align: center">@a</h2>
 <div>
 
     @if (Model.Posts != null) {
-        @foreach (var (index, post) in Model.Posts.Select((t, i) => (i,t))) {
+        @foreach (var post in Model.Posts) {
             <div style="width:60%; border: 2px solid black; margin: auto; overflow: hidden">
                 @Html.Raw(new HtmlString(post.Content))
             </div>
