@@ -24,5 +24,8 @@ public class ComicvineContext: DbContext
         modelBuilder.Entity<Parsers.Thread>()
             .Property(x => x.Creator)
             .HasColumnType("jsonb");
+        modelBuilder.Entity<Parsers.Post>()
+            .Property(x => x.Creator)
+            .HasColumnType("jsonb");
     }
 }

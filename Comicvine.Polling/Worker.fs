@@ -32,12 +32,41 @@ type Worker(logger: ILogger<Worker>, factory: ComicvineContextFactory) =
     let postParser = Parsers.PostParser()
 
     let newThread = ConcurrentBag<Parsers.Thread>()
-    let newPost = ConcurrentBag<Parsers.Post>()
     let updateThread = ConcurrentBag<Parsers.Thread>()
-    let updatePost = ConcurrentBag<Parsers.Post>()
 
          
     let pollThread ct (db: ComicvineContext) = task {
+        let update(db: ComicvineContext)(thread: Parsers.Thread) = task {
+            let! dbResult = db.Threads.AsNoTracking().FirstOrDefaultAsync((fun t -> t.Id = thread.Id))
+            // new thread
+            if obj.ReferenceEquals(dbResult, null) then
+                printfn $"id {thread.Id}; State: New"
+                let! posts = Parsers.Common.ParseMultiple postParser thread.Thread.Link
+                // add thread along with all posts found
+                let t = { thread with Posts = posts.ToArray() }
+                let! _ = db.Threads.AddAsync t
+                ()
+            elif dbResult.LastPostNo < thread.LastPostNo then
+                printfn $"id {thread.Id}; State: Update"
+                printfn "%A" thread.Posts.Count
+                // let newT =
+                //      {
+                //         dbResult with
+                //             // update thread properties
+                //             Thread = { dbResult.Thread with Text = thread.Thread.Text}
+                //             Board = thread.Board
+                //             IsPinned = thread.IsPinned
+                //             IsLocked = thread.IsLocked
+                //             LastPostNo = thread.LastPostNo
+                //             LastPostPage = thread.LastPostPage
+                //             TotalPosts = thread.TotalPosts
+                //             TotalView = thread.TotalView
+                //     }
+                // let _ = db.Threads.Update newT
+                ()
+            else
+                ()
+        }
         let updateThreads(thread: Parsers.Thread) = task {
             let! dbResult = db.Threads.FindAsync(thread.Id)
             
@@ -48,7 +77,7 @@ type Worker(logger: ILogger<Worker>, factory: ComicvineContextFactory) =
                 // let! _ = db.Threads.AddAsync(thread)
                 do! Console.Out.WriteLineAsync($"id {thread.Id}; State: New")
                 // add all posts to db since they are new
-                let! posts = postParser.ParseAll(thread.Thread.Link)
+                let! posts = Parsers.Common.ParseMultiple postParser thread.Thread.Link
                 return {NewPosts = 0; NewThreads = 1; DeletedPosts = 0}
             // thread to update
             elif dbResult.LastPostNo < thread.LastPostNo then
@@ -69,7 +98,7 @@ type Worker(logger: ILogger<Worker>, factory: ComicvineContextFactory) =
                 updateThread.Add(threadToAdd)
                 do! Console.Out.WriteLineAsync($"id {thread.Id}; State: Update" )
                  
-                let! parsedPosts = postParser.ParseAll(thread.Thread.Link)
+                let! parsedPosts = Parsers.Common.ParseMultiple postParser thread.Thread.Link
                 // get posts already in db
                 let dbPosts: Parsers.Post seq = Seq.empty
                 
@@ -107,40 +136,65 @@ type Worker(logger: ILogger<Worker>, factory: ComicvineContextFactory) =
         }
         
         
+        let latest(thread: Parsers.Thread) = task {
+            let! posts = Parsers.Common.ParseMultiple postParser thread.Thread.Link
+            printfn $"Gotten posts for thread {thread.Id}"
+            return
+                thread
+        }
         
         
-        let mutable page = 1
+        let mutable page = Random().Next(16600)
         let mutable finished = false
         
         while not finished do
             logger.LogInformation("making request to page {0}", page)
             let! stream = Net.getStreamByPageCt ct page "/forums/"
-            let! batched =
+            // let! batched =
+            let batched =
                 Net.getRootNode stream
                 |> threadParser.ParseSingle
-                |> Seq.map updateThreads
-                |> Task.WhenAll
+                |> Seq.map (update db)
+                // |> Task.WhenAll
             
-            let folder (curr: int * int * int) (record: PollInfo) =
-                let (a,b,c) = curr
-                record.NewThreads+a, record.NewPosts+b, record.DeletedPosts+c
+            // let folder (curr: int * int * int) (record: PollInfo) =
+            //     let (a,b,c) = curr
+            //     record.NewThreads+a, record.NewPosts+b, record.DeletedPosts+c
                 
-            let nT, nP, dP =
-                batched
-                |> Seq.fold folder (0,0,0)
+            // let nT, nP, dP =
+            //     batched
+            //     |> Seq.fold folder (0,0,0)
             // for t in batchedThreads do
             //     let! tt = t
             //     let! g = updatePosts tt
             //     dP <- g.DeletedPosts + dP
             //     nP <- g.NewPosts + nP
             //     nT <- g.NewThreads + nT
-            let! _ = db.Threads.AddRangeAsync(newThread)
-            do db.Threads.UpdateRange(updateThread)
-            
-            logger.LogInformation($"{nP} new posts; {nT} new threads; {dP} deleted posts")
+            logger.LogInformation("finished polling vine")
+            for t in
+                batched
+            //     |> Seq.filter Option.isSome
+            //     |> Seq.map Option.get
+                // |> db.Threads.BulkMergeAsync
+                do
+                    let! thread = t
+                    ()
+            // do!
+            //     batched
+            //     |> Seq.filter Option.isSome
+            //     |> Seq.map Option.get
+            //     |> Seq.map (fun x -> x.Posts)
+            //     |> Seq.concat
+            //     |> db.Posts.BulkMergeAsync
+            //  
             logger.LogInformation("finished updating db")
+            // let! _ = db.Threads.AddRangeAsync(newThread)
+            // do db.Threads.UpdateRange(updateThread)
             
-            finished <- nT < 50//x |> Seq.forall id
+            // logger.LogInformation($"{nP} new posts; {nT} new threads; {dP} deleted posts")
+            // logger.LogInformation("finished updating db")
+            
+            finished <- true//nT < 50//x |> Seq.forall id
             page <- page + 1
     }
     
