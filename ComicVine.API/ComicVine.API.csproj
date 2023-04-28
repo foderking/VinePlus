@@ -24,6 +24,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Comicvine.Core\Comicvine.Core.fsproj" />
+      <ProjectReference Include="..\Comicvine.Database\Comicvine.Database.csproj" />
     </ItemGroup>
 
 </Project>

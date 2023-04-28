@@ -6,6 +6,8 @@ using Microsoft.OpenApi.Models;
 // using ComicVine.API;
 // using ComicVine.API.Database;
 using Comicvine.Core;
+using Comicvine.Database;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,9 +36,13 @@ builder.Services.AddScoped<Parsers.IMultiple<Parsers.Following>, Parsers.Followi
 builder.Services.AddScoped<Parsers.ISingle<Parsers.Profile>, Parsers.ProfileParser>();
 builder.Services.AddScoped<Parsers.ISingle<Parsers.Image>, Parsers.ImageParser>();
 
-// builder.Services.AddDbContext<ForumContext>(o => o.UseNpgsql(connectionString));
+// https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis?view=aspnetcore-6.0#authorization
+// builder.Services.AddDbContext<ComicvineContext>(o => 
+//     // o.UseNpgsql(builder.Configuration.GetConnectionString("comicvine_db"))
+// );
 // builder.Services.AddStackExchangeRedisCache(o => { o.Configuration = builder.Configuration["RedisCacheUrl"]; });
 
+builder.Services.AddSingleton<ComicvineContextFactory>();
 
 
 var app = builder.Build();
