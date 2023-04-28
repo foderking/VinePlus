@@ -1,6 +1,7 @@
 ﻿
 namespace Comicvine.Core
 open System
+open System.Collections.Generic
 open System.Threading.Tasks
 open FSharp.Control
 open HtmlAgilityPack
@@ -37,7 +38,7 @@ module Parsers =
     {
       Id: int; Thread: Link; Board: Link; IsPinned: bool; IsLocked: bool; IsDeleted: bool
       Type: ThreadType; LastPostNo: int; LastPostPage: int; Created: DateTime;
-      TotalPosts: int; TotalView: int; Creator: Link; Posts: Post seq
+      TotalPosts: int; TotalView: int; Creator: Link; Posts: Post ICollection
     }
   
   // Profile section
@@ -402,7 +403,7 @@ module Parsers =
             Thread = { Text = threadName; Link = threadLink }; Board = { Text = boardName; Link = boardLink } ;
             Id = id; IsPinned = isPinned; IsLocked = isLocked; Type = threadType; LastPostNo = lastPostNo;
             LastPostPage = lastPostPage; Created = created; TotalPosts = posts; TotalView = views; IsDeleted = false;
-            Creator = { Text = creatorName; Link = creatorLink }; Posts = Seq.empty
+            Creator = { Text = creatorName; Link = creatorLink }; Posts = [||]
           }
         )
   

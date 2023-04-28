@@ -14,6 +14,7 @@
     <ItemGroup>
         <PackageReference Include="FSharp.Control.TaskSeq" Version="0.3.0" />
         <PackageReference Include="StackExchange.Redis" Version="2.6.104" />
+        <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="7.21.0" />
     </ItemGroup>
 
     <ItemGroup>
