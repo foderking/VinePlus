@@ -5,13 +5,11 @@
 @{
     Layout = "Shared/_Layout";
 
+    ViewData["headings"] = Model.Thread_?.Thread.Text ?? "xvvv";
     ViewData["title"] = Model.Thread_?.Thread.Text ?? "titty db";
 }
 
-@{ var a = Model.Thread_?.Thread.Text ?? "";}
-<h2 style="text-align: center">@a</h2>
 <div>
-
     @if (Model.Posts != null) {
         @foreach (var (index, post) in Model.Posts.Select((t, i) => (i,t))) {
             <div style="width:60%; border: 2px solid black; margin: auto; overflow: hidden">
