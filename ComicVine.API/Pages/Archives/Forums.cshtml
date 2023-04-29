@@ -1,14 +1,16 @@
 ﻿@page "{p=1}"
+@using ComicVine.API.Pages
 @model ComicVine.API.Pages.Archives.Forums
 
 @{
     Layout = "Shared/_Layout";
     ViewData["title"] = "Archived Topics";
     ViewData["highlight"] = "arch";
+    ViewData["headings"] = "Recent discussions from archive";
 }
 
 <div id="thread">
-    <h1 class="heading">Recent discussions from archive</h1>
+    @Html.Raw(Util.GetNavigation(Model.Page,Model.LastPage, "/archives/forums"))
     <div id="thread-container">
         <table>
             <thead>
@@ -29,8 +31,8 @@
                         <td>@index</td>
                         <td>@thread.Id</td>
                         <td><a href="@Url.Content($"/archives/thread/{thread.Id}")">
-                            @Html.Raw(Model.GetLock(thread.IsLocked))
-                            @Html.Raw(Model.GetPin(thread.IsPinned))
+                            @Html.Raw(Util.GetLock(thread.IsLocked))
+                            @Html.Raw(Util.GetPin(thread.IsPinned))
                             @thread.Thread.Text
                         </a></td>
                         <td>@thread.Board.Text</td>
@@ -44,4 +46,5 @@
             </tbody>
         </table>
     </div>
+    @Html.Raw(Util.GetNavigation(Model.Page,Model.LastPage, "archives/forums"))
 </div>

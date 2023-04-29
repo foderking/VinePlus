@@ -9,6 +9,8 @@ public class Thread : PageModel
     public IEnumerable<Parsers.Post>? Posts;
     // public Parsers.Thread? Thread_;
 
+    public int Page = 1;
+    public int LastPage = Util.LastPage;
     public Thread(Parsers.IMultiple<Parsers.Post> parser) {
         _parser = parser;
     }
