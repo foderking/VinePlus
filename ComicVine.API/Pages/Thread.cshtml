@@ -5,17 +5,8 @@
 
 @{
     Layout = "Shared/_Layout";
-    ViewData["title"] = "titty";
-    ViewData["headings"] = "Thread";
+    ViewData["title"] = Model.ThreadTitle;
+    ViewData["headings"] = Model.ThreadTitle;
 }
 
-<div>
-
-    @if (Model.Posts != null) {
-        @foreach (var post in Model.Posts) {
-            <div style="width:60%; border: 2px solid black; margin: auto; overflow: hidden">
-                @Html.Raw(new HtmlString(post.Content))
-            </div>
-        }
-    }
-</div>
+@await Html.PartialAsync("Shared/Thread", Model.Posts)

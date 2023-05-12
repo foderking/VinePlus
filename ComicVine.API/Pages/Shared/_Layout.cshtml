@@ -23,5 +23,14 @@
     @RenderBody()
 </main>
 <footer></footer>
+<script>
+// loads lazy images
+let lazyLoad = node =>
+    node.setAttribute("src", node.getAttribute("data-src"))
+
+document
+    .querySelectorAll(".js-lazy-load-image")
+    .forEach(lazyLoad)
+</script>
 </body>
 </html>

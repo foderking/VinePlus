@@ -189,6 +189,13 @@ module Parsers =
       else
         None
     
+    let getThreadTitle node =
+      node
+      |> getWrapperNode
+      |> Nodes.getFirstChild "section" (Predicates.classAttrib "forum-above-grid")
+      |> Nodes.getFirstChild "h1" (Predicates.classAttrib "header-border")
+      |> Helpers.innerTrim
+    
     let parsePageEnd rootNode =
       match rootNode
         |> getForumBlockNode

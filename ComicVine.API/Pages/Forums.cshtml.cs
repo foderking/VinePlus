@@ -15,7 +15,7 @@ public class Forums : PageModel
     }
 
     public async Task OnGet(int p) {
-        HtmlNode rootNode = await Net.getNodeFromPage("forums", p);
+        HtmlNode rootNode = await Net.getNodeFromPage("/forums", p);
         Threads = _parser.ParseSingle(rootNode);
         FNav = FNav with { CurrentPage = p };
     }
