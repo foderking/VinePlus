@@ -1,5 +1,5 @@
 ﻿@using ComicVine.API.Pages
-@model (IEnumerable<Comicvine.Core.Parsers.Thread>?, bool)
+@model (IEnumerable<Comicvine.Core.Parsers.Thread>?, Func<Comicvine.Core.Parsers.Thread,string>)
 
 
 <div id="thread-container">
@@ -13,7 +13,7 @@
         @foreach (var (index, thread) in Model.Item1.Select((t, i) => (i,t))) {
             <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-index")"></span>
             <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-title")">
-                <a href="@Url.Content(Util.GetThreadLink(Model.Item2, thread))">
+                <a href="@Url.Content(Model.Item2(thread))">
                     @await Html.PartialAsync("Lock", thread.IsLocked)
                     @await Html.PartialAsync("Pin" , thread.IsPinned)
                     @Html.Raw(thread.Thread.Text)

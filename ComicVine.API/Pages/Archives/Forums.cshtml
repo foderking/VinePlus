@@ -10,7 +10,9 @@
 }
 
 <div id="thread">
-    @await Html.PartialAsync("Shared/ForumNav", Model.FNav)
-    @await Html.PartialAsync("Shared/ForumTable", (Model.Threads, true))
-    @await Html.PartialAsync("Shared/ForumNav", Model.FNav)
+    @* @await Html.PartialAsync("Shared/ForumNav", Model.FNav) *@
+    @await Html.PartialAsync("Shared/Navigation", (Model.FNav, Util.ThreadNav))
+    @await Html.PartialAsync("Shared/ForumItems", (Model.Threads, Util.GetThreadLink(true)))
+    @await Html.PartialAsync("Shared/Navigation", (Model.FNav, Util.ThreadNav))
+    @* @await Html.PartialAsync("Shared/ForumNav", Model.FNav) *@
 </div>

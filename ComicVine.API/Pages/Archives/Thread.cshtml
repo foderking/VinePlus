@@ -1,4 +1,5 @@
 ﻿@page "{id:int}/{p=1}"
+@using ComicVine.API.Pages
 @using Microsoft.AspNetCore.Html
 @model ComicVine.API.Pages.Archives.Thread
 
@@ -9,12 +10,15 @@
     ViewData["title"] = Model.Thread_?.Thread.Text ?? "titty db";
 }
 
-<div>
-    @if (Model.Posts != null) {
-        @foreach (var (index, post) in Model.Posts.Select((t, i) => (i,t))) {
-            <div style="width:60%; border: 2px solid black; margin: auto; overflow: hidden">
-                @Html.Raw(new HtmlString(post.Content))
-            </div>
-        }
-    }
-</div>
+@* <div> *@
+@*     @if (Model.Posts != null) { *@
+@*         @foreach (var (index, post) in Model.Posts.Select((t, i) => (i,t))) { *@
+@*             <div style="width:60%; border: 2px solid black; margin: auto; overflow: hidden"> *@
+@*                 @Html.Raw(new HtmlString(post.Content)) *@
+@*             </div> *@
+@*         } *@
+@*     } *@
+@* </div> *@
+@await Html.PartialAsync("Shared/Navigation", (Model.FNav, Util.ArchiveThreadNav))
+@await Html.PartialAsync("Shared/Thread", Model.Posts)
+@await Html.PartialAsync("Shared/Navigation", (Model.FNav, Util.ArchiveThreadNav))

@@ -206,7 +206,9 @@ module Parsers =
       | None    -> 1
       | Some(x) ->
         x
-        |> Nodes.getChildren "li" (Predicates.attribute "class" "paginate__item")
+        |> Nodes.getChildren "li" (fun node ->
+          node.GetAttributeValue("class","") = "paginate__item on" ||
+          node.GetAttributeValue("class","") = "paginate__item" ) //(Predicates.attribute "class" "paginate__item")
         |> Seq.map Helpers.innerTrim
         |> Seq.last
         |> int
