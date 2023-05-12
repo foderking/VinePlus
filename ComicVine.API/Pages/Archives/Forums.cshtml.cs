@@ -9,15 +9,13 @@ public class Forums : PageModel
 {
     private ComicvineContext _context;
     public IEnumerable<Parsers.Thread>? Threads;
-    public int Page=1;
-    public int LastPage=Util.LastPage;
+    public Nav FNav = new (1, Util.LastPage, "/archives/forums");
 
     public Forums(ComicvineContextFactory factory) {
         _context = factory.CreateDbContext(Array.Empty<string>());
 
     }
     public void OnGet(int p) {
-        Page = p;
         Threads = _context.Threads
             .OrderByDescending(t =>
                 t.Posts.Count
@@ -27,6 +25,7 @@ public class Forums : PageModel
             .Take(50)
             .Include(t => t.Posts)
             ;
-        LastPage = _context.Posts.Count() / 50;
+        
+        FNav = FNav with { CurrentPage = p, LastPage = _context.Posts.Count() / 50 };
     }
 }

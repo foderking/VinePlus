@@ -10,41 +10,44 @@
 }
 
 <div id="thread">
-    @Html.Raw(Util.GetNavigation(Model.Page,Model.LastPage, "/archives/forums"))
-    <div id="thread-container">
-        <table>
-            <thead>
-            <tr>
-                <td>#</td>
-                <td>Id</td>
-                <td>Title</td>
-                <td>Board</td>
-                <td>Creator</td>
-                <td>Views</td>
-                <td>Posts</td>
-            </tr>
-            </thead>
-            <tbody>
-            @if (Model.Threads != null) {
-                @foreach (var (index, thread) in Model.Threads.Select((t, i) => (i,t)) ) {
-                    <tr>
-                        <td>@index</td>
-                        <td>@thread.Id</td>
-                        <td><a href="@Url.Content($"/archives/thread/{thread.Id}")">
-                            @Html.Raw(Util.GetLock(thread.IsLocked))
-                            @Html.Raw(Util.GetPin(thread.IsPinned))
-                            @thread.Thread.Text
-                        </a></td>
-                        <td>@thread.Board.Text</td>
-                        <td>@thread.Creator.Text</td>
-                        <td>@thread.TotalView</td>
-                        @{ var x =  thread.Posts?.Count ?? 0;}
-                        <td>@x</td>
-                    </tr>
-                }
-            }
-            </tbody>
-        </table>
-    </div>
-    @Html.Raw(Util.GetNavigation(Model.Page,Model.LastPage, "archives/forums"))
+    @await Html.PartialAsync("Shared/ForumNav", Model.FNav)
+    @await Html.PartialAsync("Shared/ForumTable", (Model.Threads, true))
+    @await Html.PartialAsync("Shared/ForumNav", Model.FNav)
+    @* @Html.Raw(Util.GetNavigation(Model.Page,Model.LastPage, "/archives/forums")) *@
+    @* <div id="thread-container"> *@
+    @*     <table> *@
+    @*         <thead> *@
+    @*         <tr> *@
+    @*             <td>#</td> *@
+    @*             <td>Id</td> *@
+    @*             <td>Title</td> *@
+    @*             <td>Board</td> *@
+    @*             <td>Creator</td> *@
+    @*             <td>Views</td> *@
+    @*             <td>Posts</td> *@
+    @*         </tr> *@
+    @*         </thead> *@
+    @*         <tbody> *@
+    @*         @if (Model.Threads != null) { *@
+    @*             @foreach (var (index, thread) in Model.Threads.Select((t, i) => (i,t)) ) { *@
+    @*                 <tr> *@
+    @*                     <td>@index</td> *@
+    @*                     <td>@thread.Id</td> *@
+    @*                     <td><a href="@Url.Content($"/archives/thread/{thread.Id}")"> *@
+    @*                         @Html.Raw(Util.GetLock(thread.IsLocked)) *@
+    @*                         @Html.Raw(Util.GetPin(thread.IsPinned)) *@
+    @*                         @thread.Thread.Text *@
+    @*                     </a></td> *@
+    @*                     <td>@thread.Board.Text</td> *@
+    @*                     <td>@thread.Creator.Text</td> *@
+    @*                     <td>@thread.TotalView</td> *@
+    @*                     @{ var x =  thread.Posts?.Count ?? 0;} *@
+    @*                     <td>@x</td> *@
+    @*                 </tr> *@
+    @*             } *@
+    @*         } *@
+    @*         </tbody> *@
+    @*     </table> *@
+    @* </div> *@
+    @* $1$ @Html.Raw(Util.GetNavigation(Model.Page,Model.LastPage, "archives/forums")) #1# *@
 </div>
