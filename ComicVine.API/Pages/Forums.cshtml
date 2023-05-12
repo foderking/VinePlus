@@ -10,28 +10,30 @@
 }
 
 <div id="thread">
-    @Html.Raw(Util.GetNavigation(Model.Page,Model.LastPage, "/forums"))
-    <div id="thread-container">
-            <span class="thread-odd thread-item thread-header thread-index">#</span>
-            <span class="thread-odd thread-item thread-title thread-header">Title</span>
-            <span class="thread-odd thread-item thread-header">Board</span>
-            <span class="thread-odd thread-item thread-header">Author</span>
-            <span class="thread-odd thread-item thread-header">Posts</span>
-            <span class="thread-odd thread-item thread-header">Views</span>
-            @if (Model.Threads != null) {
-                @foreach (var (index, thread) in Model.Threads.Select((t, i) => (i,t)) ) {
-                    <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-index")"></span>
-                    <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-title")"><a href="@Url.Content($"/thread?p=1&path={thread.Thread.Link}")">
-                        @Html.Raw(Util.GetLock(thread.IsLocked))
-                        @Html.Raw(Util.GetPin(thread.IsPinned))
-                        @thread.Thread.Text
-                    </a></span>
-                    <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">@thread.Board.Text</span>
-                    <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">@thread.Creator.Text</span>
-                    <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">@thread.TotalPosts</span>
-                    <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">@thread.TotalView</span>
-                }
-            }
-    </div>
-    @Html.Raw(Util.GetNavigation(Model.Page,Model.LastPage, "/forums"))
+    @await Html.PartialAsync("Shared/ForumNav", Model.FNav)
+    @await Html.PartialAsync("Shared/ForumTable", (Model.Threads, false))
+    @await Html.PartialAsync("Shared/ForumNav", Model.FNav)
+    @* <div id="thread-container"> *@
+    @*     <span class="thread-odd thread-item thread-header thread-index">#</span> *@
+    @*     <span class="thread-odd thread-item thread-title thread-header">Title</span> *@
+    @*     <span class="thread-odd thread-item thread-header">Board</span> *@
+    @*     <span class="thread-odd thread-item thread-header">Author</span> *@
+    @*     <span class="thread-odd thread-item thread-header">Posts</span> *@
+    @*     <span class="thread-odd thread-item thread-header">Views</span> *@
+    @*     @if (Model.Threads != null) { *@
+    @*         @foreach (var (index, thread) in Model.Threads.Select((t, i) => (i,t))) { *@
+    @*             <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-index")"></span> *@
+    @*             <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-title")"> *@
+    @*                 <a href="@Url.Content($"/thread?p=1&path={thread.Thread.Link}")"> *@
+    @*                     @Html.Raw(Util.GetLock(thread.IsLocked)) *@
+    @*                     @Html.Raw(Util.GetPin(thread.IsPinned)) *@
+    @*                     @thread.Thread.Text *@
+    @*                 </a></span> *@
+    @*             <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">@thread.Board.Text</span> *@
+    @*             <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">@thread.Creator.Text</span> *@
+    @*             <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">@thread.TotalPosts</span> *@
+    @*             <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">@thread.TotalView</span> *@
+    @*         } *@
+    @*     } *@
+    @* </div> *@
 </div>

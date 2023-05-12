@@ -1,0 +1,36 @@
+﻿@using ComicVine.API.Pages
+@model (IEnumerable<Comicvine.Core.Parsers.Thread>?, bool)
+
+
+<div id="thread-container">
+    <span class="thread-odd thread-item thread-header thread-index">#</span>
+    <span class="thread-odd thread-item thread-title thread-header">Title</span>
+    <span class="thread-odd thread-item thread-header">Board</span>
+    <span class="thread-odd thread-item thread-header">Author</span>
+    <span class="thread-odd thread-item thread-header">Posts</span>
+    <span class="thread-odd thread-item thread-header">Views</span>
+    @if (Model.Item1 != null) {
+        @foreach (var (index, thread) in Model.Item1.Select((t, i) => (i,t))) {
+            <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-index")"></span>
+            <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-title")">
+                <a href="@Url.Content(Util.GetThreadLink(Model.Item2, thread))">
+                    @await Html.PartialAsync("Lock", thread.IsLocked)
+                    @await Html.PartialAsync("Pin" , thread.IsPinned)
+                    @Html.Raw(thread.Thread.Text)
+                </a>
+            </span>
+            <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">
+                @thread.Board.Text
+            </span>
+            <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">
+                @thread.Creator.Text
+            </span>
+            <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">
+                @thread.TotalPosts
+            </span>
+            <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">
+                @thread.TotalView
+            </span>
+        }
+    }
+</div>
