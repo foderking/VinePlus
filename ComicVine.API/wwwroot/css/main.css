@@ -67,7 +67,7 @@ footer {
 #thread-container {
     width: 80%;
     margin: auto;
-    padding: 1em;
+    /*padding: 1em;*/
     display: grid;
     grid-template-columns: 3em 1fr 10em 10em 4em 4em;
 }
@@ -108,7 +108,7 @@ footer {
 /* pagination */
 .paginate {
     display: flex;
-    margin: auto;
+    margin: 1em auto;
     gap: 1em;
     justify-content: center;
 }
@@ -325,4 +325,38 @@ footer {
     left: 0;
     right: 0;
     bottom: 0;
+}
+/** tables **/
+.post-item table {
+    margin: 20px 0;
+    overflow: hidden
+}
+
+.post-item table[data-max-width="true"] {
+    width: 100%
+}
+
+.post-item table th,.post-item table td {
+    padding: 8px;
+    text-align: left;
+    border-collapse: collapse
+}
+
+.post-item table th {
+    background-color: rgba(0,0,0,0.3);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-left: 1px solid rgba(255,255,255,0.1);
+    border-right: 1px solid rgba(0,0,0,0.1)
+}
+
+.post-item table th:first-child {
+    border-left: none
+}
+
+.post-item table th:last-child {
+    border-right: none
+}
+
+.post-item table tr:nth-of-type(odd) td {
+    background-color: rgba(0,0,0,0.15)
 }

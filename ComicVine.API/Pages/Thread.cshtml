@@ -1,6 +1,5 @@
 ﻿@page
 @using ComicVine.API.Pages
-@using Microsoft.AspNetCore.Html
 @model ComicVine.API.Pages.Thread
 
 @{
@@ -9,4 +8,6 @@
     ViewData["headings"] = Model.ThreadTitle;
 }
 
+@await Html.PartialAsync("Shared/Navigation", (Model.FNav, Util.NormalThreadNav))
 @await Html.PartialAsync("Shared/Thread", Model.Posts)
+@await Html.PartialAsync("Shared/Navigation", (Model.FNav, Util.NormalThreadNav))

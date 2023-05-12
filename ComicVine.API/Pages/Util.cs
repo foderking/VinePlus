@@ -32,13 +32,17 @@ public static class Util
         };
     }
 
-    public static string GetThreadLink(bool isArchive, Parsers.Thread thread) {
+    public static Func<Parsers.Thread, string> GetThreadLink(bool isArchive) {
         return isArchive ? 
-            $"/archives/thread/{thread.Id}" : 
-            $"/thread?path={thread.Thread.Link}";
+            (thread) => $"/archives/thread/{thread.Id}" :
+            (thread) => $"/thread?path={thread.Thread.Link}";
     }
 
     public static string GetThreadRow(int index) {
         return index % 2  == 1? "thread-odd" : "";
     }
+
+    public static Func<string, int, string> NormalThreadNav = (path, page) => $"/thread?path={path}&p={page}";
+    public static Func<string, int, string> ArchiveThreadNav = (id, page) => $"/archives/thread/{id}/{page}";
+    public static Func<string, int, string> ThreadNav = (path, page) => $"{path}/{page}";
 }

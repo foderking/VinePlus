@@ -17,10 +17,10 @@ public class Forums : PageModel
     }
     public void OnGet(int p) {
         Threads = _context.Threads
-            // .OrderByDescending(t =>
-            //     t.Posts.Count
-            //     // t.Posts.OrderByDescending(pp => pp.Created).First().Created 
-            // )
+            .OrderByDescending(t =>
+                t.Posts.Count
+                // t.Posts.OrderByDescending(pp => pp.Created).First().Created 
+            )
             .Skip(50 * (p - 1))
             .Take(50)
             // .Include(t => t.Posts)
