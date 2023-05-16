@@ -16,7 +16,7 @@ module Program =
             .ConfigureServices(fun hostContext services ->
                 services.AddHostedService<Worker>()
                 |> ignore
-                services.AddSingleton<ComicvineContextFactory>()
+                services.RegisterDataServices(hostContext.Configuration) // IConfiguration for worker service in hostContext.Configuration
                 |> ignore
             )
 

@@ -10,6 +10,7 @@ open System.Threading.Tasks
 open Comicvine.Core
 open Comicvine.Database
 open FSharp.Control
+open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.EntityFrameworkCore
@@ -26,7 +27,7 @@ type PollInfo =
         NewPosts: int
         DeletedPosts: int
     }
-type Worker(logger: ILogger<Worker>, factory: ComicvineContextFactory) =
+type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
     inherit BackgroundService()
     let timer = new PeriodicTimer(TimeSpan.FromMinutes(1))
     let threadParser = Parsers.ThreadParser()
@@ -208,9 +209,11 @@ type Worker(logger: ILogger<Worker>, factory: ComicvineContextFactory) =
     
     override _.ExecuteAsync( ct) =
         task {
+            //scoping stuff for injection database context: https://pgroene.wordpress.com/2018/07/12/injecting-a-scoped-service-into-ihostedservice/
+            use scope = scopeFactory.CreateScope()
+            let dbCtx = scope.ServiceProvider.GetRequiredService<ComicvineContext>()
             while not ct.IsCancellationRequested do
                 let! r = timer.WaitForNextTickAsync(ct)
-                use dbCtx = factory.CreateDbContext([||])
                 logger.LogInformation("starting new task at: {time}", DateTimeOffset.Now)
                 if r then
                     do! pollThread ct dbCtx
