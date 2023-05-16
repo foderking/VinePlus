@@ -37,7 +37,6 @@ builder.Services.AddScoped<Parsers.ISingle<Parsers.Profile>, Parsers.ProfilePars
 builder.Services.AddScoped<Parsers.ISingle<Parsers.Image>, Parsers.ImageParser>();
 
 builder.Services.RegisterDataServices(builder.Configuration); // inject dbcontext
-
 // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis?view=aspnetcore-6.0#authorization
 // builder.Services.AddDbContext<ComicvineContext>(o => 
 //     // o.UseNpgsql(builder.Configuration.GetConnectionString("comicvine_db"))
