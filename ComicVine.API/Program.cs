@@ -44,8 +44,6 @@ builder.Services.RegisterDataServices(builder.Configuration); // inject dbcontex
 // builder.Services.AddStackExchangeRedisCache(o => { o.Configuration = builder.Configuration["RedisCacheUrl"]; });
 
 // builder.Services.AddSingleton<ComicvineContextFactory>();
-
-
 var app = builder.Build();
 
 var port = Environment.GetEnvironmentVariable("PORT");
