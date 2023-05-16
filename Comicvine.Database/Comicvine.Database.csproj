@@ -20,12 +20,4 @@
       <ProjectReference Include="..\Comicvine.Core\Comicvine.Core.fsproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Content Include="settings.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-    </ItemGroup>
-
 </Project>
