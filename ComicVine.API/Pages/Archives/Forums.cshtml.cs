@@ -11,19 +11,26 @@ public class Forums : PageModel
     public IEnumerable<Parsers.Thread>? Threads;
     public Nav FNav = new (1, Util.LastPage, "/archives/forums");
 
-    public Forums(ComicvineContextFactory factory) {
-        _context = factory.CreateDbContext(Array.Empty<string>());
+    public Forums(ComicvineContext context) {
+        _context = context;
 
     }
+    /*
+     * - order by id
+     * - filter by author
+     * - filter by board
+     * - filter by type
+     */
     public void OnGet(int p) {
         Threads = _context.Threads
-            .OrderByDescending(t =>
-                t.Posts.Count
-                // t.Posts.OrderByDescending(pp => pp.Created).First().Created 
+            // .OrderByDescending(t =>
+            //     t.Posts.Count
+            // )
+            .OrderBy(t =>
+                t.Id
             )
             .Skip(50 * (p - 1))
             .Take(50)
-            // .Include(t => t.Posts)
             ;
         
         FNav = FNav with { CurrentPage = p, LastPage = _context.Threads.Count() / 50 };

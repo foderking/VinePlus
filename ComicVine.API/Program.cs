@@ -36,13 +36,15 @@ builder.Services.AddScoped<Parsers.IMultiple<Parsers.Following>, Parsers.Followi
 builder.Services.AddScoped<Parsers.ISingle<Parsers.Profile>, Parsers.ProfileParser>();
 builder.Services.AddScoped<Parsers.ISingle<Parsers.Image>, Parsers.ImageParser>();
 
+builder.Services.RegisterDataServices(builder.Configuration); // inject dbcontext
+
 // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis?view=aspnetcore-6.0#authorization
 // builder.Services.AddDbContext<ComicvineContext>(o => 
 //     // o.UseNpgsql(builder.Configuration.GetConnectionString("comicvine_db"))
 // );
 // builder.Services.AddStackExchangeRedisCache(o => { o.Configuration = builder.Configuration["RedisCacheUrl"]; });
 
-builder.Services.AddSingleton<ComicvineContextFactory>();
+// builder.Services.AddSingleton<ComicvineContextFactory>();
 
 
 var app = builder.Build();
