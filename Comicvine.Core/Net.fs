@@ -26,6 +26,15 @@ module Net =
         client
         |> returnFunc $"{path}?{q}"
     }
+  
+  let getReaderWithHandler(query: Dictionary<string, string>)(handler: HttpClientHandler)(path: string) = task {
+      use querystring = new FormUrlEncodedContent(query)
+      let! q = querystring.ReadAsStringAsync()
+      let client = new HttpClient(handler, true)
+      client.BaseAddress <- Uri("https://comicvine.gamespot.com")
+      return! client.GetStringAsync($"{path}?{q}")
+    }
+    
     // return! client.GetStreamAsync("/forums/battles-7/kotor-sith-lords-vs-cw-sith-lords-1631389/?page=2");
   let getStreamWithParam (**(query: Dictionary<string, string>) (path: string)**) =
     getReaderWithParamGeneric Reader.stream

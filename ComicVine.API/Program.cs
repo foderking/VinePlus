@@ -58,7 +58,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction()) {
 
     if (app.Environment.IsProduction()) {
         app.UseExceptionHandler("/error");
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection();
     }
         
     app.UseSwaggerUI( c =>
