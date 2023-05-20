@@ -12,6 +12,8 @@ public static class Controller
      * - add proper restful errors
      */
     public static void AddEndpoints(this IEndpointRouteBuilder app) {
+        app.MapGet("/", (HttpResponse reponse) => reponse.Redirect("/forums"));
+        
         app.MapGet("/api/post", async (
             Parsers.IMultiple<Parsers.Post> parser,
             [FromQuery] string path

@@ -10,6 +10,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Comicvine.Polling", "Comicv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Comicvine.Database", "Comicvine.Database\Comicvine.Database.csproj", "{023CA06C-E4BA-426A-98B7-C83E1F048464}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Comicvine.Seed", "Comicvine.Seed\Comicvine.Seed.fsproj", "{8BAFBA50-9239-4358-9F54-39A5DFA520A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{023CA06C-E4BA-426A-98B7-C83E1F048464}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{023CA06C-E4BA-426A-98B7-C83E1F048464}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{023CA06C-E4BA-426A-98B7-C83E1F048464}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BAFBA50-9239-4358-9F54-39A5DFA520A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BAFBA50-9239-4358-9F54-39A5DFA520A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BAFBA50-9239-4358-9F54-39A5DFA520A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BAFBA50-9239-4358-9F54-39A5DFA520A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
