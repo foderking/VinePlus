@@ -451,11 +451,16 @@ module Parsers =
             |> Nodes.getFirstChild "div" (Predicates.classAttrib "message-title")
             |> (fun x -> x.InnerText.Contains("Edited By"))
           let created =
-            messageNode
-            |> Nodes.getFirstChild "div" (Predicates.classAttrib "message-options")
-            |> Nodes.getFirstChild "time" (Predicates.classAttrib "date")
-            |> Helpers.getAttrib "datetime"
-            |> DateTime.Parse
+            match
+              messageNode
+              |> Nodes.getFirstChildIfAny "div" (Predicates.classAttrib "message-options")
+            with
+            | None -> DateTime.MinValue
+            | Some mOpt ->
+              mOpt
+              |> Nodes.getFirstChild "time" (Predicates.classAttrib "date")
+              |> Helpers.getAttrib "datetime"
+              |> DateTime.Parse
           let content =
             messageNode
             |> Nodes.getFirstChild "article" (Predicates.classAttrib "message-content")

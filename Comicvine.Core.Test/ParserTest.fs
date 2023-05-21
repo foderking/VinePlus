@@ -6,6 +6,7 @@ open System.Text.RegularExpressions
 open Comicvine.Core
 open Xunit
 
+// /forums/battles-7/cw-ras-al-ghul-and-damien-darhk-vs-hawkman-and-haw-1849534/ op has no date
 let convertNameRegex (name: string) =
     let reg (v: string) (pattern: string) (str: string) =
         Regex.Replace(str, pattern, v)
