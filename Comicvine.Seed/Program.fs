@@ -4,6 +4,7 @@ open System.IO
 open System.Net.Http
 open System.Text.Json
 open System.Threading.Tasks
+open Comicvine.Core
 open Comicvine.Core.Parsers
 open FSharp.Control
 open StackExchange.Redis
@@ -40,7 +41,15 @@ let threadEnumerator: PollCreator<int> =
 
 let threadUser: PollUser<int, Thread seq> =
    fun page ->
-     Common.ParseSingle threadParser page "/forums/"
+     try
+       Common.ParseSingle threadParser page "/forums/"
+     with
+     | :? HttpRequestException as ex
+      when ex.Message <> "Response status code does not indicate success: 404 (Not Found)." ->
+       printfn "exception occured %A..." ex
+       Common.ParseSingle threadParser page "/forums/"
+     | :? HttpRequestException as ex ->
+       task{return Seq.empty}
 
 let threadConsumer: PollConsumer<Thread seq> =
   let consume (db: IDatabase)(thread: Thread) =
@@ -57,9 +66,7 @@ let threadConsumer: PollConsumer<Thread seq> =
     |> Task.WaitAll
   }
   
-// posts
-let postEnumerator(db: IDatabase): PollCreator<string * int> =
-  fun batchCount currentBatch ->
+let getPostEntries(db: IDatabase)=
     db.HashScan(threadKey)
     |> Seq.map (fun x -> JsonSerializer.Deserialize<Thread>(x.Value))
     |> Seq.collect (fun x -> 
@@ -67,7 +74,12 @@ let postEnumerator(db: IDatabase): PollCreator<string * int> =
       |> Seq.map (fun y -> x.Thread.Link, y) 
       |> Seq.filter (fun (a,_) -> a <> "")
     )
+// posts
+let postEnumerator(db: IDatabase): PollCreator<string * int> =
+  fun batchCount currentBatch ->
+    getPostEntries db
     |> Seq.skip (batchCount*currentBatch)
+    |> Seq.truncate batchCount
 
 let postUser(db: IDatabase): PollUser<string * int, Post seq option> =
   fun (path, page) -> task {
@@ -108,8 +120,11 @@ let postConsumer: PollConsumer<Post seq option> =
   
 let rec doWork
   (db: IDatabase)(enumerator: PollCreator<'T>)(producer: PollUser<'T,'U>)
-  (consumer: PollConsumer<'U>)(batchCount: int)(currentBatch: int) =
+  (consumer: PollConsumer<'U>)(batchCount: int)(currentBatch: int)(lastBatch: int) =
   async {
+    if currentBatch = lastBatch then
+      return ()
+    else
     try
       let! batched =
         enumerator batchCount currentBatch
@@ -121,7 +136,7 @@ let rec doWork
         do! (consumer db item |> Async.ofUnitTask)
         
       printfn "finished batch %d" currentBatch
-      return! doWork db enumerator producer consumer batchCount (currentBatch+1)
+      return! doWork db enumerator producer consumer batchCount (currentBatch+1) lastBatch
       
     with
     | ex ->
@@ -131,9 +146,25 @@ let rec doWork
 
 let Seed() = task{
   let db = ConnectionMultiplexer.Connect("localhost").GetDatabase()
-  do! doWork db threadEnumerator threadUser threadConsumer 6 0
+  let threadBatch = 6
+  let postBatch = 4
+  
+  let! noThreads =
+    Net.getNodeFromPage "/forums/" 1
+    |> Task.map threadParser.ParseEnd
+    |> Task.map (fun n -> n / threadBatch  - 1)
+  printfn "[+] starting threads, count: %d" noThreads
+  do! doWork db threadEnumerator threadUser threadConsumer threadBatch 0 noThreads
+  printfn "[+] writing threads to json"
   do! writeFile db threadKey "threads.json"
-  do! doWork db (postEnumerator db) (postUser db) postConsumer 4 0
+  
+  let noPosts =
+    getPostEntries db
+    |> Seq.length
+    |> fun n -> n / postBatch + 1
+  printfn "[+] starting posts, count: %d" noPosts
+  do! doWork db (postEnumerator db) (postUser db) postConsumer postBatch 0 noPosts
+  printfn "[+] writing posts to json"
   do! writeFile db postKey "posts.json"
 }
 

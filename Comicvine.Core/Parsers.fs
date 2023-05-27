@@ -73,12 +73,12 @@ module Parsers =
   type Follower =
     { Follower: Link; Avatar: string }
      
-  // type PollInfo =
-  //   {
-  //     NewThreads: int
-  //     NewPosts: int
-  //     DeletedPosts: int
-  //   } 
+  type Info =
+    {
+      NewThreads: int
+      NewPosts: int
+      DeletedPosts: int
+    } 
   // interface for the parsers 
   type ISingle<'T> =
     interface
