@@ -5,6 +5,7 @@
 #r "bin/Release/net6.0/FSharp.Control.TaskSeq.dll"
 
 open System
+open System.Collections.Generic
 open System.IO
 open System.Net
 open System.Net.Http
@@ -25,7 +26,7 @@ module Poll =
   let db = redis.GetDatabase()
 
   let threadKey = "vine:thread"
-  let postKey = "vine:post"
+  let postKey = "vine:pot"
   let vineKey = "vine:full"
 
      
@@ -60,6 +61,7 @@ module Poll =
       let! _ = db.HashSetAsync(postKey, post.Id, serialized)
       ()
     }
+    :> Task
   
   let doPost(db: IDatabase)(page: int) =
     task {
@@ -130,6 +132,51 @@ module Poll =
       
   }
   
+  let getAllPosts(thread: Parsers.Thread) =
+     taskSeq {
+       for p = 1 to thread.LastPostPage do
+         printfn "thread %A page %d" thread.Id p
+         let! post = Common.ParseSingle postParser p thread.Thread.Link
+         yield post
+     }
+  
+  let getPostsRedis(db: IDatabase)(batchSize: int) = async {
+    let consume(posts: Post seq) = task{
+      posts
+      |> Seq.map (consumePost db)
+      |> Array.ofSeq
+      |> Task.WaitAll
+    }
+    let rec iteratePost(batch: (string * int) seq)(n: int) =
+      async {
+        try
+            let! posts = 
+              batch
+              |> Seq.take batchSize
+              |> Seq.map (fun (x,y) -> Common.ParseSingle postParser y x)
+              |> Task.WhenAll
+              |> Async.ofTask
+              
+            for pp in posts do
+              do! consume pp |> Async.ofTask
+            printfn "batch %d" n
+            return! iteratePost (batch |> Seq.skip batchSize) (n+1)
+        with
+        | ex ->
+          printfn "exception %s" ex.Message
+          do! Async.Sleep 1000
+          return! iteratePost batch (n)
+      }
+      
+    let batch =
+      db.HashScan(threadKey)
+      |> Seq.map (fun x -> JsonSerializer.Deserialize<Thread>(x.Value))
+      |> Seq.collect (fun x -> [1..x.LastPostPage] |> Seq.map (fun y -> x.Thread.Link, y) )
+      
+    do! iteratePost batch 1
+  }
+    
+  
   let pollPages(batch: int)(initialBatch: int)(doPoll: IDatabase -> int -> Task) = task {
      let! stream = Net.getStreamByPage 1 "/forums/"
      let pages = 
@@ -150,7 +197,8 @@ module Poll =
   }
   // pollThread 6 doThread 958 |> Task.WaitAll;;
   // pollThread 6 doThread 0 |> Task.WaitAll;;
-  
   // pollTasks 6 1074 doThread |> Task.WaitAll;;
-  pollPages 6 0 doPost |> Task.WaitAll;;
   // writeThreads db |> Task.WaitAll;;
+  
+  // pollPages 6 0 doThread |> Task.WaitAll;;
+  getPostsRedis db 25 |> Async.RunSynchronously;;

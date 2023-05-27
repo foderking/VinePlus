@@ -13,6 +13,6 @@ You can also run the scripts to convert the json file to csv, to make it easier 
 
 ## How to Run
 - Clone the Main repository
-- Navigate the path for this project `Comicvine.Polling`
+- Navigate the path for this project `cd /Comicvine.Polling`
 - Run this command in terminal `dotnet run`
 
