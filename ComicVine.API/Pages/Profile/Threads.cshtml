@@ -9,4 +9,4 @@
     ViewData[Util.Profile.ProfileKey] = Model.User_;
 }
 
-threads
+@await Html.PartialAsync("Shared/Components/ForumItems", (Model.Thread, Util.GetThreadLink(true)))

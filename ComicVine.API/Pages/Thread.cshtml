@@ -8,6 +8,6 @@
     ViewData["headings"] = Model.ThreadTitle;
 }
 
-@await Html.PartialAsync("Shared/Navigation", (Model.FNav, Util.NormalThreadNav))
-@await Html.PartialAsync("Shared/Thread", Model.Posts)
-@await Html.PartialAsync("Shared/Navigation", (Model.FNav, Util.NormalThreadNav))
+@await Html.PartialAsync("Shared/Components/Navigation", (Model.FNav, Util.NormalThreadNav))
+@await Html.PartialAsync("Shared/Components/Thread", Model.Posts)
+@await Html.PartialAsync("Shared/Components/Navigation", (Model.FNav, Util.NormalThreadNav))

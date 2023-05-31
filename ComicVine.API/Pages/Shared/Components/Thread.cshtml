@@ -6,7 +6,7 @@
         @foreach (var post in Model) {
             <div class="post-item">
                 <div class="post-title">
-                    <span class="post-no">#@post.PostNo</span>
+                    <span class="post-no" id="@post.PostNo.ToString()">#@post.PostNo</span>
                     <span class="post-creator">@post.Creator.Text</span>
                     @if (post.IsEdited) {
                         <span class="post-edited">Edited</span>

@@ -28,14 +28,6 @@ builder.Services.AddSwaggerGen(
     });
 builder.Services.AddRazorPages();
         
-builder.Services.AddScoped<Parsers.IMultiple<Parsers.Thread>, Parsers.ThreadParser>();
-builder.Services.AddScoped<Parsers.IMultiple<Parsers.Post>, Parsers.PostParser>();
-builder.Services.AddScoped<Parsers.IMultiple<Parsers.Blog>, Parsers.BlogParser>();
-builder.Services.AddScoped<Parsers.IMultiple<Parsers.Follower>, Parsers.FollowerParser>();
-builder.Services.AddScoped<Parsers.IMultiple<Parsers.Following>, Parsers.FollowingParser>();
-builder.Services.AddScoped<Parsers.ISingle<Parsers.Profile>, Parsers.ProfileParser>();
-builder.Services.AddScoped<Parsers.ISingle<Parsers.Image>, Parsers.ImageParser>();
-
 builder.Services.RegisterDataServices(builder.Configuration); // inject dbcontext
 // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis?view=aspnetcore-6.0#authorization
 // builder.Services.AddDbContext<ComicvineContext>(o => 

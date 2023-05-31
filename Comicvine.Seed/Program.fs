@@ -20,9 +20,6 @@ let threadKey = "vine:thread"
 let postKey = "vine:pot"
 let serverErrorKey = "vine:500"
 
-let threadParser = ThreadParser()
-let postParser = PostParser()
-  
 
 let writeFile(db: IDatabase)(key: string)(file: string) = task {
   let entries =
@@ -42,12 +39,12 @@ let threadEnumerator: PollCreator<int> =
 let threadUser: PollUser<int, Thread seq> =
    fun page ->
      try
-       Common.ParseSingle threadParser page "/forums/"
+       Common.ParseSingle ThreadParser.ParseSingle page "/forums/"
      with
      | :? HttpRequestException as ex
       when ex.Message <> "Response status code does not indicate success: 404 (Not Found)." ->
        printfn "exception occured %A..." ex
-       Common.ParseSingle threadParser page "/forums/"
+       Common.ParseSingle ThreadParser.ParseSingle page "/forums/"
      | :? HttpRequestException as ex ->
        task{return Seq.empty}
 
@@ -84,7 +81,7 @@ let postEnumerator(db: IDatabase): PollCreator<string * int> =
 let postUser(db: IDatabase): PollUser<string * int, Post seq option> =
   fun (path, page) -> task {
     try
-      let! res = Common.ParseSingle postParser page path
+      let! res = Common.ParseSingle PostParser.ParseSingle page path
       return Some res
     with
     | :? HttpRequestException as ex
@@ -151,7 +148,7 @@ let Seed() = task{
   
   let! noThreads =
     Net.getNodeFromPage "/forums/" 1
-    |> Task.map threadParser.ParseEnd
+    |> Task.map ThreadParser.ParseEnd
     |> Task.map (fun n -> n / threadBatch  - 1)
   printfn "[+] starting threads, count: %d" noThreads
   do! doWork db threadEnumerator threadUser threadConsumer threadBatch 0 noThreads
