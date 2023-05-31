@@ -1,0 +1,12 @@
+﻿@page "{user}"
+@using ComicVine.API.Pages
+@model ComicVine.API.Pages.Profile.Threads
+
+@{
+    Layout = "Shared/_ProfileLayout";
+    ViewData[Util.TitleKey] = $"{Model.User_}'s Threads";
+    ViewData[Util.SiteKey ] = Util.Profile.IsThread;
+    ViewData[Util.Profile.ProfileKey] = Model.User_;
+}
+
+threads

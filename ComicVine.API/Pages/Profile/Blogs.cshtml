@@ -1,0 +1,12 @@
+﻿@page "{user}"
+@using ComicVine.API.Pages
+@model ComicVine.API.Pages.Profile.Blogs
+
+@{
+    Layout = "Shared/_ProfileLayout";
+    ViewData[Util.TitleKey] = $"{Model.User_}'s Blogs";
+    ViewData[Util.SiteKey ] = Util.Profile.IsBlog;
+    ViewData[Util.Profile.ProfileKey] = Model.User_;
+}
+
+blogs

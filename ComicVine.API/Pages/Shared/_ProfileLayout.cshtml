@@ -1,0 +1,56 @@
+﻿@using ComicVine.API.Pages
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>@ViewData[Util.TitleKey]</title>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<header>
+    <nav>
+        <div id="nav-root">
+            <span class="@Util.GetClass(ViewData, Util.Profile.IsProfile)">
+                <a href="@Util.Profile.GetLink(ViewData, "/profile/")">
+                    Profile
+                </a>
+            </span>
+            <span class="@Util.GetClass(ViewData, Util.Profile.IsImage)">
+                <a href="@Util.Profile.GetLink(ViewData, "/profile/images/")">
+                    Images
+                </a>
+            </span>
+            <span class="@Util.GetClass(ViewData, Util.Profile.IsBlog)">
+                <a href="@Util.Profile.GetLink(ViewData, "/profile/blogs/")">
+                    Blogs
+                </a>
+            </span>
+            <span class="@Util.GetClass(ViewData, Util.Profile.IsThread)">
+                <a href="@Util.Profile.GetLink(ViewData, "/profile/threads/")">
+                    Threads
+                </a>
+            </span>
+            <span class="@Util.GetClass(ViewData, Util.Profile.IsPosts)">
+                <a href="@Util.Profile.GetLink(ViewData, "/profile/posts/")">
+                    Posts
+                </a>
+            </span>
+        </div>
+    </nav>
+</header>
+<main id="container">
+    @RenderBody()
+</main>
+<footer></footer>
+<script>
+// loads lazy images
+let lazyLoad = node =>
+    node.setAttribute("src", node.getAttribute("data-src"))
+
+document
+    .querySelectorAll(".js-lazy-load-image")
+    .forEach(lazyLoad)
+</script>
+</body>
+</html>
