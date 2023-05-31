@@ -1,0 +1,12 @@
+﻿@page "{user}"
+@using ComicVine.API.Pages
+@model ComicVine.API.Pages.Profile.Index
+
+@{
+    Layout = "Shared/_ProfileLayout";
+    ViewData[Util.TitleKey] = $"{Model.User_}'s Profile";
+    ViewData[Util.SiteKey ] = Util.Profile.IsProfile;
+    ViewData[Util.Profile.ProfileKey] = Model.User_;
+}
+
+profile
