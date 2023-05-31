@@ -14,8 +14,8 @@
             <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-index")"></span>
             <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-title")">
                 <a href="@Url.Content(Model.Item2(thread))">
-                    @await Html.PartialAsync("Lock", thread.IsLocked)
-                    @await Html.PartialAsync("Pin" , thread.IsPinned)
+                    @await Html.PartialAsync("Shared/Components/Lock", thread.IsLocked)
+                    @await Html.PartialAsync("Shared/Components/Pin" , thread.IsPinned)
                     @Html.Raw(thread.Thread.Text)
                 </a>
             </span>

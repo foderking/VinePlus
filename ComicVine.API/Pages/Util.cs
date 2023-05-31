@@ -1,5 +1,6 @@
 ﻿
 using Comicvine.Core;
+using Comicvine.Database;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace ComicVine.API.Pages;
@@ -74,6 +75,26 @@ public static class Util
         public static string GetLink(ViewDataDictionary ViewData, string path) {
             string user = (string)(ViewData[ProfileKey] ?? "");
             return path + user;
+        }
+
+        public static IEnumerable<Parsers.Thread> GetUsersThreads(ComicvineContext context, string user, int page=1) {
+            return context
+                .Threads
+                .Where(thread => thread.Creator.Text == user)
+                .OrderByDescending(each => each.TotalPosts)
+                .Skip((page-1)*50)
+                .Take(50)
+                ;
+        }
+
+        public static IEnumerable<Parsers.Post> GetUserPosts(ComicvineContext context, string user, int page=1) {
+            return context
+                .Posts
+                .Where(posts => posts.Creator.Text == user)
+                .OrderByDescending(each => each.Created)
+                .Skip((page-1)*50)
+                .Take(50)
+                ;
         }
     }
 }

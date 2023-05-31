@@ -46,9 +46,6 @@ type PollInfo =
 type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
     inherit BackgroundService()
     let timer = new PeriodicTimer(TimeSpan.FromMinutes(1))
-    let threadParser = Parsers.ThreadParser()
-    let postParser = Parsers.PostParser()
-
     let newThread = ConcurrentBag<Parsers.Thread>()
     let updateThread = ConcurrentBag<Parsers.Thread>()
     
@@ -71,10 +68,10 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
         match thread with
         | New th ->
             // every post in the thread would be marked as a new post
-            Common.ParseMultiple postParser th.Thread.Link
+            Common.ParseMultiple PostParser.ParseSingle PostParser.ParseEnd th.Thread.Link
             |> Task.map(Seq.map New)
         | Update th ->
-            Common.ParseMultiple postParser th.Thread.Link
+            Common.ParseMultiple PostParser.ParseSingle PostParser.ParseEnd th.Thread.Link
             |> Task.bind(fun posts -> task {
                 // gets set of parsed posts to make lookups faster
                 let postsSet =
@@ -139,7 +136,7 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
             Net.getStreamByPageCt ct page "/forums/"
             |> Task.map (
                 Net.getRootNode
-                >> threadParser.ParseSingle
+                >> ThreadParser.ParseSingle
                 >> (cThreads db)
             )
         // send the threads to db

@@ -30,4 +30,12 @@
       <ProjectReference Include="..\Comicvine.Database\Comicvine.Database.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <AdditionalFiles Include="Pages\Shared\Components\ForumItems.cshtml" />
+      <AdditionalFiles Include="Pages\Shared\Components\Lock.cshtml" />
+      <AdditionalFiles Include="Pages\Shared\Components\Navigation.cshtml" />
+      <AdditionalFiles Include="Pages\Shared\Components\Pin.cshtml" />
+      <AdditionalFiles Include="Pages\Shared\Components\Thread.cshtml" />
+    </ItemGroup>
+
 </Project>

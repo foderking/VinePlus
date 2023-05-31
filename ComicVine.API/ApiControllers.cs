@@ -15,12 +15,11 @@ public static class Controller
         app.MapGet("/", (HttpResponse reponse) => reponse.Redirect("/forums"));
         
         app.MapGet("/api/post", async (
-            Parsers.IMultiple<Parsers.Post> parser,
             [FromQuery] string path
         ) =>
         {
             try {
-                var res = await Parsers.Common.ParseMultiple(parser, path);
+                var res = await Parsers.PostParser.ParseMultiple(path);
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -29,16 +28,12 @@ public static class Controller
         });
 
         app.MapGet("/api/post/{page}", async (
-            Parsers.IMultiple<Parsers.Post> parser,
             [FromQuery] string path,
             int page
         ) =>
         {
             try {
-                // Stream stream = await Net.getStreamByPage(page, path);
-                // HtmlNode rootNode = Net.getRootNode(stream);
-                // var res = parser.ParseSingle(rootNode);
-                var res = await Parsers.Common.ParseSingle(parser, page, path);
+                var res = await Parsers.PostParser.ParsePage(page, path);
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -47,15 +42,10 @@ public static class Controller
         });
 
 
-        app.MapGet("/api/forum", async (
-            Parsers.IMultiple<Parsers.Thread> parser
-        ) =>
+        app.MapGet("/api/forum", async () =>
         {
             try {
-                // Stream stream = await Net.getStreamByPage(1, "forums");
-                // HtmlNode rootNode = Net.getRootNode(stream);
-                // var res = parser.ParseSingle(rootNode);
-                var res = await Parsers.Common.ParseSingle(parser, 1, "forums");
+                var res = await Parsers.ThreadParser.ParsePage(1, "forums");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -66,15 +56,11 @@ public static class Controller
 
 
         app.MapGet("/api/forum/{page}", async (
-            Parsers.IMultiple<Parsers.Thread> parser,
             int page
         ) =>
         {
             try {
-                // Stream stream = await Net.getStreamByPage(page, "forums");
-                // HtmlNode rootNode = Net.getRootNode(stream);
-                // var res = parser.ParseSingle(rootNode);
-                var res = await Parsers.Common.ParseSingle(parser, page, "forums");
+                var res = await Parsers.ThreadParser.ParsePage(page, "forums");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -84,15 +70,11 @@ public static class Controller
 
 
         app.MapGet("/api/profile/{username}", async (
-            Parsers.ISingle<Parsers.Profile> parser,
             string username
         ) =>
         {
             try {
-                // Stream stream = await Net.getStream($"/profile/{username}");
-                // HtmlNode rootNode = Net.getRootNode(stream);
-                // var res = parser.ParseSingle(rootNode);
-                var res = await Parsers.Common.ParseDefault(parser, $"/profile/{username}");
+                var res = await Parsers.ProfileParser.ParseDefault($"/profile/{username}");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -102,15 +84,11 @@ public static class Controller
 
 
         app.MapGet("/api/profile/{username}/images", async (
-            Parsers.ISingle<Parsers.Image> parser,
             string username
         ) =>
         {
             try {
-                // Stream stream = await Net.getStream($"/profile/{username}/images");
-                // HtmlNode rootNode = Net.getRootNode(stream);
-                // var res = parser.ParseSingle(rootNode);
-                var res = await Parsers.Common.ParseDefault(parser, $"/profile/{username}/images");
+                var res = await Parsers.ImageParser.ParseDefault($"/profile/{username}/images");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -120,12 +98,11 @@ public static class Controller
 
 
         app.MapGet("/api/profile/{username}/blog", async (
-            Parsers.IMultiple<Parsers.Blog> parser,
             string username
         ) =>
         {
             try {
-                var res = await Parsers.Common.ParseMultiple(parser, $"/profile/{username}/blog");
+                var res = await Parsers.BlogParser.ParseMultiple($"/profile/{username}/blog");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -135,12 +112,11 @@ public static class Controller
 
 
         app.MapGet("/api/profile/{username}/follower", async (
-            Parsers.IMultiple<Parsers.Follower> parser,
             string username
         ) =>
         {
             try {
-                var res = await Parsers.Common.ParseMultiple(parser, $"/profile/{username}/follower");
+                var res = await Parsers.FollowerParser.ParseMultiple($"/profile/{username}/follower");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
@@ -150,19 +126,17 @@ public static class Controller
 
 
         app.MapGet("/api/profile/{username}/following", async (
-            Parsers.IMultiple<Parsers.Following> parser,
             string username
         ) =>
         {
             try {
-                var res = await Parsers.Common.ParseMultiple(parser, $"/profile/{username}/following");
+                var res = await Parsers.FollowingParser.ParseMultiple($"/profile/{username}/following");
                 return Results.Ok(res);
             }
             catch (HttpRequestException) {
                 return Results.NotFound();
             }
         });
-        // .Produces<IEnumerable<Parsers.Following>>();
 
     }
 }
