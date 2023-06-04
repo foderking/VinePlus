@@ -1,0 +1,26 @@
+﻿@using ComicVine.API.Pages
+@model IEnumerable<Comicvine.Core.Parsers.Post>
+
+<div id="post-container">
+    @foreach (var post in Model) {
+        <div class="post-item">
+            <div class="post-title">
+                <span class="post-no" id="@post.PostNo.ToString()">
+                    #@post.PostNo
+                </span>
+                <span class="post-creator">
+                    <a href="@post.Creator.Link">
+                        @post.Creator.Text
+                    </a>
+                </span>
+                @if (post.IsEdited) {
+                    <span class="post-edited">Edited</span>
+                }
+            </div>
+            <div class="post-content">
+                @Html.Raw(post.Content)
+            </div>
+            <time class="post-time">@Util.GetDuration(DateTime.Now, post.Created)</time>
+        </div>
+    }
+</div>

@@ -6,7 +6,7 @@ namespace ComicVine.API.Pages;
 
 public class Forums : PageModel
 {
-    public IEnumerable<Parsers.Thread>? Threads;
+    public IEnumerable<Parsers.Thread> Threads = Enumerable.Empty<Parsers.Thread>();
     public Nav FNav = new (1, Util.LastPage, "/forums");
     public Func<string, int, string> Navigation = (path, page) => $"{path}/{page}";
 

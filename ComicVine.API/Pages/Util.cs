@@ -1,11 +1,24 @@
 ﻿
 using Comicvine.Core;
 using Comicvine.Database;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace ComicVine.API.Pages;
 
-public record Nav(int CurrentPage, int LastPage, string Path);
+public record Nav(int CurrentPage, int LastPage, string DelegatParam);
+
+public abstract class Navigator<T>: PageModel
+{
+    public IEnumerable<T> Entities = Enumerable.Empty<T>();
+    public Nav NavRecord = new(0, 0, "");
+    public abstract Func<string, int, string> PageDelegate();
+}
+
+public interface IForum
+{
+    public Func<Parsers.Thread, string> GetThreadLink();
+}
 
 public static class Util
 {
@@ -30,7 +43,7 @@ public static class Util
             1 => 
                 $"{dur.Days} day",
             _ => 
-                $"{dur.Days} days"
+                date.ToLongDateString()
         };
     }
 
@@ -40,12 +53,14 @@ public static class Util
             (thread) => $"/thread?path={thread.Thread.Link}";
     }
 
+
     public static string GetThreadRow(int index) {
         return index % 2  == 1? "thread-odd" : "";
     }
 
     public static Func<string, int, string> NormalThreadNav = (path, page) => $"/thread?path={path}&p={page}";
     public static Func<string, int, string> ArchiveThreadNav = (id, page) => $"/archives/thread/{id}/{page}";
+    public static Func<string, int, string> ProfileThreadNav = (user, page) => $"/profile/threads/{user}/{page}";
     public static Func<string, int, string> ThreadNav = (path, page) => $"{path}/{page}";
 
     public static string GetClass(ViewDataDictionary ViewData, string expected) {
@@ -91,7 +106,7 @@ public static class Util
             return context
                 .Posts
                 .Where(posts => posts.Creator.Text == user)
-                .OrderByDescending(each => each.Created)
+                // .OrderByDescending(each => each.Id)
                 .Skip((page-1)*50)
                 .Take(50)
                 ;

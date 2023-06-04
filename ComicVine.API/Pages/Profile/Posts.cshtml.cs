@@ -4,19 +4,22 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ComicVine.API.Pages.Profile;
 
-public class Posts : PageModel
+public class Posts : Navigator<Parsers.Post>
 {
-    public string User_ = "";
-    public IEnumerable<Parsers.Post> Post = Enumerable.Empty<Parsers.Post>();
+    public string UserName = "";
     private ComicvineContext _context;
 
     public Posts(ComicvineContext ctx) {
         _context = ctx;
     }
     
-    public async Task OnGet(string user) {
-        var profile = await Parsers.ProfileParser.ParseDefault($"/profile/{user}");
-        User_ = profile.UserName;
-        Post = Util.Profile.GetUserPosts(_context, user, 1);
+    public void OnGet(string user, int p) {
+        UserName = user;
+        Entities = Util.Profile.GetUserPosts(_context, user, p);
+        NavRecord = new(p, 1000, user);
+    }
+
+    public override Func<string, int, string> PageDelegate() {
+        return (user, page) => $"/profile/posts/{user}/{page}";
     }
 }

@@ -9,6 +9,7 @@
         <Compile Include="Program.fs" />
         <Content Include="README.md" />
         <Content Include="threadToCsv.sh" />
+        <Folder Include="Assets" />
     </ItemGroup>
 
     <ItemGroup>
