@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>@ViewData[Util.TitleKey]</title>
+    <title>@Html.Raw(ViewData[Keys.Title])</title>
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <link rel="stylesheet" href="/css/main.css">
@@ -11,27 +11,27 @@
 <header>
     <nav>
         <div id="nav-root">
-            <span class="@Util.GetClass(ViewData, Util.Profile.IsProfile)">
+            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Main)">
                 <a href="@Util.Profile.GetLink(ViewData, "/profile/")">
                     Profile
                 </a>
             </span>
-            <span class="@Util.GetClass(ViewData, Util.Profile.IsImage)">
+            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Images)">
                 <a href="@Util.Profile.GetLink(ViewData, "/profile/images/")">
                     Images
                 </a>
             </span>
-            <span class="@Util.GetClass(ViewData, Util.Profile.IsBlog)">
+            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Blogs)">
                 <a href="@Util.Profile.GetLink(ViewData, "/profile/blogs/")">
                     Blogs
                 </a>
             </span>
-            <span class="@Util.GetClass(ViewData, Util.Profile.IsThread)">
+            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Threads)">
                 <a href="@Util.Profile.GetLink(ViewData, "/profile/threads/")">
                     Threads
                 </a>
             </span>
-            <span class="@Util.GetClass(ViewData, Util.Profile.IsPosts)">
+            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Posts)">
                 <a href="@Util.Profile.GetLink(ViewData, "/profile/posts/")">
                     Posts
                 </a>

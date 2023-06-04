@@ -19,7 +19,7 @@
             </a>
         </span>
         <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">
-            @thread.Board.Text
+            @Html.Raw(thread.Board.Text)
         </span>
         <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">
             <a href="@thread.Creator.Link">

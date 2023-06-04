@@ -4,9 +4,9 @@
 
 @{
     Layout = "Shared/_ProfileLayout";
-    ViewData[Util.TitleKey] = $"{Model.User_}'s Images";
-    ViewData[Util.SiteKey ] = Util.Profile.IsImage;
-    ViewData[Util.Profile.ProfileKey] = Model.User_;
+    ViewData[Keys.Title]       = $"{Model.User_}'s Images";
+    ViewData[Keys.Highlight ]  = ProfileHighlight.Images;
+    ViewData[Keys.ProfileName] = Model.User_;
 }
 
 images

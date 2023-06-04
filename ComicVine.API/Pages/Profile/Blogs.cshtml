@@ -1,16 +1,17 @@
-﻿@page "{user}"
+﻿@page "{user}/{p=1}"
 @using ComicVine.API.Pages
 @model ComicVine.API.Pages.Profile.Blogs
 
 @{
     Layout = "Shared/_ProfileLayout";
-    ViewData[Util.TitleKey] = $"{Model.User_}'s Blogs";
-    ViewData[Util.SiteKey ] = Util.Profile.IsBlog;
-    ViewData[Util.Profile.ProfileKey] = Model.User_;
+    ViewData[Keys.Title]       = $"{Model.UserProfile}'s Blogs";
+    ViewData[Keys.ProfileName] = Model.UserProfile;
+    ViewData[Keys.Highlight]   = ProfileHighlight.Blogs;
 }
 
+@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
 <div id="blog-container">
-@foreach (var b in Model.Blog) {
+@foreach (var b in Model.Entities) {
     <div class="blog-item">
         <h1 class="blog-header">
             <a href="@($"/archives/thread/{b.ThreadId}")">
@@ -28,3 +29,4 @@
     </div>
 }
 </div>
+@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))

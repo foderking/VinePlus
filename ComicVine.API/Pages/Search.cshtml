@@ -1,11 +1,12 @@
 ﻿@page
+@using ComicVine.API.Pages
 @model ComicVine.API.Pages.Search
 
 @{
     Layout = "Shared/_Layout";
-    ViewData["title"] = "Search Archived Content";
-    ViewData["highlight"] = "search";
-    ViewData["headings"] = "Search archives";
+    ViewData[Keys.Title]     = "Search Archived Content";
+    ViewData[Keys.Headings]  = "Search archives";
+    ViewData[Keys.Highlight] = MainHighlight.Search;
 }
 
 search

@@ -20,10 +20,33 @@ public interface IForum
     public Func<Parsers.Thread, string> GetThreadLink();
 }
 
+public static class ProfileHighlight
+{
+    public const string Main = "profile";
+    public const string Images = "images";
+    public const string Blogs = "blogs";
+    public const string Threads = "threads";
+    public const string Posts = "posts";
+}
+
+public static class Keys
+{
+    public const string Highlight = "highlight";
+    public const string Headings  = "headings";
+    public const string Title  = "title";
+    public const string ProfileName  = "profile-name";
+}
+
+public static class MainHighlight
+{
+    public const string Vine = "vine";
+    public const string Archives = "archives";
+    public const string Search = "search";
+    public const string Stats = "stats";
+}
+
 public static class Util
 {
-    public static int LastPage = 16600;
-
     public static string GetDuration(DateTime current, DateTime date) {
         TimeSpan dur = current - date;
         return dur.Days switch
@@ -47,69 +70,44 @@ public static class Util
         };
     }
 
-    public static Func<Parsers.Thread, string> GetThreadLink(bool isArchive) {
-        return isArchive ? 
-            (thread) => $"/archives/thread/{thread.Id}" :
-            (thread) => $"/thread?path={thread.Thread.Link}";
-    }
-
 
     public static string GetThreadRow(int index) {
         return index % 2  == 1? "thread-odd" : "";
     }
-
-    public static Func<string, int, string> NormalThreadNav = (path, page) => $"/thread?path={path}&p={page}";
-    public static Func<string, int, string> ArchiveThreadNav = (id, page) => $"/archives/thread/{id}/{page}";
-    public static Func<string, int, string> ProfileThreadNav = (user, page) => $"/profile/threads/{user}/{page}";
-    public static Func<string, int, string> ThreadNav = (path, page) => $"{path}/{page}";
-
-    public static string GetClass(ViewDataDictionary ViewData, string expected) {
-        if (expected == (string)(ViewData[SiteKey] ?? "")) {
-            return "nav-item nav-highlight";
-        }
-        else {
-            return "nav-item";
-        }
-    }
-    
-    public static string TitleKey = "title";
-    public static string SiteKey = "site";
-    public static string HeaderKey = "headings";
-    
-    
+   
     public static class Profile
     {
-        public static string IsProfile = "key:profile";
-        public static string IsImage = "key:image";
-        public static string IsPosts = "key:post";
-        public static string IsBlog = "key:blog";
-        public static string IsThread = "key:thread";
-
-        public static string ProfileKey = "profile:name";
-        
         public static string GetLink(ViewDataDictionary ViewData, string path) {
-            string user = (string)(ViewData[ProfileKey] ?? "");
+            string user = (string)(ViewData[Keys.ProfileName] ?? "");
             return path + user;
         }
 
-        public static IEnumerable<Parsers.Thread> GetUsersThreads(ComicvineContext context, string user, int page=1) {
-            return context
-                .Threads
-                .Where(thread => thread.Creator.Text == user)
-                .OrderByDescending(each => each.TotalPosts)
-                .Skip((page-1)*50)
-                .Take(50)
-                ;
-        }
+    }
+    
+    public static IEnumerable<Parsers.Thread> GetUsersThreads(ComicvineContext context, string user, int page=1) {
+        return context
+            .Threads
+            .Where(thread => thread.Creator.Text == user)
+            .OrderByDescending(each => each.TotalPosts)
+            .Skip((page-1)*50)
+            .Take(50)
+            ;
+    }
 
-        public static IEnumerable<Parsers.Post> GetUserPosts(ComicvineContext context, string user, int page=1) {
-            return context
-                .Posts
-                .Where(posts => posts.Creator.Text == user)
-                // .OrderByDescending(each => each.Id)
-                .Skip((page-1)*50)
-                .Take(50)
-                ;
+    public static IEnumerable<Parsers.Post> GetUserPosts(ComicvineContext context, string user, int page=1) {
+        return context
+            .Posts
+            .Where(posts => posts.Creator.Text == user)
+            // .OrderByDescending(each => each.Id)
+            .Skip((page-1)*50)
+            .Take(50)
+            ;
+    }
+    
+    public static string GetHighlightClass(ViewDataDictionary ViewData, string expected) {
+        if (expected == (string)(ViewData[Keys.Highlight] ?? "")) {
+            return "nav-item nav-highlight";
         }
+        return "nav-item";
     }
 }
