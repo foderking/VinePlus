@@ -1,13 +1,15 @@
-﻿@page "{user}"
+﻿@page "{user}/{p=1}"
 @using ComicVine.API.Pages
 @model ComicVine.API.Pages.Profile.Posts
 
 @{
     Layout = "Shared/_ProfileLayout";
-    ViewData[Util.TitleKey] = $"{Model.User_}'s Posts";
+    ViewData[Util.TitleKey] = $"{Model.UserName}'s Posts";
     ViewData[Util.SiteKey ] = Util.Profile.IsPosts;
-    ViewData[Util.Profile.ProfileKey] = Model.User_;
+    ViewData[Util.Profile.ProfileKey] = Model.UserName;
 }
 
 
-@await Html.PartialAsync("Shared/Components/Thread", Model.Post)
+@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
+@await Html.PartialAsync("Shared/Components/ThreadItems", Model.Entities)
+@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))

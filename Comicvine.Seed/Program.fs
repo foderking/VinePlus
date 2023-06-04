@@ -1,6 +1,7 @@
 ﻿
 
 open System.IO
+open System.Linq
 open System.Net.Http
 open System.Text.Json
 open System.Threading.Tasks
@@ -11,13 +12,15 @@ open StackExchange.Redis
 
 type PollCreator<'T> =
   int -> int -> 'T seq
+  
 type PollUser<'T,'U> =
   'T -> 'U Task
+  
 type PollConsumer<'U> =
   IDatabase -> 'U -> Task
 
 let threadKey = "vine:thread"
-let postKey = "vine:pot"
+let postKey = "vine:post"
 let serverErrorKey = "vine:500"
 
 
@@ -30,38 +33,43 @@ let writeFile(db: IDatabase)(key: string)(file: string) = task {
   let! _ = JsonSerializer.SerializeAsync(stream, entries)
   printfn "written entry to file"
 }
-  
-// threads
+ 
+let writeThreadCsv(db: IDatabase)(file: string) = task {
+  let json(x: Link) =
+    sprintf "\"{\"\"Text\"\":\"\"%s\"\"}\""
+  let entries =
+    db.HashScan(threadKey)
+    |> Seq.map (fun x -> JsonSerializer.Deserialize<Thread>(x.Value.ToString()))
+    |> Seq.map (fun x ->
+      $"{x.Id},{x.Thread}"
+    )
+  printfn "deserialized entries"
+  do! File.WriteAllLinesAsync(file, [||])
+  printfn "written entry to file"
+} 
+/// Gets the forum pages to be used by the current batch to parse the next set of threads
 let threadEnumerator: PollCreator<int> =
   fun batchCount currentBatch ->
     seq{batchCount*currentBatch..batchCount*(currentBatch+1)-1}
-
+    
+/// Gets all the threads in a particular page
 let threadUser: PollUser<int, Thread seq> =
-   fun page ->
-     try
-       Common.ParseSingle ThreadParser.ParseSingle page "/forums/"
-     with
-     | :? HttpRequestException as ex
-      when ex.Message <> "Response status code does not indicate success: 404 (Not Found)." ->
-       printfn "exception occured %A..." ex
-       Common.ParseSingle ThreadParser.ParseSingle page "/forums/"
-     | :? HttpRequestException as ex ->
-       task{return Seq.empty}
+  fun page ->
+    Common.ParseSingle ThreadParser.ParseSingle page "/forums/"
 
+/// Stores the next set of threads in redis
 let threadConsumer: PollConsumer<Thread seq> =
-  let consume (db: IDatabase)(thread: Thread) =
-    task {
-      let serialized = JsonSerializer.Serialize(thread)
-      let! _ = db.HashSetAsync(threadKey, thread.Id, serialized)
-      ()
-    } :> Task
+  fun redis threads -> 
+    threads
+    |> Seq.map (fun thread ->
+      task {
+        let serialized = JsonSerializer.Serialize(thread)
+        let! _ = redis.HashSetAsync(threadKey, thread.Id, serialized)
+        ()
+      } :> Task
+    )
+    |> Task.WhenAll
   
-  fun db item -> task {
-    item
-    |> Seq.map (consume db)
-    |> Array.ofSeq
-    |> Task.WaitAll
-  }
   
 let getPostEntries(db: IDatabase)=
     db.HashScan(threadKey)
@@ -69,12 +77,24 @@ let getPostEntries(db: IDatabase)=
     |> Seq.collect (fun x -> 
       [1..x.LastPostPage] 
       |> Seq.map (fun y -> x.Thread.Link, y) 
-      |> Seq.filter (fun (a,_) -> a <> "")
     )
+
+let getFileEntries(name: string) =
+  File.ReadLines(name).ToArray()
+  |> Seq.map(fun x -> x.Split(',')) 
+  |> Seq.map(fun x -> x[0],x[1] |> int)
+  
+  
 // posts
-let postEnumerator(db: IDatabase): PollCreator<string * int> =
+let postEnumeratorRedis(db: IDatabase): PollCreator<string * int> =
   fun batchCount currentBatch ->
     getPostEntries db
+    |> Seq.skip (batchCount*currentBatch)
+    |> Seq.truncate batchCount
+    
+let postEnumerator(entries: (string * int) seq): PollCreator<string * int> =
+  fun batchCount currentBatch ->
+    entries
     |> Seq.skip (batchCount*currentBatch)
     |> Seq.truncate batchCount
 
@@ -115,8 +135,8 @@ let postConsumer: PollConsumer<Post seq option> =
   }
   
   
-let rec doWork
-  (db: IDatabase)(enumerator: PollCreator<'T>)(producer: PollUser<'T,'U>)
+let rec Work
+  (redis: IDatabase)(enumerator: PollCreator<'T>)(producer: PollUser<'T,'U>)
   (consumer: PollConsumer<'U>)(batchCount: int)(currentBatch: int)(lastBatch: int) =
   async {
     if currentBatch = lastBatch then
@@ -130,39 +150,45 @@ let rec doWork
         |> Async.AwaitTask
         
       for item in batched do
-        do! (consumer db item |> Async.ofUnitTask)
+        do! (consumer redis item |> Async.ofUnitTask)
         
       printfn "finished batch %d" currentBatch
-      return! doWork db enumerator producer consumer batchCount (currentBatch+1) lastBatch
+      return! Work redis enumerator producer consumer batchCount (currentBatch+1) lastBatch
       
     with
     | ex ->
       printfn "exception at batch %d occured: %A" currentBatch ex.Message
       do! Async.Sleep 1000
+      return! Work redis enumerator producer consumer batchCount currentBatch lastBatch
   }
 
 let Seed() = task{
-  let db = ConnectionMultiplexer.Connect("localhost").GetDatabase()
+  let redis = ConnectionMultiplexer.Connect("localhost").GetDatabase()
   let threadBatch = 6
-  let postBatch = 4
+  let postBatch = 6
   
-  let! noThreads =
+  let! threadCount =
     Net.getNodeFromPage "/forums/" 1
     |> Task.map ThreadParser.ParseEnd
     |> Task.map (fun n -> n / threadBatch  - 1)
-  printfn "[+] starting threads, count: %d" noThreads
-  do! doWork db threadEnumerator threadUser threadConsumer threadBatch 0 noThreads
-  printfn "[+] writing threads to json"
-  do! writeFile db threadKey "threads.json"
+    
+  printfn "[+] starting threads, count: %d" threadCount
+  do! Work redis threadEnumerator threadUser threadConsumer threadBatch 0 threadCount
   
+  printfn "[+] writing threads to json"
+  do! writeFile redis threadKey "threads.json"
+  
+  let entries = (getPostEntries redis).ToArray()
   let noPosts =
-    getPostEntries db
+    entries
     |> Seq.length
     |> fun n -> n / postBatch + 1
+    
   printfn "[+] starting posts, count: %d" noPosts
-  do! doWork db (postEnumerator db) (postUser db) postConsumer postBatch 0 noPosts
+  do! Work redis (postEnumerator entries) (postUser redis) postConsumer postBatch 0 noPosts
+  
   printfn "[+] writing posts to json"
-  do! writeFile db postKey "posts.json"
+  do! writeFile redis postKey "posts.json"
 }
 
 [<EntryPoint>]

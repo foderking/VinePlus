@@ -7,7 +7,7 @@ namespace ComicVine.API.Pages.Archives;
 public class Thread : PageModel
 {
     private ComicvineContext _context;
-    public IEnumerable<Parsers.Post>? Posts;
+    public IEnumerable<Parsers.Post> Posts = Enumerable.Empty<Parsers.Post>();
     public Parsers.Thread? Thread_;
     public Nav FNav = new (1, 1, "/forums");
 

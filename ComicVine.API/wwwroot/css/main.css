@@ -360,3 +360,32 @@ footer {
 .post-item table tr:nth-of-type(odd) td {
     background-color: rgba(0,0,0,0.15)
 }
+
+/* blog */
+#blog-container {
+    width: 80%;
+    margin: auto;
+}
+.blog-item {
+}
+.blog-item a {
+    color: #017c37;
+    text-decoration: none;
+}
+.blog-header {
+    font-size: 35px;
+    margin-top: 30px;
+    color: #105e10;
+}
+.blog-date {
+    flex-grow: 1;
+}
+.blog-comments{
+}
+
+.blog-bottom {
+    font-size: 20px;
+    border-bottom: 1px solid #bfbfbf;
+    font-style: italic;
+    display: flex;
+}

@@ -9,4 +9,22 @@
     ViewData[Util.Profile.ProfileKey] = Model.User_;
 }
 
-blogs
+<div id="blog-container">
+@foreach (var b in Model.Blog) {
+    <div class="blog-item">
+        <h1 class="blog-header">
+            <a href="@($"/archives/thread/{b.ThreadId}")">
+                @Html.Raw(b.Blog.Text)
+            </a>
+        </h1>
+        <div class="blog-bottom">
+            <span class="blog-date">
+                @b.Created.ToShortDateString()
+            </span>
+            <span class="blog-comments">
+                @b.Comments Comments
+            </span>
+        </div>
+    </div>
+}
+</div>

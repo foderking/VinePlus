@@ -8,7 +8,7 @@ namespace ComicVine.API.Pages.Archives;
 public class Forums : PageModel
 {
     private ComicvineContext _context;
-    public IEnumerable<Parsers.Thread>? Threads;
+    public IEnumerable<Parsers.Thread> Threads = Enumerable.Empty<Parsers.Thread>();
     public Nav FNav = new (1, Util.LastPage, "/archives/forums");
 
     public Forums(ComicvineContext context) {

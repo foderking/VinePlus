@@ -9,5 +9,5 @@
 }
 
 @await Html.PartialAsync("Shared/Components/Navigation", (Model.FNav, Util.NormalThreadNav))
-@await Html.PartialAsync("Shared/Components/Thread", Model.Posts)
+@await Html.PartialAsync("Shared/Components/ThreadItems", Model.Posts)
 @await Html.PartialAsync("Shared/Components/Navigation", (Model.FNav, Util.NormalThreadNav))

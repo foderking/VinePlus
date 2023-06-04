@@ -6,7 +6,7 @@ namespace ComicVine.API.Pages;
 
 public class Thread : PageModel
 {
-    public IEnumerable<Parsers.Post>? Posts;
+    public IEnumerable<Parsers.Post> Posts = Enumerable.Empty<Parsers.Post>();
     public string ThreadTitle = "";
     public Nav FNav = new (1, 1, "/forums");
 
@@ -15,6 +15,6 @@ public class Thread : PageModel
         Posts = Parsers.PostParser.ParseSingle(node);//await Parsers.Common.ParseSingle(_parser, p, path);
         ThreadTitle = Parsers.Common.getThreadTitle(node);
         int last = Parsers.PostParser.ParseEnd(node);
-        FNav = new Nav(Path: path, CurrentPage: p, LastPage: last);
+        FNav = new Nav(DelegatParam: path, CurrentPage: p, LastPage: last);
     }
 }
