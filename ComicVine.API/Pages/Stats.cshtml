@@ -1,11 +1,12 @@
 ﻿@page
+@using ComicVine.API.Pages
 @model ComicVine.API.Pages.Stats
 
 @{
     Layout = "Shared/_Layout";
-    ViewData["highlight"] = "stat";
-    ViewData["title"] = "Statistics";
-    ViewData["headings"] = "Archive statistics";
+    ViewData[Keys.Title]     = "Statistics";
+    ViewData[Keys.Headings]  = "General statistics";
+    ViewData[Keys.Highlight] = MainHighlight.Stats;
 }
 
 stats

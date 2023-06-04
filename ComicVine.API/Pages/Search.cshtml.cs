@@ -5,6 +5,5 @@ namespace ComicVine.API.Pages;
 public class Search : PageModel
 {
     public void OnGet() {
-        // ViewData["highlight"] = true;
     }
 }

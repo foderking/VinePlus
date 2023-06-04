@@ -4,15 +4,13 @@
 
 @{
     Layout = "Shared/_Layout";
-    ViewData["title"] = "Archived Topics";
-    ViewData["highlight"] = "arch";
-    ViewData["headings"] = "Recent discussions from archive";
+    ViewData[Keys.Title]     = "Archived Topics";
+    ViewData[Keys.Headings]  = "Recent discussions from archive";
+    ViewData[Keys.Highlight] = MainHighlight.Archives;
 }
 
 <div id="thread">
-    @* @await Html.PartialAsync("Shared/ForumNav", Model.FNav) *@
-    @await Html.PartialAsync("Shared/Components/Navigation", (Model.FNav, Util.ThreadNav))
-    @await Html.PartialAsync("Shared/Components/ForumItems", (Model.Threads, Util.GetThreadLink(true)))
-    @await Html.PartialAsync("Shared/Components/Navigation", (Model.FNav, Util.ThreadNav))
-    @* @await Html.PartialAsync("Shared/ForumNav", Model.FNav) *@
+    @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
+    @await Html.PartialAsync("Shared/Components/ForumItems", (Model.Entities, Model.GetThreadLink()))
+    @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
 </div>

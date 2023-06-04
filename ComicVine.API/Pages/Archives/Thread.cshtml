@@ -5,11 +5,10 @@
 
 @{
     Layout = "Shared/_Layout";
-
-    ViewData["headings"] = Model.Thread_?.Thread.Text ?? "xvvv";
-    ViewData["title"] = Model.Thread_?.Thread.Text ?? "titty db";
+    ViewData[Keys.Title]    = Model.Thread_?.Thread.Text ?? "";
+    ViewData[Keys.Headings] = Model.Thread_?.Thread.Text ?? "";
 }
 
-@await Html.PartialAsync("Shared/Components/Navigation", (Model.FNav, Util.ArchiveThreadNav))
-@await Html.PartialAsync("Shared/Components/ThreadItems", Model.Posts)
-@await Html.PartialAsync("Shared/Components/Navigation", (Model.FNav, Util.ArchiveThreadNav))
+@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
+@await Html.PartialAsync("Shared/Components/ThreadItems", Model.Entities)
+@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))

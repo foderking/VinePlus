@@ -4,9 +4,9 @@
 
 @{
     Layout = "Shared/_ProfileLayout";
-    ViewData[Util.TitleKey] = $"{Model.UserName}'s Posts";
-    ViewData[Util.SiteKey ] = Util.Profile.IsPosts;
-    ViewData[Util.Profile.ProfileKey] = Model.UserName;
+    ViewData[Keys.Title]       = $"{Model.UserName}'s Posts";
+    ViewData[Keys.Highlight]   = ProfileHighlight.Posts;
+    ViewData[Keys.ProfileName] = Model.UserName;
 }
 
 

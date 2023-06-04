@@ -1,15 +1,12 @@
 ﻿using Comicvine.Core;
 using Comicvine.Database;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ComicVine.API.Pages.Profile;
 
 public class Threads : Navigator<Parsers.Thread>, IForum
 {
-    public string UserName = "";
-    // public IEnumerable<Parsers.Thread> Thread = Enumerable.Empty<Parsers.Thread>();
     private ComicvineContext _context;
-    // public Nav FNav = new (1, 1, "/forums");
+    public string UserName = "";
 
     public Threads(ComicvineContext ctx) {
         _context = ctx;
@@ -17,7 +14,7 @@ public class Threads : Navigator<Parsers.Thread>, IForum
     
     public void OnGet(string user, int p) {
         UserName = user;
-        Entities = Util.Profile.GetUsersThreads(_context, UserName, p);
+        Entities = Util.GetUsersThreads(_context, UserName, p);
         NavRecord = new(p, 100000, user);
     }
 

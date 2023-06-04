@@ -1,6 +1,5 @@
 ﻿using Comicvine.Core;
 using Comicvine.Database;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ComicVine.API.Pages.Profile;
 
@@ -15,7 +14,7 @@ public class Posts : Navigator<Parsers.Post>
     
     public void OnGet(string user, int p) {
         UserName = user;
-        Entities = Util.Profile.GetUserPosts(_context, user, p);
+        Entities = Util.GetUserPosts(_context, user, p);
         NavRecord = new(p, 1000, user);
     }
 

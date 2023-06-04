@@ -4,9 +4,9 @@
 
 @{
     Layout = "Shared/_ProfileLayout";
-    ViewData[Util.TitleKey] = $"{Model.UserName}'s Threads";
-    ViewData[Util.SiteKey ] = Util.Profile.IsThread;
-    ViewData[Util.Profile.ProfileKey] = Model.UserName;
+    ViewData[Keys.Title]        = $"{Model.UserName}'s Threads";
+    ViewData[Keys.Highlight]    = ProfileHighlight.Threads;
+    ViewData[Keys.ProfileName]  = Model.UserName;
 }
 
 @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))

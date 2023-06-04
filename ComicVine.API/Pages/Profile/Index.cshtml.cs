@@ -5,10 +5,10 @@ namespace ComicVine.API.Pages.Profile;
 
 public class Index : PageModel
 {
-    public string User_ = "";
+    public string UserName = "";
     
     public async Task OnGet(string user) {
         var profile = await Parsers.ProfileParser.ParseDefault($"/profile/{user}");
-        User_ = profile.UserName;
+        UserName = profile.UserName;
     }
 }
