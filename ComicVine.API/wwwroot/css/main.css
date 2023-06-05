@@ -389,3 +389,13 @@ footer {
     font-style: italic;
     display: flex;
 }
+
+/* profile images */
+#img-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+.img-item {
+    min-height: 400px;
+    min-width: 400px;
+}

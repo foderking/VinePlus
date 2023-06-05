@@ -13,7 +13,7 @@ public class Thread : Navigator<Parsers.Post>
         Entities = Parsers.PostParser.ParseSingle(node);
         ThreadTitle = Parsers.Common.getThreadTitle(node);
         int last = Parsers.PostParser.ParseEnd(node);
-        NavRecord = new Nav(DelegatParam: path, CurrentPage: p, LastPage: last);
+        NavRecord = new Nav(DelegateParam: path, CurrentPage: p, LastPage: last);
     }
 
     public override Func<string, int, string> PageDelegate() {
