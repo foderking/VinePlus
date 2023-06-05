@@ -1,4 +1,7 @@
 ﻿
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using Comicvine.Core;
 using Comicvine.Database;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -6,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace ComicVine.API.Pages;
 
-public record Nav(int CurrentPage, int LastPage, string DelegatParam);
+public record Nav(int CurrentPage, int LastPage, string DelegateParam);
 
 public abstract class Navigator<T>: PageModel
 {
@@ -45,6 +48,16 @@ public static class MainHighlight
     public const string Stats = "stats";
 }
 
+public class ImgData
+{
+    [JsonPropertyName("dateCreated")]
+    public string DateCreated {get; set; } = "";
+    [JsonPropertyName("gallery")]
+    public string Gallery { get; set; } = "";
+    [JsonPropertyName("original")]
+    public string Original { get; set; } = "";
+}
+
 public static class Util
 {
     public static string GetDuration(DateTime current, DateTime date) {
@@ -70,20 +83,10 @@ public static class Util
         };
     }
 
-
     public static string GetThreadRow(int index) {
         return index % 2  == 1? "thread-odd" : "";
     }
-   
-    public static class Profile
-    {
-        public static string GetLink(ViewDataDictionary ViewData, string path) {
-            string user = (string)(ViewData[Keys.ProfileName] ?? "");
-            return path + user;
-        }
-
-    }
-    
+     
     public static IEnumerable<Parsers.Thread> GetUsersThreads(ComicvineContext context, string user, int page=1) {
         return context
             .Threads
@@ -104,10 +107,42 @@ public static class Util
             ;
     }
     
-    public static string GetHighlightClass(ViewDataDictionary ViewData, string expected) {
-        if (expected == (string)(ViewData[Keys.Highlight] ?? "")) {
+    public static string GetHighlightClass(ViewDataDictionary viewData, string expected) {
+        if (expected == (string)(viewData[Keys.Highlight] ?? "")) {
             return "nav-item nav-highlight";
         }
         return "nav-item";
+    }  
+    
+    
+    public static class Profile
+    {
+        public static string GetLink(ViewDataDictionary viewData, string path) {
+            string user = (string)(viewData[Keys.ProfileName] ?? "");
+            return path + user;
+        }
+
+    }
+
+
+    private class ImgResponse
+    {
+        [JsonPropertyName("images")] 
+        public IEnumerable<ImgData> Images { get; set; } = Enumerable.Empty<ImgData>();
+    }
+
+    public static class Image
+    {
+        public static int BatchSize = 30;
+        
+        public static async Task<IEnumerable<ImgData>> GetImages(Parsers.Image data, int offset) {
+
+            using HttpClient client = new();
+            string response = await client.GetStringAsync(
+                $"https://www.comicvine.gamespot.com/js/image-data.json?images={data.GalleryId}&object={data.ObjectId}&start={offset * BatchSize}&count={BatchSize}"
+            );
+            ImgResponse? res = JsonSerializer.Deserialize<ImgResponse>(response);
+            return res!.Images;
+        }
     }
 }

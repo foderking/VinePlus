@@ -1,12 +1,22 @@
-﻿@page "{user}"
+﻿@page "{user}/{p=1}"
 @using ComicVine.API.Pages
 @model ComicVine.API.Pages.Profile.Images
 
 @{
     Layout = "Shared/_ProfileLayout";
-    ViewData[Keys.Title]       = $"{Model.User_}'s Images";
+    ViewData[Keys.Title]       = $"{Model.UserName}'s Images";
     ViewData[Keys.Highlight ]  = ProfileHighlight.Images;
-    ViewData[Keys.ProfileName] = Model.User_;
+    ViewData[Keys.ProfileName] = Model.UserName;
 }
 
-images
+@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
+<div id="img-container">
+@foreach (var img in Model.Entities) {
+    <a href="@img.Original" target="_blank">
+        <div class="img-item">
+            <img class="img-img" src="@img.Gallery" alt="A user's image"/>
+        </div>
+    </a>
+}
+</div>
+@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
