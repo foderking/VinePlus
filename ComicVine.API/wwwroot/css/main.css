@@ -463,12 +463,15 @@ footer {
 }
 
 .profile-activity {
-    /*background-color: red;*/
+    background-color: white;
     /*height: 100%;*/
+    display: grid;
+    grid-template-columns: 1fr 10em;
+    padding: 1.5em;
+    border-radius: 5px;
 }
 
 .profile-about {
-    background: #3b3b3b;
     color: white;
     border-radius: 5px;
     /*background-color: blue;*/
@@ -478,8 +481,10 @@ footer {
     height: 100px;
     display: grid;
     grid-template-columns: 1fr 30em;
+    column-gap: 8em;
 }
 .profile-stats {
+    background: #3b3b3b;
     padding: 1em;
     display: grid;
     grid-template-columns: 8em 1fr;
@@ -494,4 +499,13 @@ footer {
 .profile-stat-value {
     font-style: italic;
 }
-
+.activity {
+    font-size: 25px;
+    text-transform: lowercase;
+    font-style: italic;
+    margin-bottom: 10px;
+    color: #3b3b3b;
+}
+.activity-time {
+    color: #999999;
+}
