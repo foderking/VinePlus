@@ -32,6 +32,12 @@
     <div id="container">
         <div class="profile-main">
             <div class="profile-activity">
+                @foreach (var activity in Model.UserProfile.Activities) {
+                    <div class="activity">
+                        @Model.UserName added a new @activity.Type
+                    </div>
+                    <time class="activity-time">@activity.Date</time>
+                }
             </div> 
             <div class="profile-about">
                 <img 
