@@ -802,4 +802,4 @@ module ProfileParsers =
         let! node = getNodeFromPath $"/profile/{username}"
         let j = ProfileParser.ParseSingle node
         Assert.True(j.About.Summary.Length = 0)
-    }   
+    }

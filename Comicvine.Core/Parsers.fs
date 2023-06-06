@@ -43,12 +43,13 @@ module Parsers =
   
   // Profile section
   type ActivityType =
-    | Comment = 1
-    | Image   = 2
-    | Follow  = 3
+    | Post   = 1
+    | Image  = 2
+    | Follow = 3
+    | List   = 4
     
   type Activity =
-    { Type: ActivityType; Date: DateTime  }
+    { Type: ActivityType; Date: string; }
   
   type About =
     { DateJoined: DateTime;  Alignment: Alignment; Points: int; Summary: string }
@@ -826,6 +827,34 @@ module Parsers =
             Summary = description
           }
           
+        let (|Activity|)(activityItem: HtmlNode) =
+          let node =
+            activityItem
+            |> Nodes.getFirstChild "div" (Predicates.classAttrib "media")
+            |> Nodes.getFirstChild "div" (Predicates.classAttrib "media-body")
+            |> Nodes.getFirstChild "span"(Predicates.classAttrib "activity-message")
+          let date =
+            node
+            |> Nodes.getFirstChild "time" (Predicates.classAttrib "activity-time")
+            |> Helpers.innerTrim
+          node
+          |> Nodes.getFirstChild "i" (Predicates.identity)
+          |> Nodes.getFirstChild "svg" (Predicates.identity)
+          |> Helpers.getAttrib "class"
+          |> (fun cls ->
+            match cls with
+            | "symbol symbol-picture" ->
+              { Type = ActivityType.Image; Date = date }
+            | "symbol symbol-comments-alt" ->
+              { Type = ActivityType.Post; Date = date }
+            | "symbol symbol-smile" ->
+              { Type = ActivityType.Follow; Date = date }
+            | "symbol symbol-star" ->
+              { Type = ActivityType.List; Date = date }
+            | x ->
+              failwith x
+          )
+          
         let about =
           match
             mainNode
@@ -834,10 +863,23 @@ module Parsers =
           with
           | About n -> n
           
+        let activities =
+          mainNode
+          |> Nodes.getFirstChild "div" (Predicates.classAttrib "primary-content")
+          |> Nodes.getFirstChild "div" (Predicates.classAttrib "tab-content")
+          |> Nodes.getFirstChild "div" (Predicates.idAttrib "js-user-main-feed")
+          |> Nodes.getFirstChild "ul"  (Predicates.classAttrib "activity-list")
+          |> Nodes.getChildrenIfAny "li" (Predicates.classAttrib "activity-list__item")
+          |> Option.map (Seq.map (fun node ->
+            match node with
+            | Activity act -> act
+          ))
+          |> Option.defaultValue Seq.empty
+          
         {
           UserName = username; Avatar = avatar; Description = description; Posts = stats |> Seq.item 0; WikiPoints = stats |> Seq.item 1
           Following = stats |> Seq.item 2; Followers = stats |> Seq.item 3; CoverImage = cover; BackgroundImage = background; 
-          About = about; Activities = [] |> Seq.ofList; HasBlogs = navItems |> Seq.exists (navPredicate "Images"); HasImages = navItems |> Seq.exists (navPredicate "Images");
+          About = about; Activities = activities; HasBlogs = navItems |> Seq.exists (navPredicate "Images"); HasImages = navItems |> Seq.exists (navPredicate "Images");
         }
         
     let ParseDefault path =
