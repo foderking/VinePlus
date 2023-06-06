@@ -410,6 +410,15 @@ footer {
 
 
 /* main profile */
+.profile-nav {
+    background-color: #3b3b3b;
+}
+.profile-nav a {
+    color: white;
+}
+.profile-nav .nav-highlight > a {
+    color: #21ba21;
+}
 .profile-header{
     background-size: cover;
     /*height: 300px;*/
@@ -485,3 +494,4 @@ footer {
 .profile-stat-value {
     font-style: italic;
 }
+
