@@ -9,4 +9,81 @@
     ViewData[Keys.ProfileName]   = Model.UserName;
 }
 
-profile
+@if (Model.UserProfile != null) {
+    <div class="profile-header" style="background-image: url(@Model.UserProfile.BackgroundImage)">
+        <div class="profile-content">
+            <div class="profile-info">
+                <div>
+                    <div class="profile-avatar">
+                        <img class="avatar" src="@Model.UserProfile.Avatar" alt="users avatar"/>
+                    </div>
+                </div>
+                <div class="profile-desc">
+                    <h1 class="profile-h">
+                        @Model.UserProfile.UserName
+                    </h1>
+                    <span class="profile-description">
+                        @Html.Raw(Model.UserProfile.Description)
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="container">
+        <div class="profile-main">
+            <div class="profile-activity">
+            </div> 
+            <div class="profile-about">
+                <img 
+                    class="profile-cover" 
+                    src="@(Model.UserProfile.CoverImage == "" ? Model.FallBackImage : Model.UserProfile.CoverImage)" 
+                    alt="user's cover image"
+                />
+                
+                <div class="profile-stats">
+                    <div class="profile-stat-key">
+                        Date Joined
+                    </div>
+                    <div class="profile-stat-value">
+                        @Model.UserProfile.About.DateJoined
+                    </div>
+
+                    <div class="profile-stat-key">
+                        Alignment
+                    </div>
+                    <div class="profile-stat-value">
+                        @Model.UserProfile.About.Alignment
+                    </div>
+ 
+                   <div class="profile-stat-key">
+                        Posts
+                    </div>
+                    <div class="profile-stat-value">
+                        @Model.UserProfile.Posts
+                    </div>
+
+                    <div class="profile-stat-key">
+                        Wiki Points
+                    </div>
+                    <div class="profile-stat-value">
+                        @Model.UserProfile.WikiPoints
+                    </div>
+                    
+                     <div class="profile-stat-key">
+                        Following
+                    </div>
+                    <div class="profile-stat-value">
+                        @Model.UserProfile.Following
+                    </div>
+
+                    <div class="profile-stat-key">
+                        Followers
+                    </div>
+                    <div class="profile-stat-value">
+                        @Model.UserProfile.Followers
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </div>
+}
