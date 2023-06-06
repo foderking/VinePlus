@@ -10,7 +10,7 @@
 }
 
 @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
-<div id="blog-container">
+<div id="blog-container" class="generic-container">
 @foreach (var b in Model.Entities) {
     <div class="blog-item">
         <h1 class="blog-header">
