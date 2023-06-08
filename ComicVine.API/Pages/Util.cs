@@ -60,6 +60,9 @@ public class ImgData
 
 public static class Util
 {
+    public static int ThreadPerPage = 50;
+    public static int PostsPerPage = 50;
+    
     public static string GetDuration(DateTime current, DateTime date) {
         TimeSpan dur = current - date;
         return dur.Days switch
@@ -92,8 +95,8 @@ public static class Util
             .Threads
             .Where(thread => thread.Creator.Text == user)
             .OrderByDescending(each => each.TotalPosts)
-            .Skip((page-1)*50)
-            .Take(50)
+            .Skip(ThreadPerPage * (page-1))
+            .Take(ThreadPerPage)
             ;
     }
 
@@ -102,11 +105,24 @@ public static class Util
             .Posts
             .Where(posts => posts.Creator.Text == user)
             // .OrderByDescending(each => each.Id)
-            .Skip((page-1)*50)
-            .Take(50)
+            .Skip(PostsPerPage * (page-1))
+            .Take(PostsPerPage)
             ;
     }
-    
+
+    public static IEnumerable<Parsers.Thread> GetArchivedThreads(ComicvineContext context, int page) {
+        return context
+            .Threads
+            .OrderByDescending(t => t.Id)
+            .Skip(ThreadPerPage * (page - 1))
+            .Take(ThreadPerPage)
+            ;
+    }
+
+    public static int GetThreadsMaxPage(ComicvineContext context) {
+        return context.Threads.Count() / ThreadPerPage + 1;
+    }
+
     public static string GetHighlightClass(ViewDataDictionary viewData, string expected) {
         if (expected == (string)(viewData[Keys.Highlight] ?? "")) {
             return "nav-item nav-highlight";

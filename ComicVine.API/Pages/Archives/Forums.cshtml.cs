@@ -18,14 +18,8 @@ public class Forums : Navigator<Parsers.Thread>, IForum
      * - filter by type
      */
     public void OnGet(int p) {
-        Entities = 
-            _context.Threads
-            .OrderBy(t => t.Id)
-            .Skip(50 * (p - 1))
-            .Take(50)
-            ;
-        
-        NavRecord = new(p, _context.Threads.Count() / 50, p.ToString());
+        Entities = Util.GetArchivedThreads(_context, p);
+        NavRecord = new(p, Util.GetThreadsMaxPage(_context), p.ToString());
     }
 
     public override Func<string, int, string> PageDelegate() {
