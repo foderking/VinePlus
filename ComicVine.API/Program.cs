@@ -27,7 +27,6 @@ builder.Services.AddSwaggerGen(
         c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
     });
 builder.Services.AddRazorPages();
-        
 builder.Services.RegisterDataServices(builder.Configuration); // inject dbcontext
 // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis?view=aspnetcore-6.0#authorization
 // builder.Services.AddDbContext<ComicvineContext>(o => 
