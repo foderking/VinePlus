@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Configuration;
 using Comicvine.Core;
-using Microsoft.Extensions.Configuration;
 
 namespace Comicvine.Database;
 
