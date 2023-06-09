@@ -8,9 +8,9 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Comicvine.Core.Test", "Comi
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Comicvine.Polling", "Comicvine.Polling\Comicvine.Polling.fsproj", "{E7B0CD05-B996-42A5-A271-69E394A25EE9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Comicvine.Database", "Comicvine.Database\Comicvine.Database.csproj", "{023CA06C-E4BA-426A-98B7-C83E1F048464}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VinePlus.Database", "VinePlus.Database\VinePlus.Database.csproj", "{023CA06C-E4BA-426A-98B7-C83E1F048464}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Comicvine.Seed", "Comicvine.Seed\Comicvine.Seed.fsproj", "{8BAFBA50-9239-4358-9F54-39A5DFA520A0}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "VinePlus.Seed", "VinePlus.Seed\VinePlus.Seed.fsproj", "{8BAFBA50-9239-4358-9F54-39A5DFA520A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
