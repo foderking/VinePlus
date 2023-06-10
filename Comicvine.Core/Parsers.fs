@@ -22,6 +22,7 @@ module Parsers =
     | Question = 4
     | Answered = 5
     | Unknown  = 6
+    | Article  = 7
   
   type Link =
     { Text: string; Link: string }
@@ -252,8 +253,8 @@ module Parsers =
       Net.getNodeFromPage path page
       |> Task.map parser
       
-    let ParseMultiple(parseSingle)(parseEnd)(path: string) =
-      let parseAll parseSingle parseEnd (path: string) (page: int) = task {
+    let ParseMultiple parseSingle parseEnd path =
+      let parseAll parseSingle parseEnd path page = task {
         let! node = Net.getNodeFromPage path page
         let lastPage = parseEnd node
         
@@ -282,6 +283,7 @@ module Parsers =
           | "Blog"     -> ThreadType.Blog
           | "Question" -> ThreadType.Question
           | "Answered" -> ThreadType.Answered
+          | "Article"  -> ThreadType.Article
           | _  -> ThreadType.Unknown
  
         rootNode
@@ -838,8 +840,8 @@ module Parsers =
             |> Nodes.getFirstChild "time" (Predicates.classAttrib "activity-time")
             |> Helpers.innerTrim
           node
-          |> Nodes.getFirstChild "i" (Predicates.identity)
-          |> Nodes.getFirstChild "svg" (Predicates.identity)
+          |> Nodes.getFirstChild "i"   Predicates.identity
+          |> Nodes.getFirstChild "svg" Predicates.identity
           |> Helpers.getAttrib "class"
           |> (fun cls ->
             match cls with

@@ -5,9 +5,9 @@ namespace Comicvine.Database;
 
 public class ComicvineContext: DbContext
 {
-    public DbSet<Parsers.Thread> Threads { get; set; }
-    public DbSet<Parsers.Post> Posts { get; set; }
-    
+    public DbSet<Parsers.Thread> Threads { get; set; } = null!;
+    public DbSet<Parsers.Post> Posts { get; set; } = null!;
+
     public ComicvineContext(DbContextOptions<ComicvineContext> options): base(options) {}
     
 

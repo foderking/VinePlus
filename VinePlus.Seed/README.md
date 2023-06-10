@@ -16,5 +16,6 @@ after it is done, a bunch of csv files are created: `threads_full.csv` containin
 ## How to Run
 - Clone the Main repository
 - Navigate the path for this project `cd /Comicvine.Polling`
+- make sure redis is installed and star the redis server with `redis-server`
 - Run this command in terminal `dotnet run`
 

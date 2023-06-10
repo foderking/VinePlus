@@ -131,11 +131,19 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
         (threadConsumer: Thread Aggregate -> Task)(ct: CancellationToken)(page: int) = task{
         
         let print(a: 't) = printfn "%A" a
+        let getStreamByPageCt (ct: CancellationToken) (page: int) path = task {
+            use querystring = new FormUrlEncodedContent((Dictionary[KeyValuePair("page", page |> string)]))
+            let! q = querystring.ReadAsStringAsync(ct)
+            let client = new HttpClient()
+            client.BaseAddress <- Uri("https://comicvine.gamespot.com")
+            return! client.GetStringAsync($"{path}?{q}")
+        }
+    // return! client.GetStreamAsync("/forums/battles-7/kotor-sith-lords-vs-cw-sith-lords-1631389/?page=2");
         // get the thread 
         let! batchedThreads =
-            Net.getStreamByPageCt ct page "/forums/"
+            getStreamByPageCt ct page "/forums/"
             |> Task.map (
-                Net.getRootNode
+                Net.createRootNode
                 >> ThreadParser.ParseSingle
                 >> (cThreads db)
             )

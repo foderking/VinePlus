@@ -19,7 +19,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Comicvine.Core\Comicvine.Core.fsproj" />
-      <ProjectReference Include="..\Comicvine.Database\Comicvine.Database.csproj" />
+      <ProjectReference Include="..\VinePlus.Database\VinePlus.Database.csproj" />
     </ItemGroup>
 
     <ItemGroup>
