@@ -80,6 +80,7 @@ let postEnumerator(entries: ThreadPage seq): PollCreator<ThreadPage> =
   fun batchCount currentBatch ->
     entries
     |> Seq.skip (batchCount*currentBatch)
+    |> Seq.filter (fun (x,_) -> x <> "") // filter therads without links
     |> Seq.truncate batchCount
 
 /// returns function that parses all the posts in a particular threads page
@@ -206,7 +207,7 @@ let writePostCsv(db: IDatabase)(file: string) = task {
 }
   
 let rec Work
-  (redis: IDatabase)(enumerator: PollCreator<'T>)(producer: PollUser<'T,'U>)
+  (redis: IDatabase)(enumerator: PollCreator<'T>)(producer: PollUser<'T,'U>)(waitTime: int)
   (consumer: PollConsumer<'U>)(batchCount: int)(currentBatch: int)(lastBatch: int) =
   async {
     // ends polling when the last batch is reached
@@ -225,20 +226,23 @@ let rec Work
         do! (consumer redis item |> Async.ofUnitTask)
       // go to next batch
       printfn "finished batch %d" currentBatch
-      return! Work redis enumerator producer consumer batchCount (currentBatch+1) lastBatch
+      do! Async.Sleep waitTime
+      return! Work redis enumerator producer waitTime consumer batchCount (currentBatch+1) lastBatch
       
     with
     | ex ->
       // when an error occurs, log and wait for some time before retrying
       printfn "exception at batch %d occured: %A" currentBatch ex.Message
       do! Async.Sleep 1000
-      return! Work redis enumerator producer consumer batchCount currentBatch lastBatch
+      return! Work redis enumerator producer waitTime consumer batchCount currentBatch lastBatch
   }
 
 let Seed() = task{
   let redis = ConnectionMultiplexer.Connect("localhost").GetDatabase()
   let threadBatch = 6
   let postBatch   = 6
+  let threadTime = 0 // for some reason, there is no reason to wait after parsing threads
+  let postTime = 1000 // waits 1s after parsing a single batch of posts to reduce 429s
   // number of batches for threads
   let! threadCount =
     Net.getNodeFromPage "/forums/" 1
@@ -246,7 +250,7 @@ let Seed() = task{
     |> Task.map (fun n -> n / threadBatch  - 1)
   // parse all threads and store in redis
   printfn "[+] starting threads, count: %d" threadCount
-  do! Work redis threadEnumerator threadUser threadConsumer threadBatch 0 threadCount
+  do! Work redis threadEnumerator threadUser threadTime threadConsumer threadBatch 0 threadCount
   // write parsed threads to csv file
   printfn "[+] writing threads to csv"
   do! writeThreadCsv redis "threads_full.csv"
@@ -270,7 +274,7 @@ let Seed() = task{
     let endS   = setSize * (set+1) - 1
     // parse next set
     printfn "[+] set %d from batch %d to %d" set startS endS
-    do! Work redis (postEnumerator entries) (postUser redis) postConsumer postBatch startS (endS+1)
+    do! Work redis (postEnumerator entries) (postUser redis) postTime postConsumer postBatch startS (endS+1)
     // write files in set
     printfn "[+] writing posts_%d to csv" set
     do! writePostCsv redis $"posts_{set}.csv"
@@ -280,7 +284,7 @@ let Seed() = task{
   // last set of batches
   let lastStart = totalSets*setSize
   printfn "[+] set %d from batch %d to %d" totalSets lastStart noPosts
-  do! Work redis (postEnumerator entries) (postUser redis) postConsumer postBatch lastStart noPosts
+  do! Work redis (postEnumerator entries) (postUser redis) postTime postConsumer postBatch lastStart noPosts
   // write to csv file
   printfn "[+] writing posts_%d to csv" totalSets
   do! writePostCsv redis $"posts_{totalSets}.csv"
