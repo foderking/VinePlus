@@ -4,7 +4,6 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 settings.json
-appsettings.Development.json
 .vs
 .idea
 ComicVineAPI.sln.DotSettings.user
