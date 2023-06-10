@@ -7,6 +7,7 @@
     <ItemGroup>
         <Compile Include="Net.fs" />
         <Compile Include="Parsers.fs" />
+        <Content Include="README.md" />
     </ItemGroup>
 
     <ItemGroup>

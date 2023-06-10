@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComicVine.API", "ComicVine.API\ComicVine.API.csproj", "{D1B7435D-CA3B-4F83-B0BD-ACB104B3FC3F}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Comicvine.Core", "Comicvine.Core\Comicvine.Core.fsproj", "{982F2F07-DE25-4DF0-B8DE-F22DB30FF9F7}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "VinePlus.Core", "VinePlus.Core\VinePlus.Core.fsproj", "{982F2F07-DE25-4DF0-B8DE-F22DB30FF9F7}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "VinePlus.Core.Test", "VinePlus.Core.Test\VinePlus.Core.Test.fsproj", "{94DB75BC-2C7C-4655-8102-CDD6CAE08967}"
 EndProject

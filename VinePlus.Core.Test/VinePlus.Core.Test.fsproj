@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Comicvine.Core\Comicvine.Core.fsproj" />
+      <ProjectReference Include="..\VinePlus.Core\VinePlus.Core.fsproj" />
     </ItemGroup>
 
 </Project>
