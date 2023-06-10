@@ -245,7 +245,7 @@ module Parsers =
           n |> Seq.map parseData
     
     let ParseDefault(parseSingle: 'T IParseSingle)(path: string) =
-      Net.getNode path
+      Net.getNodeFromPath path
       |> Task.map parseSingle
       
     let ParseSingle(parser: 'T IParseSingle)(page: int)(path: string) =
