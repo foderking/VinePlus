@@ -563,19 +563,16 @@ module PostTests =
       }
 
   module PostFullParser =
-    let parseMultiple =
-      Common.ParseMultiple PostParser.ParseSingle PostParser.ParseEnd
-
     [<Fact>]
     let ``parsing full posts return the correct number of comments`` () =
       task {
-        let! j = parseMultiple "/forums/battles-7/tai-lung-vs-alex-madagascar-2281381/"
+        let! j = PostParser.ParseMultiple "/forums/battles-7/tai-lung-vs-alex-madagascar-2281381/"
         Assert.Equal(12, j |> Seq.length)
-        let! j = parseMultiple "/forums/gen-discussion-1/your-magical-racer-and-of-course-will-be-talking-1776966/"
+        let! j =PostParser.ParseMultiple "/forums/gen-discussion-1/your-magical-racer-and-of-course-will-be-talking-1776966/"
         Assert.Equal(1, j |> Seq.length)
-        let! j = parseMultiple "/forums/battles-7/thanos-vs-superman-3155/"
+        let! j =PostParser.ParseMultiple "/forums/battles-7/thanos-vs-superman-3155/"
         Assert.Equal(1759, j |> Seq.length)
-        let! j = parseMultiple "/forums/battles-7/cyttorak-vs-living-tribunal-528457/"
+        let! j = PostParser.ParseMultiple "/forums/battles-7/cyttorak-vs-living-tribunal-528457/"
         Assert.Equal(54, j |> Seq.length)
       }
 

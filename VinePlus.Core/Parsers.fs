@@ -23,6 +23,9 @@ module Parsers =
     | Answered = 5
     | Unknown  = 6
     | Article  = 7
+    | Review   = 8
+    | Video    = 9
+    | Podcast  =10
   /// A type representing an hyperlink
   type Link =
     { Text: string; Link: string }
@@ -295,7 +298,12 @@ module Parsers =
           | "Question" -> ThreadType.Question
           | "Answered" -> ThreadType.Answered
           | "Article"  -> ThreadType.Article
-          | _  -> ThreadType.Unknown
+          | "Review"   -> ThreadType.Review
+          | "Video"    -> ThreadType.Video
+          | "Podcast"  -> ThreadType.Podcast
+          | x  ->
+            printfn "unknown thread type: %s" x
+            ThreadType.Unknown
  
         rootNode
         |> Common.getForumBlockNode
