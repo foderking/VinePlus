@@ -123,15 +123,15 @@ let postConsumer: PollConsumer<Post seq option> =
       )
   }
  
-// let writeFile(db: IDatabase)(key: string)(file: string) = task {
-//   let entries =
-//     db.HashScan(key)
-//     |> Seq.map (fun x -> JsonSerializer.Deserialize(x.Value.ToString()))
-//   printfn "deserialized entries"
-//   use stream = File.Create(file)
-//   let! _ = JsonSerializer.SerializeAsync(stream, entries)
-//   printfn "written entry to file"
-// }
+let writeFile(db: IDatabase)(key: string)(file: string) = task {
+  let entries =
+    db.HashScan(key)
+    |> Seq.map (fun x -> JsonSerializer.Deserialize(x.Value.ToString()))
+  printfn "deserialized entries"
+  use stream = File.Create(file)
+  let! _ = JsonSerializer.SerializeAsync(stream, entries)
+  printfn "written entry to file"
+}
  
 let escape(str: string) =
   let mustQuote = (str.Contains(",") || str.Contains("\"") || str.Contains("\r") || str.Contains("\n"))
@@ -253,7 +253,8 @@ let Seed() = task{
   do! Work redis threadEnumerator threadUser threadTime threadConsumer threadBatch 0 threadCount
   // write parsed threads to csv file
   printfn "[+] writing threads to csv"
-  do! writeThreadCsv redis "threads_full.csv"
+  // do! writeThreadCsv redis "threads_full.csv"
+  do! writeFile redis threadKey "threads_full.json"
   // get number of batches for posts
   let entries = getPostEntries redis
   let noPosts =
@@ -276,8 +277,9 @@ let Seed() = task{
     printfn "[+] set %d from batch %d to %d" set startS endS
     do! Work redis (postEnumerator entries) (postUser redis) postTime postConsumer postBatch startS (endS+1)
     // write files in set
-    printfn "[+] writing posts_%d to csv" set
-    do! writePostCsv redis $"posts_{set}.csv"
+    printfn "[+] writing posts_%d to json" set
+    // do! writePostCsv redis $"posts_{set}.csv"
+    do! writeFile redis postKey "posts_{set}.json"
     // empties key (next set starts on an empty key to minimize memory used)
     let! _ = redis.KeyDeleteAsync(postKey)
     ()
@@ -286,8 +288,9 @@ let Seed() = task{
   printfn "[+] set %d from batch %d to %d" totalSets lastStart noPosts
   do! Work redis (postEnumerator entries) (postUser redis) postTime postConsumer postBatch lastStart noPosts
   // write to csv file
-  printfn "[+] writing posts_%d to csv" totalSets
-  do! writePostCsv redis $"posts_{totalSets}.csv"
+  printfn "[+] writing posts_%d to json" totalSets
+  // do! writePostCsv redis $"posts_{totalSets}.csv"
+  do! writeFile redis postKey "posts_{totalSets}.json"
 }
 
 [<EntryPoint>]
