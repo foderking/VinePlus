@@ -6,7 +6,7 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "VinePlus.Core", "VinePlus.C
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "VinePlus.Core.Test", "VinePlus.Core.Test\VinePlus.Core.Test.fsproj", "{94DB75BC-2C7C-4655-8102-CDD6CAE08967}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Comicvine.Polling", "Comicvine.Polling\Comicvine.Polling.fsproj", "{E7B0CD05-B996-42A5-A271-69E394A25EE9}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "VinePlus.Polling", "VinePlus.Polling\VinePlus.Polling.fsproj", "{E7B0CD05-B996-42A5-A271-69E394A25EE9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VinePlus.Database", "VinePlus.Database\VinePlus.Database.csproj", "{023CA06C-E4BA-426A-98B7-C83E1F048464}"
 EndProject
