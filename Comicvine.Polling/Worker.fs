@@ -17,27 +17,44 @@ open Microsoft.Extensions.Logging
 open Microsoft.EntityFrameworkCore
 open Microsoft.FSharp.Collections
 
-type PollType<'T> =
-  | Update of 'T
-  | Delete of 'T
-  | New    of 'T
-  | Old
+// type PollType<'T> =
+//   | Update of 'T
+//   | Delete of 'T
+//   | New    of 'T
+//   | Old
 
 type Couple = { Data: Thread; Pages: seq<int> }
+
+// type 
 
 type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
   inherit BackgroundService()
 
+  let postComparer =
+    {
+      new IEqualityComparer<Post> with
+        member _.Equals(x, y) =
+          x.Id = y.Id
+        member _.GetHashCode(x) =
+          match x.Id.Substring(0, 2) with
+          | "Cx" ->
+            int x.Id[2..]
+          | "Tx" ->
+            x.Id[2..]
+            |> int
+            |> (*) -1
+          | _ -> failwith "invalid post Id"  
+    }
+    
   let timer =
     new PeriodicTimer(TimeSpan.FromMinutes(1))
-
-  let newThread =
+  let newThreadBag =
     ConcurrentBag<Couple>()
-  let updateThread =
+  let updateThreadBag =
     ConcurrentBag<Couple>()
-  let newPost =
+  let newPostBag =
     ConcurrentBag<Post>()
-  let updatePost =
+  let updatePostBag =
     ConcurrentBag<Post>()
 
   let threadProd(db: ComicvineContext)(thread: Thread) =
@@ -49,11 +66,11 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
           .FirstOrDefaultAsync(fun t -> t.Id = thread.Id)
           
       if obj.ReferenceEquals(dbResult, null) then
-        newThread.Add({
-          Data = thread; Pages = seq{1..thread.LastPostPage}
+        newThreadBag.Add({
+          Data = thread; Pages = seq{ 1..thread.LastPostPage }
         })
       elif dbResult.LastPostNo < thread.LastPostNo then
-        updateThread.Add({
+        updateThreadBag.Add({
           Data = thread; Pages = seq{ dbResult.LastPostPage .. thread.LastPostPage }
         })
       else
@@ -65,9 +82,10 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
     // let! newPosts = PostParser.ParsePage page thread.Thread.Link 
     // add all posts
     newPosts
-    |> Seq.iter (fun x ->
-      newPost.Add(x)
-    )   
+    |> Seq.iter newPostBag.Add
+    // |> Seq.iter (fun x ->
+    //   newPostBag.Add(x)
+    // )   
 
   let consUpdatedThread(db: ComicvineContext)(thread: Thread)(parsedPosts: seq<Post>)(page: int) = task {
      // for a visualization of how new, deleted, and updated post related, a venn diagram is available here:
@@ -85,14 +103,7 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
         )
         .ToArrayAsync()
     // I'm using a comparer function because `exceptby` isn't working on f# for some reason
-    let postComparer =
-      {
-        new IEqualityComparer<Post> with
-          member _.Equals(x, y) =
-            x.PostNo = y.PostNo
-          member _.GetHashCode(x) =
-            x.PostNo
-      }
+
     // deleted posts are posts that are present in the db, but not parsed from comicvine
     let deletedPosts = dbPosts.Except(parsedPosts, postComparer)
     // new posts are posts that are parsed in comicvine, but not present in db
@@ -106,19 +117,19 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
     // add new posts
     newPosts
     |>Seq.iter( fun x ->
-      newPost.Add(x)
+      newPostBag.Add(x)
     )
     // add deleted posts
     deletedPosts
     |> Seq.iter (fun x ->
-      updatePost.Add({
+      updatePostBag.Add({
        x with IsDeleted = true
       })
     )
     // add edited posts
     editedPosts
     |> Seq.iter (fun x ->
-      updatePost.Add(x)
+      updatePostBag.Add(x)
     )
   }
   
@@ -127,15 +138,16 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
       let! parsedPosts = PostParser.ParsePage page thread.Thread.Link |> Async.ofTask
       return parsedPosts
      with
-    | :? HttpRequestException as ex
-      when ex.Message = "Response status code does not indicate success: 404 (Not Found)." ->
+    | :? AggregateException as ex
+      when ex.Message = "One or more errors occurred. (Response status code does not indicate success: 404 (Not Found).)" ->
         printfn "- deleted thread %s" thread.Thread.Link
         return Seq.empty
-    | :? HttpRequestException as ex
-      when ex.Message = "Response status code does not indicate success: 500 (Internal Server Error)." ->
+    | :? AggregateException as ex
+      when ex.Message = "One or more errors occurred. (Response status code does not indicate success: 500 (Internal Server Error).)" ->
         printfn "- error thread %s" thread.Thread.Link
         return Seq.empty
-    | _ ->
+    | x ->
+      printfn "%s %A" thread.Thread.Link x
       return! newPst page thread
   }
   
@@ -162,12 +174,8 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
             abc.Data, i
         })
         // group to batches of `batchSize`
-        |> Seq.mapi (fun x y ->
-          x,y
-        )
-        |> Seq.groupBy (fun (x, _) ->
-          x / batchSize
-        )
+        |> Seq.mapi    (fun x y -> x,y)
+        |> Seq.groupBy (fun (x, _) -> x / batchSize)
         // parsed posts from vine in parallel within each batch
         |> Seq.map(fun (_, batch) ->
           batch
@@ -192,8 +200,8 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
       for b in batch do
         do! threadProd db b
         
-      let newThreadPost = doBatch newThread batchSize newPst
-      let updateThreadPost = doBatch updateThread batchSize newPst
+      let newThreadPost = doBatch newThreadBag batchSize newPst
+      let updateThreadPost = doBatch updateThreadBag batchSize newPst
         
       logger.LogInformation("parsing new post {0}", DateTime.Now)
       let newTasks =
@@ -204,18 +212,21 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
             |> Seq.iter (fun (a,_,_) -> consNewThread a)
           )
         )
+      let mutable h= 1
       for task in newTasks do
+        printfn "batch %d" h
+        h <- h + 1
         do! task
         
       logger.LogInformation("parsing updated post {0}", DateTime.Now)
-      let mutable batchedUpdates = List()
+      let batchedUpdates = List()
       let mutable n = 1
       for batch in updateThreadPost do
         let! xxx = batch
         printfn "batch %d" n
         n <- n + 1
         batchedUpdates.AddRange(xxx)
-      // workaround for a weird "state machine not statically compilable" bug
+      // workaround for the weird "state machine not statically compilable" error
       // https://github.com/dotnet/fsharp/issues/12839#issuecomment-1292310944
       let mutable batchEnumerator = batchedUpdates.GetEnumerator()
       while batchEnumerator.MoveNext() do
@@ -233,36 +244,45 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
 
       while not finished do
         
-        newThread.Clear()
-        updateThread.Clear()
-        newPost.Clear()
-        updatePost.Clear()
+        newThreadBag.Clear()
+        updateThreadBag.Clear()
+        newPostBag.Clear()
+        updatePostBag.Clear()
+        
         logger.LogInformation("making request to page {0}", page)
         do! Poll db ct page
         
-        printfn "%d %d new, update for thread" newThread.Count updateThread.Count
-        printfn "%d %d new, update for post" newPost.Count updatePost.Count
+        printfn "%d %d new, update for thread" newThreadBag.Count updateThreadBag.Count
+        printfn "%d %d new, update for post" newPostBag.Count updatePostBag.Count
+        let ope = newPostBag.Intersect(updatePostBag, postComparer)
+        printfn "%d" (ope.Count())
         
-        let allPost = Seq.append newPost updatePost
+        for t in newThreadBag do
+          printfn "a - %s" t.Data.Thread.Link
+        for t in updateThreadBag do
+          printfn "b - %s" t.Data.Thread.Link
         
+        // let allThreads = Seq.append newThreadBag updateThreadBag
+        let allPost = Seq.append newPostBag updatePostBag
+          
         let nXxx =
-          newThread
+          newThreadBag
           |> Seq.map(fun abc ->
             let th = abc.Data
             let posts =
               allPost
               |> Seq.filter (fun p -> p.ThreadId = th.Id)
-              // |> Seq.distinctBy (fun p -> p.Id)
+              |> Seq.distinctBy (fun p -> p.Id)
             { th with Posts = posts.ToArray() }
           )
         let uXxx =
-          updateThread
+          updateThreadBag
           |> Seq.map(fun abc ->
             let th = abc.Data
             let posts =
-              updatePost
+              updatePostBag
               |> Seq.filter (fun p -> p.ThreadId = th.Id)
-              // |> Seq.distinctBy (fun p -> p.Id)
+              |> Seq.distinctBy (fun p -> p.Id)
             { th with Posts = posts.ToList() }
           )
         do! db.Threads.AddRangeAsync(nXxx)
@@ -270,19 +290,20 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
         let yy =
           uXxx
           |> Seq.collect (fun ab ->
-            newPost
+            newPostBag
             |> Seq.filter (fun p -> p.ThreadId = ab.Id)
             // |> Seq.distinctBy (fun p -> p.Id)
           )
         printfn "%d" (Seq.length yy)
         do! db.Posts.AddRangeAsync yy
         
-        // db.Posts.UpdateRange(updatePost)
-        
+        // save changes and stops tracking entities after changes have been saved in current session...
+        // ..to prevent exception when changes are made on the same entities in future sessions
         let! x = db.SaveChangesAsync()
+        db.ChangeTracker.Clear() 
         printfn "%d changes" x
         page <- page + 1
-        finished <- (newThread.Count + updateThread.Count) = 0
+        finished <- (newThreadBag.Count + updateThreadBag.Count) = 0
     }
 
   override _.ExecuteAsync(ct) =

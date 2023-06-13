@@ -8,11 +8,12 @@ namespace Comicvine.Database;
 // when running migrations, web project should be referenced as startup project
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection RegisterDataServices(this IServiceCollection services, IConfiguration configuration) {
+    public static IServiceCollection RegisterDataServices(this IServiceCollection services, IConfiguration configuration, bool logSensitiveData = false) {
         services.AddDbContext<ComicvineContext>(o =>
-            o
-            .UseNpgsql(configuration.GetConnectionString("comicvine_db"))
-            .UseSnakeCaseNamingConvention()
+                o
+                    .UseNpgsql(configuration.GetConnectionString("comicvine_db"))
+                    .UseSnakeCaseNamingConvention()
+                    .EnableSensitiveDataLogging(logSensitiveData)
         );
         return services;
     }
