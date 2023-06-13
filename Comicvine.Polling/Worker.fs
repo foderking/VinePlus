@@ -216,23 +216,21 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
           )
         )
         
-      let mutable h = 1
+      // let mutable h = 1
       for task in newTasks do
         do! task
-        
-        printfn "batch %d" h
-        h <- h + 1
+        // printfn "batch %d" h
+        // h <- h + 1
         
       logger.LogInformation("parsing updated post {0}", DateTime.Now)
       
+      // let mutable n = 1
       let batchedUpdates = List()
-      let mutable n = 1
       for batch in updateThreadBatch do
         let! xxx = batch
         batchedUpdates.AddRange(xxx)
-        
-        printfn "batch %d" n
-        n <- n + 1
+        // printfn "batch %d" n
+        // n <- n + 1
       // workaround for the weird "state machine not statically compilable" error
       // https://github.com/dotnet/fsharp/issues/12839#issuecomment-1292310944
       let mutable batchEnumerator = batchedUpdates.GetEnumerator()
@@ -255,8 +253,6 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
         
         let! threadD, postD = Poll db ct page
         
-        // printfn "%d %d new, update for thread" threadD.New.Count threadD.Update.Count
-        // printfn "%d %d new, update for post" postD.New.Count postD.Update.Count
         logger.LogInformation("{0} new and {1} updated threads. {2}", threadD.New.Count, threadD.Update.Count, DateTime.Now)
         logger.LogInformation("{0} new and {1} updated posts. {2}", postD.New.Count, postD.Update.Count, DateTime.Now)
         
@@ -265,15 +261,12 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
         // for t in threadD.Update do
         //   printfn "b - %s" t.Data.Thread.Link
         
-        // let allPost = Seq.append postD.New postD.Update
         let newThreadAndPostsToAdd =
           threadD.New
           |> Seq.map(fun abc ->
-            // let th = 
-            // let posts =
             {
               abc.Data with
-                Posts = //posts.ToArray()
+                Posts =
                   postD.New
                   |> Seq.filter (fun p -> p.ThreadId = abc.Data.Id)
                   |> Array.ofSeq
@@ -283,13 +276,10 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
         let updatedThreadNewPostToAdd =
           threadD.Update
           |> Seq.map(fun abc ->
-            // let th = abc.Data
-            // let posts =
             {
               abc.Data
               with
                 Posts =
-                  // posts.ToList()
                   (
                     postD.Update
                     |> Seq.filter (fun p -> p.ThreadId = abc.Data.Id)
@@ -303,7 +293,6 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
             postD.New
             |> Seq.filter (fun p -> p.ThreadId = ab.Id)
           )
-        // printfn "%d" (Seq.length yy)
         // save to db
         // order is important for updated threads
         do! db.Threads.AddRangeAsync(newThreadAndPostsToAdd)
@@ -314,7 +303,7 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
         // ..to prevent exception when changes are made on the same entities in future sessions
         let! changesMade = db.SaveChangesAsync()
         db.ChangeTracker.Clear() 
-        
+        // ensure certain properties always hold
         let intersectCount = postD.New.Intersect(postD.Update, postComparer).Count()
         let calculatedChanges = postD.Update.Count + postD.New.Count + threadD.Update.Count + threadD.New.Count
         Assert (intersectCount = 0) $"new and updated posts not mutually exclusive. {intersectCount} duplicates"
