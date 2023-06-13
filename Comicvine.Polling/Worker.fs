@@ -1,7 +1,6 @@
 namespace Comicvine.Polling
 
 open System
-open System.Collections.Concurrent
 open System.Collections.Generic
 open System.Linq
 open System.Net.Http
@@ -17,19 +16,27 @@ open Microsoft.Extensions.Logging
 open Microsoft.EntityFrameworkCore
 open Microsoft.FSharp.Collections
 
-// type PollType<'T> =
-//   | Update of 'T
-//   | Delete of 'T
-//   | New    of 'T
-//   | Old
-
 type Couple = { Data: Thread; Pages: seq<int> }
 
-// type 
+type Result<'T> =
+  {
+    New: System.Collections.Generic.List<'T>
+    Update: System.Collections.Generic.List<'T>
+  }
+with
+  static member Create(newItem: seq<'T>, updateItem: seq<'T>) =
+    {
+      New    = List(newItem)
+      Update = List(updateItem)
+    }
+    
+  member this.Extend(other: Result<'T>) =
+    this.New.AddRange(other.New)
+    this.Update.AddRange(other.Update)
 
 type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
   inherit BackgroundService()
-
+  // implements comparison for posts
   let postComparer =
     {
       new IEqualityComparer<Post> with
@@ -47,42 +54,59 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
     }
     
   let timer =
-    new PeriodicTimer(TimeSpan.FromMinutes(1))
-  let newThreadBag =
-    ConcurrentBag<Couple>()
-  let updateThreadBag =
-    ConcurrentBag<Couple>()
-  let newPostBag =
-    ConcurrentBag<Post>()
-  let updatePostBag =
-    ConcurrentBag<Post>()
+    new PeriodicTimer(TimeSpan.FromMinutes(5))
+  // let newThreadBag =
+  //   ConcurrentBag<Couple>()
+  // let updateThreadBag =
+  //   ConcurrentBag<Couple>()
+  // let newPostBag =
+  //   ConcurrentBag<Post>()
+  // let updatePostBag =
+  //   ConcurrentBag<Post>()
 
-  let threadProd(db: ComicvineContext)(thread: Thread) =
-    task {
-      let! dbResult =
-        db
-          .Threads
-          .AsNoTracking()
-          .FirstOrDefaultAsync(fun t -> t.Id = thread.Id)
-          
-      if obj.ReferenceEquals(dbResult, null) then
-        newThreadBag.Add({
-          Data = thread; Pages = seq{ 1..thread.LastPostPage }
-        })
-      elif dbResult.LastPostNo < thread.LastPostNo then
-        updateThreadBag.Add({
-          Data = thread; Pages = seq{ dbResult.LastPostPage .. thread.LastPostPage }
-        })
-      else
-        ()
-    } :> Task
+  let threadProd(db: ComicvineContext)(thread: Thread) = task {
+    let! dbResult =
+      db
+        .Threads
+        .AsNoTracking()
+        .FirstOrDefaultAsync(fun t -> t.Id = thread.Id)
+        
+    if obj.ReferenceEquals(dbResult, null) then
+      // newThreadBag.Add({
+      //   Data = thread; Pages = seq{ 1..thread.LastPostPage }
+      // })
+      return
+        Result<Couple>.Create(
+          newItem    = [|{Data = thread; Pages = seq{ 1..thread.LastPostPage }}|],
+          updateItem = [||]
+        )
+    elif dbResult.LastPostNo < thread.LastPostNo then
+      // updateThreadBag.Add({
+      //   Data = thread; Pages = seq{ dbResult.LastPostPage .. thread.LastPostPage }
+      // })
+      return 
+        Result<Couple>.Create(
+          newItem    = [||],
+          updateItem = [|{Data = thread; Pages = seq{ dbResult.LastPostPage .. thread.LastPostPage }}|]
+        )
+    else
+      return 
+        Result<Couple>.Create(
+          newItem    = [||],
+          updateItem = [||]
+        )
+    }
   
   let consNewThread(newPosts: seq<Post>) =
      // every post in the thread would be marked as a new post
     // let! newPosts = PostParser.ParsePage page thread.Thread.Link 
     // add all posts
-    newPosts
-    |> Seq.iter newPostBag.Add
+    // newPosts
+    // |> Seq.iter newPostBag.Add
+    Result<Post>.Create(
+      newItem    = newPosts,
+      updateItem = Seq.empty
+    )
     // |> Seq.iter (fun x ->
     //   newPostBag.Add(x)
     // )   
@@ -92,6 +116,7 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
     // https://web.archive.org/web/20230610183122/https://ibb.co/02Vx8Pk
     // get the posts from a particular pge in the thread from db
     let parsedPosts = parsedPosts |> Seq.filter (fun each -> not(page <> 1 && each.PostNo = 0)) // removes the op since it appears every page for blog, polls and co.
+    let result = Result<Post>.Create(Seq.empty, Seq.empty)
     let! dbPosts =
       db
         .Posts
@@ -115,24 +140,63 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
     
     
     // add new posts
-    newPosts
-    |>Seq.iter( fun x ->
-      newPostBag.Add(x)
-    )
+    // newPosts
+    // |>Seq.iter( fun x ->
+    //   newPostBag.Add(x)
+    // )
+    result.New.AddRange(newPosts)
     // add deleted posts
+    // deletedPosts
+    // |> Seq.iter (fun x ->
+    //   updatePostBag.Add({
+    //    x with IsDeleted = true
+    //   })
+    // )
     deletedPosts
-    |> Seq.iter (fun x ->
-      updatePostBag.Add({
-       x with IsDeleted = true
-      })
-    )
+    |> Seq.map (fun each -> { each with IsDeleted = true })
+    |> result.Update.AddRange
     // add edited posts
-    editedPosts
-    |> Seq.iter (fun x ->
-      updatePostBag.Add(x)
-    )
+    // editedPosts
+    // |> Seq.iter (fun x ->
+    //   updatePostBag.Add(x)
+    // )
+    result.Update.AddRange(editedPosts)
+    
+    return result
   }
-  
+  let getHtml (ct: CancellationToken) (page: int) path =
+    task {
+      use querystring =
+        new FormUrlEncodedContent(Dictionary[KeyValuePair("page", page |> string)])
+
+      let! q = querystring.ReadAsStringAsync(ct)
+      let client = new HttpClient()
+      client.BaseAddress <- Uri("https://comicvine.gamespot.com")
+      return! client.GetStringAsync($"{path}?{q}")
+    }
+    
+  let doBatch collection batchSize parsePosts=
+    collection
+    // make request page by page
+    |> Seq.collect (fun abc -> seq {
+      for i in abc.Pages ->
+        abc.Data, i
+    })
+    // group to batches of `batchSize`
+    |> Seq.mapi    (fun x y -> x,y)
+    |> Seq.groupBy (fun (x, _) -> x / batchSize)
+    // parsed posts from vine in parallel within each batch
+    |> Seq.map(fun (_, batch) ->
+      batch
+      |> Seq.map(fun (_,(thread,page)) ->
+        parsePosts page thread
+        |> Async.map (fun x -> x,thread, page)
+        |> Task.ofAsync
+      )
+      |> Task.WhenAll
+    )
+
+
   let rec newPst page thread = async {
     try 
       let! parsedPosts = PostParser.ParsePage page thread.Thread.Link |> Async.ofTask
@@ -152,56 +216,28 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
   }
   
   let Poll
-    (db: ComicvineContext)(ct: CancellationToken)(forumPage: int)
-    =
+    (db: ComicvineContext)(ct: CancellationToken)(forumPage: int) =
     task {
-      let getHtml (ct: CancellationToken) (page: int) path =
-        task {
-          use querystring =
-            new FormUrlEncodedContent(Dictionary[KeyValuePair("page", page |> string)])
-
-          let! q = querystring.ReadAsStringAsync(ct)
-          let client = new HttpClient()
-          client.BaseAddress <- Uri("https://comicvine.gamespot.com")
-          return! client.GetStringAsync($"{path}?{q}")
-        }
-        
-      let doBatch collection batchSize parsePosts=
-        collection
-        // make request page by page
-        |> Seq.collect (fun abc -> seq {
-          for i in abc.Pages ->
-            abc.Data, i
-        })
-        // group to batches of `batchSize`
-        |> Seq.mapi    (fun x y -> x,y)
-        |> Seq.groupBy (fun (x, _) -> x / batchSize)
-        // parsed posts from vine in parallel within each batch
-        |> Seq.map(fun (_, batch) ->
-          batch
-          |> Seq.map(fun (_,(thread,page)) ->
-            parsePosts page thread
-            |> Async.map (fun x -> x,thread, page)
-            |> Task.ofAsync
-          )
-          |> Task.WhenAll
-        )
- 
-      
       logger.LogInformation("getting thread  on page {0}. {1}", forumPage, DateTime.Now)
+     
       let batchSize = 6
+      let threadsData = Result<Couple>.Create(Seq.empty, Seq.empty)
+      let postsData   = Result<Post>.Create(Seq.empty, Seq.empty)
+      
       let! rawHtml = getHtml ct forumPage "/forums/"
-      let batch =
+      let nextThreads =
         rawHtml
         |> Net.createRootNode
         |> ThreadParser.ParseSingle
       
+      
       logger.LogInformation("parsing threads {0}", DateTime.Now)
-      for b in batch do
-        do! threadProd db b
+      for b in nextThreads do
+        let! data = threadProd db b
+        threadsData.Extend(data)
         
-      let newThreadPost = doBatch newThreadBag batchSize newPst
-      let updateThreadPost = doBatch updateThreadBag batchSize newPst
+      let newThreadPost = doBatch threadsData.New batchSize newPst
+      let updateThreadPost = doBatch threadsData.Update batchSize newPst
         
       logger.LogInformation("parsing new post {0}", DateTime.Now)
       let newTasks =
@@ -209,7 +245,8 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
         |> Seq.map (
           Task.map ( fun batch ->
             batch
-            |> Seq.iter (fun (a,_,_) -> consNewThread a)
+            |> Seq.map (fun (a,_,_) -> consNewThread a)
+            |> Seq.iter postsData.Extend
           )
         )
       let mutable h= 1
@@ -231,11 +268,14 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
       let mutable batchEnumerator = batchedUpdates.GetEnumerator()
       while batchEnumerator.MoveNext() do
         let posts, thread, page = batchEnumerator.Current
-        do!  consUpdatedThread db thread posts page
+        let! data = consUpdatedThread db thread posts page
+        postsData.Extend(data)
+        
       batchEnumerator.Dispose()
         
       logger.LogInformation("finished {0}", DateTime.Now)
-    } :> Task
+      return threadsData, postsData
+    }
 
   let pollVine ct (db: ComicvineContext) =
     task {
@@ -244,45 +284,45 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
 
       while not finished do
         
-        newThreadBag.Clear()
-        updateThreadBag.Clear()
-        newPostBag.Clear()
-        updatePostBag.Clear()
+        // newThreadBag.Clear()
+        // updateThreadBag.Clear()
+        // newPostBag.Clear()
+        // updatePostBag.Clear()
         
         logger.LogInformation("making request to page {0}", page)
-        do! Poll db ct page
+        let! threadD, postD = Poll db ct page
         
-        printfn "%d %d new, update for thread" newThreadBag.Count updateThreadBag.Count
-        printfn "%d %d new, update for post" newPostBag.Count updatePostBag.Count
-        let ope = newPostBag.Intersect(updatePostBag, postComparer)
+        printfn "%d %d new, update for thread" threadD.New.Count threadD.Update.Count
+        printfn "%d %d new, update for post" postD.New.Count postD.Update.Count
+        let ope = postD.New.Intersect(postD.Update, postComparer)
         printfn "%d" (ope.Count())
         
-        for t in newThreadBag do
-          printfn "a - %s" t.Data.Thread.Link
-        for t in updateThreadBag do
-          printfn "b - %s" t.Data.Thread.Link
+        // for t in threadD.New do
+        //   printfn "a - %s" t.Data.Thread.Link
+        // for t in threadD.Update do
+        //   printfn "b - %s" t.Data.Thread.Link
         
         // let allThreads = Seq.append newThreadBag updateThreadBag
-        let allPost = Seq.append newPostBag updatePostBag
+        let allPost = Seq.append postD.New postD.Update
           
         let nXxx =
-          newThreadBag
+          threadD.New
           |> Seq.map(fun abc ->
             let th = abc.Data
             let posts =
               allPost
               |> Seq.filter (fun p -> p.ThreadId = th.Id)
-              |> Seq.distinctBy (fun p -> p.Id)
+              // |> Seq.distinctBy (fun p -> p.Id)
             { th with Posts = posts.ToArray() }
           )
         let uXxx =
-          updateThreadBag
+          threadD.Update
           |> Seq.map(fun abc ->
             let th = abc.Data
             let posts =
-              updatePostBag
+              postD.Update
               |> Seq.filter (fun p -> p.ThreadId = th.Id)
-              |> Seq.distinctBy (fun p -> p.Id)
+              // |> Seq.distinctBy (fun p -> p.Id)
             { th with Posts = posts.ToList() }
           )
         do! db.Threads.AddRangeAsync(nXxx)
@@ -290,7 +330,7 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
         let yy =
           uXxx
           |> Seq.collect (fun ab ->
-            newPostBag
+            postD.New
             |> Seq.filter (fun p -> p.ThreadId = ab.Id)
             // |> Seq.distinctBy (fun p -> p.Id)
           )
@@ -303,7 +343,7 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
         db.ChangeTracker.Clear() 
         printfn "%d changes" x
         page <- page + 1
-        finished <- (newThreadBag.Count + updateThreadBag.Count) = 0
+        finished <- (threadD.New.Count + threadD.Update.Count) = 0
     }
 
   override _.ExecuteAsync(ct) =
