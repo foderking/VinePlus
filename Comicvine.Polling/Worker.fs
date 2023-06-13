@@ -53,7 +53,7 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
     }
     
   let Assert cond message =
-    if cond then
+    if not cond then
       failwith message
 
   let getThreadData(db: ComicvineContext)(thread: Thread) = task {
@@ -260,57 +260,66 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
         logger.LogInformation("{0} new and {1} updated threads. {2}", threadD.New.Count, threadD.Update.Count, DateTime.Now)
         logger.LogInformation("{0} new and {1} updated posts. {2}", postD.New.Count, postD.Update.Count, DateTime.Now)
         
-        // let ope = postD.New.Intersect(postD.Update, postComparer)
-        // printfn "%d" (ope.Count())
-        
         // for t in threadD.New do
         //   printfn "a - %s" t.Data.Thread.Link
         // for t in threadD.Update do
         //   printfn "b - %s" t.Data.Thread.Link
         
         // let allPost = Seq.append postD.New postD.Update
-          
-        let nXxx =
+        let newThreadAndPostsToAdd =
           threadD.New
           |> Seq.map(fun abc ->
-            let th = abc.Data
-            let posts =
-              postD.New
-              |> Seq.filter (fun p -> p.ThreadId = th.Id)
-              // |> Seq.distinctBy (fun p -> p.Id)
-            { th with Posts = posts.ToArray() }
+            // let th = 
+            // let posts =
+            {
+              abc.Data with
+                Posts = //posts.ToArray()
+                  postD.New
+                  |> Seq.filter (fun p -> p.ThreadId = abc.Data.Id)
+                  |> Array.ofSeq
+            }
           )
-        let uXxx =
+          
+        let updatedThreadNewPostToAdd =
           threadD.Update
           |> Seq.map(fun abc ->
-            let th = abc.Data
-            let posts =
-              postD.Update
-              |> Seq.filter (fun p -> p.ThreadId = th.Id)
-              // |> Seq.distinctBy (fun p -> p.Id)
-            { th with Posts = posts.ToList() }
+            // let th = abc.Data
+            // let posts =
+            {
+              abc.Data
+              with
+                Posts =
+                  // posts.ToList()
+                  (
+                    postD.Update
+                    |> Seq.filter (fun p -> p.ThreadId = abc.Data.Id)
+                  ).ToList()
+            }
           )
-        do! db.Threads.AddRangeAsync(nXxx)
-        db.Threads.UpdateRange(uXxx)
-        let yy =
-          uXxx
+        
+        let updatedThreadUpdatedPostToAdd =
+          updatedThreadNewPostToAdd
           |> Seq.collect (fun ab ->
             postD.New
             |> Seq.filter (fun p -> p.ThreadId = ab.Id)
-            // |> Seq.distinctBy (fun p -> p.Id)
           )
         // printfn "%d" (Seq.length yy)
-        do! db.Posts.AddRangeAsync yy
+        // save to db
+        // order is important for updated threads
+        do! db.Threads.AddRangeAsync(newThreadAndPostsToAdd)
+        db.Threads.UpdateRange(updatedThreadNewPostToAdd)
+        do! db.Posts.AddRangeAsync updatedThreadUpdatedPostToAdd
         
         // save changes and stops tracking entities after changes have been saved in current session...
         // ..to prevent exception when changes are made on the same entities in future sessions
-        let! x = db.SaveChangesAsync()
+        let! changesMade = db.SaveChangesAsync()
         db.ChangeTracker.Clear() 
         
+        let intersectCount = postD.New.Intersect(postD.Update, postComparer).Count()
+        let calculatedChanges = postD.Update.Count + postD.New.Count + threadD.Update.Count + threadD.New.Count
+        Assert (intersectCount = 0) $"new and updated posts not mutually exclusive. {intersectCount} duplicates"
+        Assert (changesMade = calculatedChanges) $"number of changes not adding up. Expect {changesMade}, got {calculatedChanges}"
         
-        Assert (postD.New.Intersect(postD.Update, postComparer).Count() = 1) "new and updated posts not mutually exclusive"
-        Assert (x = (postD.Update.Count + postD.New.Count + threadD.Update.Count + threadD.New.Count)) "number of changes not adding up"
-        // printfn "%d changes" x
         page <- page + 1
         finished <- (threadD.New.Count + threadD.Update.Count) = 0
     }
