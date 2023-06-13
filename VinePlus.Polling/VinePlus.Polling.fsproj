@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <UserSecretsId>dotnet-Comicvine.Polling-67BD27B0-78C0-4AA6-AEBC-404AE3B9AC07</UserSecretsId>
+        <RootNamespace>Comicvine.Polling</RootNamespace>
     </PropertyGroup>
 
 
