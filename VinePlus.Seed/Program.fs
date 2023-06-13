@@ -279,7 +279,7 @@ let Seed() = task{
     // write files in set
     printfn "[+] writing posts_%d to json" set
     // do! writePostCsv redis $"posts_{set}.csv"
-    do! writeFile redis postKey "posts_{set}.json"
+    do! writeFile redis postKey $"posts_{set}.json"
     // empties key (next set starts on an empty key to minimize memory used)
     let! _ = redis.KeyDeleteAsync(postKey)
     ()
@@ -290,7 +290,7 @@ let Seed() = task{
   // write to csv file
   printfn "[+] writing posts_%d to json" totalSets
   // do! writePostCsv redis $"posts_{totalSets}.csv"
-  do! writeFile redis postKey "posts_{totalSets}.json"
+  do! writeFile redis postKey $"posts_{totalSets}.json"
 }
 
 [<EntryPoint>]

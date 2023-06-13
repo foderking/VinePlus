@@ -14,7 +14,6 @@
 
     <ItemGroup>
         <PackageReference Include="FSharp.Control.TaskSeq" Version="0.3.0" />
-        <PackageReference Include="StackExchange.Redis" Version="2.6.104" />
     </ItemGroup>
 
     <ItemGroup>

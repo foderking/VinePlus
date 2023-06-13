@@ -1,6 +1,6 @@
 ﻿
 ## Setup
-- Set the connection string in the environment variable called `ConnectionStrings:comicvine_db`. eg (on windows)`$env:ConnectionStrings:comicvine_db = "Server=..."`
+- Set the connection string in the environment variable called `ConnectionStrings__comicvine_db`. eg (on windows`$env:ConnectionStrings__comicvine_db = "Server=..."`)
 ## Features
 - Provides restful api for querying posts, threads, user profiles and more
 
@@ -9,6 +9,7 @@
 - response UI
 - refactor internals
 - add search
+- add polling worker
 - add stats
 - default error pages for both api and web interface
 - better styling for api documentation
