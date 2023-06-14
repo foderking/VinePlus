@@ -24,5 +24,7 @@
 
     <ItemGroup>
       <Content Include="README.md" />
+      <Content Remove="appsettings.json" />
+      <Content Remove="appsettings.Development.json" />
     </ItemGroup>
 </Project>
