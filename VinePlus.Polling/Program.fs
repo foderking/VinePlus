@@ -14,7 +14,7 @@ module Program =
         Host
             .CreateDefaultBuilder(args)
             .ConfigureServices(fun hostContext services ->
-                services.AddHostedService<Worker>()
+                services.AddHostedService<PollingWorker>()
                 |> ignore
                 services.RegisterDataServices(hostContext.Configuration) // IConfiguration for worker service in hostContext.Configuration
                 |> ignore

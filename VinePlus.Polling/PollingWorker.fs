@@ -33,7 +33,7 @@ with
     this.New.AddRange(other.New)
     this.Update.AddRange(other.Update)
 
-type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
+type PollingWorker(logger: ILogger<PollingWorker>, scopeFactory: IServiceScopeFactory) =
   inherit BackgroundService()
   // implements comparison for posts
   let postComparer =
@@ -317,7 +317,7 @@ type Worker(logger: ILogger<Worker>, scopeFactory: IServiceScopeFactory) =
     task {
       // scoping stuff for injection database context: https://pgroene.wordpress.com/2018/07/12/injecting-a-scoped-service-into-ihostedservice/
       use scope = scopeFactory.CreateScope()
-      use timer = new PeriodicTimer(TimeSpan.FromMinutes(1))
+      use timer = new PeriodicTimer(TimeSpan.FromMinutes(5))
 
       let dbCtx =
         scope.ServiceProvider.GetRequiredService<ComicvineContext>()

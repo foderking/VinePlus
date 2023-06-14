@@ -27,6 +27,7 @@
     <ItemGroup>
       <ProjectReference Include="..\VinePlus.Core\VinePlus.Core.fsproj" />
       <ProjectReference Include="..\VinePlus.Database\VinePlus.Database.csproj" />
+      <ProjectReference Include="..\VinePlus.Polling\VinePlus.Polling.fsproj" />
     </ItemGroup>
 
     <ItemGroup>
