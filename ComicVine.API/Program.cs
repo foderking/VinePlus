@@ -7,15 +7,18 @@ using Microsoft.OpenApi.Models;
 // using ComicVine.API.Database;
 using Comicvine.Core;
 using Comicvine.Database;
+using Comicvine.Polling;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true); // https://stackoverflow.com/questions/69961449/net6-and-datetime-problem-cannot-write-datetime-with-kind-utc-to-postgresql-ty
 
 builder.Services.AddControllers().AddJsonOptions( 
     x => x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())
 );
+builder.Services.AddHostedService<PollingWorker>(); // adds the pollng background service
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
