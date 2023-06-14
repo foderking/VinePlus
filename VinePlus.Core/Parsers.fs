@@ -30,6 +30,7 @@ module Parsers =
   type Link =
     { Text: string; Link: string }
   /// A post made on a thread. this also includes the OP
+  /// marked as cli mutable because efcore needs it to have a constructor with getters and setters
   [<CLIMutable>]
   type Post =
     {
@@ -37,6 +38,7 @@ module Parsers =
       Creator: Link; IsEdited: bool; Created: DateTime; Content: string; ThreadId: int
     }
   /// A thread created on comicvine
+  /// marked as cli mutable because efcore needs it to have a constructor with getters and setters
   [<CLIMutable>]
   type Thread =
     {
@@ -76,11 +78,13 @@ module Parsers =
     { Follower: Link; Avatar: string }
      
   /// a table on the db that keeps track of how many threads/posts are created regularly
+  /// marked as cli mutable because efcore needs it to have a constructor with getters and setters
+  [<CLIMutable>]
   type Info =
     {
       NewThreads: int
       NewPosts: int
-      DeletedPosts: int
+      Date: DateTime
     }
     
   /// function that can parse a page

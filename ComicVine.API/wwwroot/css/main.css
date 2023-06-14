@@ -76,6 +76,7 @@ footer {
     /*padding: 1em;*/
     display: grid;
     grid-template-columns: 3em 1fr 10em 10em 4em 4em;
+    align-content: start;
 }
 #thread-container > span:not(div:last-child) {
     border-right: 1px solid #d1d4d6;
