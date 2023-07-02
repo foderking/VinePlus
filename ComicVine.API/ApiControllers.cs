@@ -11,13 +11,8 @@ public static class Controller
      * - add documentation
      * - add proper restful errors
      */
-    public static void AddEndpoints(this IEndpointRouteBuilder app) {
-        app.MapGet("/", (HttpResponse reponse) => reponse.Redirect("/forums"));
-        
-        app.MapGet("/api/post", async (
-            [FromQuery] string path
-        ) =>
-        {
+    public static void AddApiEndpoints(this IEndpointRouteBuilder app) {
+        app.MapGet("/api/post", async ([FromQuery] string path) => {
             try {
                 var res = await Parsers.PostParser.ParseMultiple(path);
                 return Results.Ok(res);

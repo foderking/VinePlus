@@ -1,0 +1,8 @@
+﻿@page //"{searchPost}/{query}"
+@model ComicVine.API.Pages.Search.Results
+
+@{
+    Layout = "Shared/_Layout";
+}
+
+@await Html.PartialAsync("Shared/Components/ForumItems", (Model.ThreadResult , Model.GetThreadLink()))

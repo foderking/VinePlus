@@ -6,6 +6,7 @@ using Comicvine.Core;
 using Comicvine.Database;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.EntityFrameworkCore;
 
 namespace ComicVine.API.Pages;
 
@@ -159,6 +160,19 @@ public static class Util
             );
             ImgResponse? res = JsonSerializer.Deserialize<ImgResponse>(response);
             return res!.Images;
+        }
+    }
+
+    public static class Search
+    {
+        public static IEnumerable<Parsers.Thread> SearchThreads(ComicvineContext context, string query) {
+            return context
+                .Threads
+                .Where(thread => 
+                    EF.Functions
+                        .ToTsVector(thread.Thread.Text)
+                        .Matches(EF.Functions.ToTsQuery(query))
+                );
         }
     }
 }

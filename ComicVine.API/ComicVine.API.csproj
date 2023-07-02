@@ -31,11 +31,13 @@
     </ItemGroup>
 
     <ItemGroup>
+<!--      <AdditionalFiles Include="Pages\Search\Search.cshtml" />-->
       <AdditionalFiles Include="Pages\Shared\Components\ForumItems.cshtml" />
       <AdditionalFiles Include="Pages\Shared\Components\Lock.cshtml" />
       <AdditionalFiles Include="Pages\Shared\Components\Navigation.cshtml" />
       <AdditionalFiles Include="Pages\Shared\Components\Pin.cshtml" />
       <AdditionalFiles Include="Pages\Shared\Components\ThreadItems.cshtml" />
+      <AdditionalFiles Include="Pages\Stats\Stats.cshtml" />
     </ItemGroup>
 
 </Project>

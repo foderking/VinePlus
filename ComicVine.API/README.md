@@ -12,13 +12,16 @@
 -[ ] add search
 -[x] add polling worker
 -[ ] add stats
--[ ] default error pages for both api and web interface
--[ ] better styling for api documentation
--[ ] more documentation for api
+-[ ] default error pages for web interface
 -[ ] refactors for thread and post view on user profile (and errors for deactivated accounts)
 -[ ] ability to sort threads by different criteria
 -[ ] added footer linking to api on forums
 -[ ] make images and blogs on user profile optional
+
+## Api TODO
+-[ ] better styling for api documentation
+-[ ] more documentation for api
+-[ ] add format for api errors
 
 ## Archives TODO
 -[x] sorting of threads by no of posts 
