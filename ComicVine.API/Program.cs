@@ -1,14 +1,9 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using ComicVine.API;
-// using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-// using ComicVine.API;
-// using ComicVine.API.Database;
-using Comicvine.Core;
 using Comicvine.Database;
 using Comicvine.Polling;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +13,7 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true); // https://s
 builder.Services.AddControllers().AddJsonOptions( 
     x => x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())
 );
-builder.Services.AddHostedService<PollingWorker>(); // adds the pollng background service
+// builder.Services.AddHostedService<PollingWorker>(); // adds the pollng background service
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
@@ -48,30 +43,25 @@ if (!string.IsNullOrWhiteSpace(port)) {
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction()) {
-    app.UseSwagger();
 
-    if (app.Environment.IsProduction()) {
-        app.UseExceptionHandler("/error");
-        // app.UseHttpsRedirection();
-    }
-        
-    app.UseSwaggerUI( c =>
-    {
-        c.InjectStylesheet("../css/swagger.css");
-        c.SwaggerEndpoint("/swagger/cv/swagger.json", "API v1");
-        c.RoutePrefix = "api";
-    });
 }
-
-// https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/openapi?view=aspnetcore-7.0
+if (app.Environment.IsProduction()) {
+    app.UseExceptionHandler("/error");
+    // app.UseHttpsRedirection();
+}
+        
+app.UseSwagger();
+app.UseSwaggerUI( c =>
+{
+    c.InjectStylesheet("../css/swagger.css");
+    c.SwaggerEndpoint("/swagger/cv/swagger.json", "API v1");
+    c.RoutePrefix = "api";
+});
 app.UseSwaggerUI();
 app.UseSwagger();
-
-// app.UseAuthorization();
-
 app.UseStaticFiles();
-
 app.MapRazorPages();
-app.AddEndpoints();
+app.UseStatusCodePages(); // add default status page for errors
+app.AddApiEndpoints();
 
 app.Run();

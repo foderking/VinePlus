@@ -1,0 +1,12 @@
+﻿@page "{user}"
+@model ComicVine.API.Pages.Stats.VisitedThread
+
+@{
+    Layout = "Shared/_Layout";
+}
+
+@foreach (var thread in Model.PostedThreads) {
+    <a href="@($"/archives/thread/{thread.Id}")">
+        @Html.Raw(thread.Thread.Text)
+    </a>
+}

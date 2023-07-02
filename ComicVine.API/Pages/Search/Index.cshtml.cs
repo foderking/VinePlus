@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ComicVine.API.Pages;
+namespace ComicVine.API.Pages.Search;
 
-public class Stats : PageModel
+public class Index : PageModel
 {
     public void OnGet() {
-        
     }
 }
