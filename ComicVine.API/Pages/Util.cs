@@ -111,6 +111,24 @@ public static class Util
             ;
     }
 
+    public record PostWithThread(Parsers.Post P, Parsers.Thread T);
+    
+    public static IEnumerable<PostWithThread> GetUserPostsWithThread(ComicvineContext context, string user, int page=1) {
+        return context
+            .Posts
+            .Where(posts => posts.Creator.Text == user)
+            // .OrderByDescending(each => each.Id)
+            .Join(
+                context.Threads,
+                post => post.ThreadId,
+                thread => thread.Id,
+                (post, thread) => new PostWithThread(post, thread)
+            )
+            .Skip(PostsPerPage * (page-1))
+            .Take(PostsPerPage)
+            ;
+    }
+
     public static IEnumerable<Parsers.Thread> GetArchivedThreads(ComicvineContext context, int page) {
         return context
             .Threads

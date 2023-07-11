@@ -185,6 +185,11 @@ footer {
     text-decoration: none;
 }
 
+.post-thread {
+    font-weight: bold;
+    padding-bottom: 3px;
+}
+
 /* quotes */
 .post-item div[data-embed-type="message-quote"] div[data-embed-type="message-quote-content"] {
     border-left: 1px solid #cccfd1;

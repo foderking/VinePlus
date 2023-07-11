@@ -34,7 +34,7 @@
 -[ ] add format for api errors
 
 ### Users archives
--[ ] posts view in user profile should have link to the thread
+-[x] posts view in user profile should have link to the thread
 -[x] there should be a way to link to a specific post in a thread
 
 ## Archives
