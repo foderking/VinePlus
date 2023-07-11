@@ -1,0 +1,18 @@
+﻿@page
+@using ComicVine.API.Pages
+@model ComicVine.API.Pages.Search.SearchThreads
+
+@{
+    Layout = "Shared/_Layout";
+    ViewData[Keys.Title]     = "Search Archived Threads";
+    ViewData[Keys.Headings]  = "Search Archived Threads";
+    ViewData[Keys.Highlight] = MainHighlight.Search;
+}
+
+<div id="search">
+    <form method="post">
+        <input class="searchQuery" name="searchQuery" id="searchQuery" type="search" placeholder="Search Query"/>
+        <input class="searchCreator" name="creator" id="creator" type="search" placeholder="Posted By"/>
+        <input class="searchSubmit" type="submit"/>
+    </form>
+</div>

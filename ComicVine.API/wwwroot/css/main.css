@@ -512,3 +512,34 @@ footer {
 .activity-time {
     color: #999999;
 }
+
+/** search **/
+#search {
+    background-color: white;
+    border-radius: 5px;
+    width: 60%;
+    margin: 4em auto;
+    padding: 2em;
+}
+
+.searchCreator, .searchQuery, .searchSubmit {
+    margin: 0 auto;
+    display: block;
+    border-style: solid;
+}
+.searchCreator, .searchQuery {
+    height: 3em;
+    width: 55%;
+    margin-top: 1em;
+    margin-bottom: 2em;
+    background-color: rgb(242, 242, 242);
+}
+.searchSubmit {
+    margin-top: 3em;
+    margin-bottom: 1em;
+    border-radius: 0;
+    height: 2.5em;
+    background-color: #4c754c;
+    color: white;
+    width: 8em;
+}
