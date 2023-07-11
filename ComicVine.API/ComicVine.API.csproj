@@ -37,7 +37,7 @@
       <AdditionalFiles Include="Pages\Shared\Components\Navigation.cshtml" />
       <AdditionalFiles Include="Pages\Shared\Components\Pin.cshtml" />
       <AdditionalFiles Include="Pages\Shared\Components\ThreadItems.cshtml" />
-      <AdditionalFiles Include="Pages\Stats\Stats.cshtml" />
+<!--      <AdditionalFiles Include="Pages\Stats\Stats.cshtml" />-->
     </ItemGroup>
 
 </Project>
