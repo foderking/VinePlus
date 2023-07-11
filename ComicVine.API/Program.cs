@@ -46,22 +46,23 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction()) {
 
 }
 if (app.Environment.IsProduction()) {
-    app.UseExceptionHandler("/error");
+    // app.UseExceptionHandler("/error");
     // app.UseHttpsRedirection();
 }
+app.UseExceptionHandler("/error");
         
 app.UseSwagger();
 app.UseSwaggerUI( c =>
 {
-    c.InjectStylesheet("../css/swagger.css");
+    c.InjectStylesheet("/css/swagger.css");
     c.SwaggerEndpoint("/swagger/cv/swagger.json", "API v1");
     c.RoutePrefix = "api";
 });
-app.UseSwaggerUI();
-app.UseSwagger();
+// app.UseSwaggerUI();
+// app.UseSwagger();
 app.UseStaticFiles();
 app.MapRazorPages();
-app.UseStatusCodePages(); // add default status page for errors
 app.AddApiEndpoints();
+app.UseStatusCodePages(); // add default status page for errors
 
 app.Run();

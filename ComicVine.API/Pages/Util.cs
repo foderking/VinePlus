@@ -163,6 +163,14 @@ public static class Util
         }
     }
 
+    public static string GetPostClass(Parsers.Post post) {
+        if (post.IsDeleted) {
+            return "post-item post-deleted";
+        }
+        else {
+            return "post-item";
+        }
+    }
 
     public static class Search
     {

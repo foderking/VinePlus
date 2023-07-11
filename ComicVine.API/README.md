@@ -15,6 +15,7 @@
 
 ### Threads 
 -[ ] ability to sort threads by different criteria
+-[ ] thread should have a link to the og post on cv
 
 ### Profile
 -[ ] make images and blogs on user profile optional
@@ -32,11 +33,11 @@
 -[ ] more documentation for api
 -[ ] add format for api errors
 
-## Archives TODO
--[x] sorting of threads by no of posts 
--[ ] sorting of posts by date created
--[ ] thread should have a link to the og post on cv
--[ ] higlights for deleted posts
+### Users archives
 -[ ] posts view in user profile should have link to the thread
--[ ] there should be a way to link to a specific post in a thread
--[ ] clicking on post user's post view should link to the post in thread
+-[x] there should be a way to link to a specific post in a thread
+
+## Archives
+-[x] sorting of threads by no of posts 
+-[x] sorting of posts by date created
+-[x] highlight for deleted posts
