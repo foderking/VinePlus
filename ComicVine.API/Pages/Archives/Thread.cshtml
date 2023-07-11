@@ -1,4 +1,4 @@
-﻿@page "{id:int}/{p=1}"
+﻿@page "{id:int}"
 @using ComicVine.API.Pages
 @using Microsoft.AspNetCore.Html
 @model ComicVine.API.Pages.Archives.Thread
@@ -9,8 +9,13 @@
     ViewData[Keys.Headings] = Model.Thread_?.Thread.Text ?? "";
 }
 
-@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
-@await Html.PartialAsync("Shared/Components/ThreadItems", Model.Entities)
-@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
+@if (Model.NavRecord.CurrentPage == -1) {
+    @await Html.PartialAsync("Shared/Components/ThreadItems", Model.Entities)
+}
+else {
+    @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
+    @await Html.PartialAsync("Shared/Components/ThreadItems", Model.Entities)
+    @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
+}
 
 <a href="@("https://comicvine.gamespot.com" + (Model.Thread_?.Thread.Link ?? ""))">Original Thread</a>

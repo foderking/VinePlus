@@ -27,6 +27,6 @@ public class Forums : Navigator<Parsers.Thread>, IForum
     }
     
     public Func<Parsers.Thread, string> GetThreadLink() {
-        return (thread) => $"/archives/thread/{thread.Id}";
+        return (thread) => $"/archives/thread/{thread.Id}?p=1";
     }
 }

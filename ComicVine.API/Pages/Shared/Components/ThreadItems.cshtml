@@ -3,7 +3,7 @@
 
 <div id="post-container" class="generic-container">
     @foreach (var post in Model) {
-        <div class="post-item">
+        <div class="@Util.GetPostClass(post)">
             <div class="post-title">
                 <span class="post-no" id="@post.PostNo.ToString()">
                     #@post.PostNo

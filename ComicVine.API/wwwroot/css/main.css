@@ -158,6 +158,10 @@ footer {
     background-color: white;
 }
 
+.post-deleted {
+    background-color: #ff000014;
+}
+
 .post-no {
     color: rgb(1, 124, 55);
 }
@@ -537,7 +541,6 @@ footer {
 .searchSubmit {
     margin-top: 3em;
     margin-bottom: 1em;
-    border-radius: 0;
     height: 2.5em;
     background-color: #4c754c;
     color: white;
