@@ -9,4 +9,15 @@
     ViewData[Keys.Highlight] = MainHighlight.Search;
 }
 
-search
+<form method="post">
+    <label for="searchQuery">
+        Query:
+        <input name="searchQuery" id="searchQuery" type="search"/>
+    </label>
+    
+    <label for="creator">
+        Creator:
+        <input name="creator" id="creator" type="search"/>
+    </label>
+    <input type="submit" />
+</form>
