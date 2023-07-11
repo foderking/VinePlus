@@ -171,7 +171,7 @@ public static class Util
                 .Where(thread => 
                     EF.Functions
                         .ToTsVector(thread.Thread.Text)
-                        .Matches(EF.Functions.ToTsQuery(query))
+                        .Matches(EF.Functions.WebSearchToTsQuery(query))
                 );
         }
     }
