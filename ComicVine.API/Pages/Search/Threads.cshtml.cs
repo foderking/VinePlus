@@ -10,6 +10,12 @@ public class SearchThreads : PageModel
     }
         
      public IActionResult OnPost(string? creator, string searchQuery) {
-        return Redirect($"/search/results?searchPost=false&query={searchQuery}");
+         return creator switch
+         {
+             null => 
+                 Redirect($"/search/results?searchPost=false&query={searchQuery}"),
+             _ =>
+                 Redirect($"/search/results?searchPost=false&query={searchQuery}&creator={creator}")
+         };
     }
 }

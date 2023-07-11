@@ -5,20 +5,29 @@
 - Provides restful api for querying posts, threads, user profiles and more
 
 ## TODO
--[ ] better styling
+-[ ] improve styling
 -[ ] responsive UI
 -[ ] refactor internals
 -[ ] add time stamp to posts
--[ ] add search
 -[x] add polling worker
--[ ] add stats
 -[ ] default error pages for web interface
--[ ] refactors for thread and post view on user profile (and errors for deactivated accounts)
--[ ] ability to sort threads by different criteria
 -[ ] added footer linking to api on forums
--[ ] make images and blogs on user profile optional
 
-## Api TODO
+### Threads 
+-[ ] ability to sort threads by different criteria
+
+### Profile
+-[ ] make images and blogs on user profile optional
+-[ ] refactors for thread and post view on user profile (and errors for deactivated accounts)
+
+### Search
+-[x] add search
+-[x] search from user
+
+### Stats
+-[ ] add stats UI
+
+### Api
 -[ ] better styling for api documentation
 -[ ] more documentation for api
 -[ ] add format for api errors
