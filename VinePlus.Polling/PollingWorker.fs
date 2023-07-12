@@ -83,10 +83,15 @@ type PollingWorker(logger: ILogger<PollingWorker>, scopeFactory: IServiceScopeFa
         )
     }
   
-  let getPostDataFromNewThread(newPosts: seq<Post>) =
+  /// Removes duplicate polls OP since they appear on every page
+  let filterPoll(post: Post)(page: int) =
+    (page > 1 && post.PostNo > (page*50-50) && post.PostNo <= (page*50))||
+    (page = 1 && post.PostNo >= 0 && post.PostNo <= 50)
+    
+  let getPostDataFromNewThread(newPosts: seq<Post>)(page: int) =
      // every post in the thread would be marked as a new post
     Result<Post>.Create(
-      newItem    = newPosts,
+      newItem = newPosts.Where(fun post -> filterPoll post page),
       updateItem = Seq.empty
     )
 
@@ -105,11 +110,7 @@ type PollingWorker(logger: ILogger<PollingWorker>, scopeFactory: IServiceScopeFa
       db
         .Posts
         .AsNoTracking()
-        .Where(fun each -> each.ThreadId = thread.Id)
-        .Where(fun each ->
-          (page > 1 && each.PostNo > (page*50-50) && each.PostNo <= (page*50))||
-          (page = 1 && each.PostNo >= 0 && each.PostNo <= 50)
-        )
+        .Where(fun each -> each.ThreadId = thread.Id && (filterPoll each page))
         .ToArrayAsync()
     // deleted posts are posts that are present in the db, but not parsed from comicvine
     let deletedPosts = dbPosts.Except(parsedPosts, postComparer)
@@ -211,7 +212,7 @@ type PollingWorker(logger: ILogger<PollingWorker>, scopeFactory: IServiceScopeFa
         |> Seq.map (
           Task.map ( fun batch ->
             batch
-            |> Seq.map (fun (a,_,_) -> getPostDataFromNewThread a)
+            |> Seq.map (fun (a,_,pp) -> getPostDataFromNewThread a pp)
             |> Seq.iter postsData.Extend
           )
         )

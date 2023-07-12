@@ -8,10 +8,13 @@
 -[ ] improve styling
 -[ ] responsive UI
 -[ ] refactor internals
--[ ] add time stamp to posts
 -[x] add polling worker
 -[ ] default error pages for web interface
 -[ ] added footer linking to api on forums
+
+### Posts
+-[ ] fix youtube video in posts (http://localhost:5119/archives/thread/2308691#11)
+-[ ] add time stamp to posts
 
 ### Threads 
 -[ ] ability to sort threads by different criteria
@@ -39,5 +42,5 @@
 
 ## Archives
 -[x] sorting of threads by no of posts 
--[x] sorting of posts by date created
+-[ ] sorting of posts by date created
 -[x] highlight for deleted posts
