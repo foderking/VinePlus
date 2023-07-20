@@ -33,7 +33,7 @@
     <h1 class="heading">@Html.Raw(ViewData[Keys.Headings])</h1>
     @RenderBody()
 </main>
-<footer></footer>
+@await Html.PartialAsync("Shared/Components/Footer")
 <script>
 // loads lazy images
 let lazyLoad = node =>

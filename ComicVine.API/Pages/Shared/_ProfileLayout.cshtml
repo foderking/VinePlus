@@ -19,16 +19,20 @@
                     Profile
                 </a>
             </span>
+            @if ((bool?)ViewData[Keys.ProfileHasImage] ?? false) {
             <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Images)">
                 <a href="@Util.Profile.GetLink(ViewData, "/profile/images/")">
                     Images
                 </a>
             </span>
+            }
+            @if ((bool?)ViewData[Keys.ProfileHasBlog] ?? false) {
             <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Blogs)">
                 <a href="@Util.Profile.GetLink(ViewData, "/profile/blogs/")">
                     Blogs
                 </a>
             </span>
+            }
             <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Threads)">
                 <a href="@Util.Profile.GetLink(ViewData, "/profile/threads/")">
                     Threads

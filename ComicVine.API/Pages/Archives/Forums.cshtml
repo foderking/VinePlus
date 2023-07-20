@@ -11,6 +11,6 @@
 
 <div id="thread">
     @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
-    @await Html.PartialAsync("Shared/Components/ForumItems", (Model.Entities, Model.GetThreadLink()))
+    @await Html.PartialAsync("Shared/Components/ForumItems", (Model.Entities , Model.GetThreadLink()))
     @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
 </div>

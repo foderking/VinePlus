@@ -190,6 +190,7 @@ footer {
     padding-bottom: 3px;
 }
 
+
 /* quotes */
 .post-item div[data-embed-type="message-quote"] div[data-embed-type="message-quote-content"] {
     border-left: 1px solid #cccfd1;
@@ -420,6 +421,18 @@ footer {
     width: 480px;
 }
 
+/** profile error **/
+.profile-error {
+    font-size: 30px;
+    margin: 3em auto;
+    width: 60%;
+    text-align: center;
+}
+.profile-error  .profile-error-img {
+    display: block;
+    height: 15em;
+    margin: 0 auto;
+}
 
 /* main profile */
 .profile-nav {
