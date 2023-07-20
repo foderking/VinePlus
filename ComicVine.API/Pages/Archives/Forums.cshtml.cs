@@ -11,12 +11,7 @@ public class Forums : Navigator<Parsers.Thread>, IForum
         _context = context;
 
     }
-    /*
-     * - order by id
-     * - filter by author
-     * - filter by board
-     * - filter by type
-     */
+    
     public void OnGet(int p) {
         Entities = Util.GetArchivedThreads(_context, p);
         NavRecord = new(p, Util.GetThreadsMaxPage(_context), p.ToString());

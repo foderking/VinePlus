@@ -6,13 +6,14 @@ namespace ComicVine.API.Pages.Archives;
 public class Thread : Navigator<Parsers.Post>
 {
     private ComicvineContext _context;
-    public Parsers.Thread? Thread_;
+    public Parsers.Thread? CurrentThread;
 
     public Thread(ComicvineContext context) {
         _context = context;
     }
+    
     public void OnGet(int id, int? p) {
-        Thread_ = _context.Threads.Find(id);
+        CurrentThread = _context.Threads.Find(id);
         Entities = p switch 
         {
         
@@ -24,7 +25,7 @@ public class Thread : Navigator<Parsers.Post>
             // .OrderBy(_p => _p.PostNo)
             // .Skip((p-1)*50)
             // .Take(50);
-        NavRecord = new(p ?? -1, Thread_?.LastPostPage ?? 1, id.ToString());
+        NavRecord = new(p ?? -1, CurrentThread?.LastPostPage ?? 1, id.ToString());
     }
 
     public IEnumerable<Parsers.Post> GetAllPosts(int threadId) {

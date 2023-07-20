@@ -110,7 +110,11 @@ type PollingWorker(logger: ILogger<PollingWorker>, scopeFactory: IServiceScopeFa
       db
         .Posts
         .AsNoTracking()
-        .Where(fun each -> each.ThreadId = thread.Id && (filterPoll each page))
+        .Where(fun each -> each.ThreadId = thread.Id)// && (filterPoll each page))
+        .Where(fun post -> // each.ThreadId = thread.Id && (filterPoll each page))
+          (page > 1 && post.PostNo > (page*50-50) && post.PostNo <= (page*50))||
+          (page = 1 && post.PostNo >= 0 && post.PostNo <= 50)
+        )
         .ToArrayAsync()
     // deleted posts are posts that are present in the db, but not parsed from comicvine
     let deletedPosts = dbPosts.Except(parsedPosts, postComparer)

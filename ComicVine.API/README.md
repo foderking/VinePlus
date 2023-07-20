@@ -10,7 +10,7 @@
 -[ ] refactor internals
 -[x] add polling worker
 -[ ] default error pages for web interface
--[ ] added footer linking to api on forums
+-[ ] add footer linking to api on forums
 
 ### Posts
 -[ ] fix youtube video in posts (http://localhost:5119/archives/thread/2308691#11)
@@ -19,14 +19,16 @@
 ### Threads 
 -[ ] ability to sort threads by different criteria
 -[ ] thread should have a link to the og post on cv
+-[ ] forum should be able to link to the last post
 
 ### Profile
--[ ] make images and blogs on user profile optional
--[ ] refactors for thread and post view on user profile (and errors for deactivated accounts)
+-[x] make images and blogs on user profile optional
+-[x] refactors for thread and post view on user profile (and errors for deactivated accounts)
 
 ### Search
 -[x] add search
 -[x] search from user
+- [ ] possibly filter thread search by board, type
 
 ### Stats
 -[ ] add stats UI

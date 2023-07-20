@@ -39,6 +39,8 @@ public static class Keys
     public const string Headings  = "headings";
     public const string Title  = "title";
     public const string ProfileName  = "profile-name";
+    public const string ProfileHasBlog  = "profile-blog";
+    public const string ProfileHasImage  = "profile-image";
 }
 
 public static class MainHighlight
