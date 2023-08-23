@@ -5,8 +5,8 @@
 - Provides restful api for querying posts, threads, user profiles and more
 
 ## TODO
--[ ] improve styling
--[ ] responsive UI
+-[x] improve styling
+-[x] responsive UI
 -[ ] refactor internals
 -[x] add polling worker
 -[ ] default error pages for web interface
@@ -14,7 +14,7 @@
 
 ### Posts
 -[ ] fix youtube video in posts (http://localhost:5119/archives/thread/2308691#11)
--[ ] add time stamp to posts
+-[x] add time stamp to posts
 
 ### Threads 
 -[ ] ability to sort threads by different criteria
