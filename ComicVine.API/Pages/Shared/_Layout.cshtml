@@ -7,10 +7,10 @@
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <link rel="stylesheet" href="/css/main.css">
 </head>
+
 <body>
-<header>
-    <nav>
-        <div id="nav-root">
+    <div class="layout">
+        <nav class="layout-nav">
             <a href="/forums" class="nav-item">
                 <img src="/images/logo.png" alt="logo" id="nav-logo"/>
             </a>
@@ -26,14 +26,16 @@
             <span class="@Util.GetHighlightClass(ViewData, MainHighlight.Stats)">
                 <a href="/stats">Stats</a>
             </span>
-        </div>
-    </nav>
-</header>
-<main id="container">
-    <h1 class="heading">@Html.Raw(ViewData[Keys.Headings])</h1>
-    @RenderBody()
-</main>
-@await Html.PartialAsync("Shared/Components/Footer")
+        </nav>
+
+        <main class="layout-content">
+            <h1 class="heading">@Html.Raw(ViewData[Keys.Headings])</h1>
+            @RenderBody()
+        </main>
+
+        @await Html.PartialAsync("Shared/Components/Footer")
+    </div>
+
 <script>
 // loads lazy images
 let lazyLoad = node =>

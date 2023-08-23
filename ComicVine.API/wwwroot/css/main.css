@@ -1,6 +1,7 @@
 ﻿
 html {
     background-color: rgb(242, 242, 242);
+    font-size: calc(10px + 0.390625vw);/*  responsive font size */
 }
 body {
     font-family: "Segoe UI" ,"Helvetica", sans-serif;
@@ -28,51 +29,10 @@ h1, h2, h3, h5 {
 .generic-container {
     min-height: 100vh;
 }
-/*navigation*/
-nav {
-    height: 3em;
-    background-color: rgb(255, 255, 255);
-}
-#nav-root {
-    height: inherit;
-    display: flex;
-}
-.nav-item > a {
-    text-decoration: none ;
-    color: black;
-}
-.nav-item {
-    font-size: 17px;
-    align-self: center;
-    padding-left: 1em;
-    padding-right: 1em;
-}
-#nav-logo {
-    height: 3em;
-}
-.nav-highlight > a {
-    color: rgb(1, 124, 55);
-}
-/** footer */
-footer {
-    min-height: 5em;
-}
-
 /** thread view */
-.heading {
-    font-size: 40px;
-    margin-top: 30px;
-    border-bottom: 1px solid #bfbfbf;
-    color: #105e10;
-    text-align: center;
-}
-
-#container {
-    margin: 1em 5em ;
-}
 #thread-container {
-    width: 80%;
-    margin: auto;
+    /*width: 80%;*/
+    margin: 0 var(--side-width);
     /*padding: 1em;*/
     display: grid;
     grid-template-columns: 3em 1fr 10em 10em 4em 4em;
@@ -378,8 +338,6 @@ footer {
     background-color: rgba(0,0,0,0.15)
 }
 
-#profile-container {
-}
 /* blog */
 #blog-container {
     width: 80%;
@@ -433,6 +391,122 @@ footer {
     height: 15em;
     margin: 0 auto;
 }
+
+/** search **/
+#search {
+    background-color: white;
+    border-radius: 5px;
+    width: 60%;
+    margin: 4em auto;
+    padding: 2em;
+}
+
+.searchCreator, .searchQuery, .searchSubmit {
+    margin: 0 auto;
+    display: block;
+    border-style: solid;
+}
+.searchCreator, .searchQuery {
+    height: 3em;
+    width: 55%;
+    margin-top: 1em;
+    margin-bottom: 2em;
+    background-color: rgb(242, 242, 242);
+}
+.searchSubmit {
+    margin-top: 3em;
+    margin-bottom: 1em;
+    height: 2.5em;
+    background-color: #4c754c;
+    color: white;
+    width: 8em;
+}
+
+
+
+:root {
+    --side-width: 1rem;
+}
+
+@media (min-width:768px) {
+    :root {
+        --side-width: 2rem;
+    }
+}
+
+@media (min-width:1024px) {
+    :root {
+        --side-width: 5rem;
+    }
+}
+
+
+/**
+    Main Layout
+ **/
+.layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.layout-nav {
+    /**background-color: red;*/
+    height: 3.2rem;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+}
+.layout-content {
+    /*background-color: blue;*/
+    padding: 1rem var(--side-width) ;
+}
+.layout-footer {
+    margin-top: auto; /* forces footer to bottom. needs flexbox for some reason*/
+    background-color: green;
+    height: 5rem;
+}
+
+.heading {
+    font-size: 2.5rem;
+    margin-top: 30px;
+    border-bottom: 1px solid #bfbfbf;
+    color: #105e10;
+    text-align: center;
+}
+
+
+
+/**
+    Navigation Layout
+    .layout-nav
+*/
+.nav-item > a {
+    text-decoration: none ;
+    color: black;
+}
+.nav-item {
+    font-size: 1.1rem;
+    align-self: center;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+#nav-logo {
+    height: 3em;
+}
+.nav-highlight > a {
+    color: rgb(1, 124, 55);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 /* main profile */
 .profile-nav {
@@ -503,7 +577,7 @@ footer {
     /*height: 100%;*/   
 }
 .profile-main {
-    height: 100px;
+    /*height: 100px;*/
     display: grid;
     grid-template-columns: 1fr 30em;
     column-gap: 8em;
@@ -535,32 +609,4 @@ footer {
     color: #999999;
 }
 
-/** search **/
-#search {
-    background-color: white;
-    border-radius: 5px;
-    width: 60%;
-    margin: 4em auto;
-    padding: 2em;
-}
 
-.searchCreator, .searchQuery, .searchSubmit {
-    margin: 0 auto;
-    display: block;
-    border-style: solid;
-}
-.searchCreator, .searchQuery {
-    height: 3em;
-    width: 55%;
-    margin-top: 1em;
-    margin-bottom: 2em;
-    background-color: rgb(242, 242, 242);
-}
-.searchSubmit {
-    margin-top: 3em;
-    margin-bottom: 1em;
-    height: 2.5em;
-    background-color: #4c754c;
-    color: white;
-    width: 8em;
-}
