@@ -110,36 +110,6 @@ h1, h2, h3, h5 {
     margin: 0 auto;
 }
 
-/** search **/
-#search {
-    background-color: white;
-    border-radius: 5px;
-    width: 60%;
-    margin: 4em auto;
-    padding: 2em;
-}
-
-.searchCreator, .searchQuery, .searchSubmit {
-    margin: 0 auto;
-    display: block;
-    border-style: solid;
-}
-.searchCreator, .searchQuery {
-    height: 3em;
-    width: 55%;
-    margin-top: 1em;
-    margin-bottom: 2em;
-    background-color: rgb(242, 242, 242);
-}
-.searchSubmit {
-    margin-top: 3em;
-    margin-bottom: 1em;
-    height: 2.5em;
-    background-color: #4c754c;
-    color: white;
-    width: 8em;
-}
-
 /* desktop */
 :root {
     --side-width: 5rem;
@@ -187,7 +157,7 @@ h1, h2, h3, h5 {
 .layout-footer {
     margin-top: auto; /* forces footer to bottom. needs flexbox for some reason*/
     background-color: green;
-    height: 5rem;
+    height: 4rem;
 }
 
 .heading {
@@ -339,15 +309,6 @@ h1, h2, h3, h5 {
 
 
 
-
-
-
-
-
-
-
-/*~~~~~~~~~~~~~*/
-
 /* quotes */
 .post-item div[data-embed-type="message-quote"] div[data-embed-type="message-quote-content"] {
     border-left: 1px solid #cccfd1;
@@ -384,8 +345,8 @@ h1, h2, h3, h5 {
     fill: currentColor;
     position: relative;
     top: -1px;
-    height: 1em;
-    width: 1em;
+    height: 1rem;
+    width: 1rem;
     vertical-align: middle;
 }
 
@@ -394,10 +355,10 @@ h1, h2, h3, h5 {
 }
 .progress {
     overflow: hidden;
-    height: 14px;
+    height: 0.87rem;
     padding: 2px;
-    margin-bottom: 18px;
-    border-radius: 10px;
+    margin-bottom: 1.125rem;
+    border-radius: 0.625rem;
     box-sizing: content-box;
     background-color: #3d4043;
     background-image: linear-gradient(#303336,rgba(61,64,67,0));
@@ -405,12 +366,12 @@ h1, h2, h3, h5 {
 }
 .progress .bar {
     width: 0;
-    height: 14px;
+    height: 0.875rem;
     color: #fff;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: center;
     background: #21ba21;
-    border-radius: 10px;
+    border-radius: 0.625rem;
     transition: width 0.6s ease;
 }
 
@@ -440,7 +401,7 @@ h1, h2, h3, h5 {
     overflow-wrap: anywhere; /* prevent overflowing out of border*/
 }
 .post-item [data-embed-type="spoiler"] {
-    margin-bottom: 1em;
+    margin-bottom: 1rem;
 }
 .post-item div[data-embed-type="spoiler"] .header::before {
     display: block;
@@ -465,13 +426,13 @@ h1, h2, h3, h5 {
     display: block;
     font-family: Georgia, serif;
     font-style: oblique;
-    margin: 10px 0;
+    margin: 0.625rem 0;
     text-align: center;
     text-shadow: rgba(255,255,255,0.5) 0 1px 0;
 }
 
 .post-item figure[data-embed-type="gallery"] {
-    margin: 20px 0;
+    margin: 1.25rem 0;
     position: relative;
     border-bottom: 1px solid #bfbfbf;
     border-top: 1px solid #bfbfbf;
@@ -518,7 +479,7 @@ h1, h2, h3, h5 {
 }
 /** tables **/
 .post-item table {
-    margin: 20px 0;
+    margin: 1.25rem 0;
     overflow: hidden
 }
 
@@ -551,6 +512,58 @@ h1, h2, h3, h5 {
     background-color: rgba(0,0,0,0.15)
 }
 
+
+
+/** 
+    Search Layout
+**/
+#search {
+    background-color: white;
+    border-radius: 0.3rem;
+    margin: 4rem 17rem;
+    padding: 3em 2em 3em 2em
+}
+
+.searchCreator, .searchQuery, .searchSubmit {
+    margin: 0 auto;
+    display: block;
+    border-style: solid;
+}
+.searchCreator, .searchQuery {
+    height: 2rem;
+    width: 55%;
+    margin-bottom: 2rem;
+    background-color: rgb(242, 242, 242);
+}
+.searchSubmit {
+    margin-top: 3rem;
+    height: 2.5rem;
+    background-color: #4c754c;
+    color: white;
+    width: 8rem;
+}
+
+
+
+
+@media (max-width:1024px) {
+    #search {
+        margin: 4rem 8rem;
+        padding: 4em 2em 3em 2em
+    }
+}
+
+
+@media (max-width:768px) {
+    #search {
+        margin: 4rem 2rem;
+        padding: 3em 2em 3em 2em
+    }
+    .searchCreator, .searchQuery {
+        width: 70%;
+        height: 2.5rem;
+    }
+}
 
 
 
