@@ -13,10 +13,10 @@ img {
     border: 0;
 }
 h3,h4, .text-large {
-    font-size: 22px;
+    font-size: 1.4rem;
 }
 h2 {
-    font-size: 26px;
+    font-size: 1.6rem;
 }
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
@@ -324,7 +324,7 @@ h1, h2, h3, h5 {
     width: 3em;
     text-align: center;
     border-radius: 2px;
-    font-size: 13px;
+    font-size: 0.8rem;
     margin-left: 5px;
 }
 .post-item a {
@@ -338,28 +338,46 @@ h1, h2, h3, h5 {
 }
 
 
+
+
+
+
+
+
+
+
+/*~~~~~~~~~~~~~*/
+
 /* quotes */
 .post-item div[data-embed-type="message-quote"] div[data-embed-type="message-quote-content"] {
     border-left: 1px solid #cccfd1;
-    margin: 10px 0 10px 40px;
-    padding: 0 0 0 10px;
+    margin: 0.6rem 0 0.6rem 1.5rem; /* indent for quote */
+    padding: 0 0 0 0.6rem;
     overflow: hidden;
 }
 .post-item blockquote {
+    /* special quotes */
     font-family: -apple-system,".SFNSText-Regular",BlinkMacSystemFont,"San Francisco","Roboto","Segoe UI","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue","Helvetica","Lucida Grande",sans-serif;
-    padding: 10px 20px;
-    margin: 0 0 20px;
+    padding: 0.6rem 1.25rem;
+    margin: 0 0 1.24rem;
     border-left: 2px solid rgba(0,0,0,0.05);
     background-image: none;
     opacity: .75;
-    font-size: 14px;
-    line-height: 20px;
+    font-size: 0.9rem;
+    line-height: 1.25rem;
 }
 /** blog **/
 .poll-header {
     font-weight: 600;
-    font-size: 15px;
-    line-height: 20px;
+    font-size: 1rem;
+    line-height: 2rem;
+}
+.poll-header > h3 {
+    font-size: 1.7rem; /* font size of poll's title*/
+}
+.poll > .number {
+    font-size: 1.3rem; /* font size of poll entry */
+    padding-left: 0.5rem;
 }
 
 .post-item symbol {
@@ -406,15 +424,20 @@ h1, h2, h3, h5 {
     text-align: center;
 }
 .post-content h2 {
+    /* post heading 2 */
     clear: both;
-    margin-bottom: 20px;
-    padding-bottom: 5px;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.3rem;
     border-bottom: 1px solid #bfbfbf;
+}
+.post-content {
+    overflow-wrap: anywhere; /* prevent overflowing out of border*/
 }
 /* spoiler */
 .post-item div[data-embed-type="spoiler"] {
     border-left: solid 2px #017c37;
-    padding-left: 10px;
+    padding-left: 0.6rem;
+    overflow-wrap: anywhere; /* prevent overflowing out of border*/
 }
 .post-item [data-embed-type="spoiler"] {
     margin-bottom: 1em;
@@ -423,6 +446,17 @@ h1, h2, h3, h5 {
     display: block;
     color: #017c37;
     content: "Click to reveal **SPOILERS**";
+}
+
+.post-item span[data-embed-type="spoiler"] {
+    /* color of spoiler*/
+    background-color: #191919;
+    color: #191919;
+}
+.post-item span[data-embed-type="spoiler"]:hover {
+    /* color of hover */
+    background-color: #191919;
+    color: white;
 }
 
 /* images */
@@ -457,15 +491,7 @@ h1, h2, h3, h5 {
     content: "";
     display: table;
 }
-/* spoil */
-.post-item span[data-embed-type="spoiler"] {
-    background-color: #191919;
-    color: #191919;
-}
-.post-item span[data-embed-type="spoiler"]:hover {
-    background-color: white;
-    color: black;
-}
+
 
 /* video */
 .post-item div[data-embed-type="video"]::before {
