@@ -28,10 +28,11 @@
 ### Search
 -[x] add search
 -[x] search from user
-- [ ] possibly filter thread search by board, type
+-[ ] possibly filter thread search by board, type
 
 ### Stats
 -[ ] add stats UI
+-[ ] board stats
 
 ### Api
 -[ ] better styling for api documentation
