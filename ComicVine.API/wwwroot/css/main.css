@@ -26,52 +26,6 @@ h1, h2, h3, h5 {
     font-weight: bold;
 }
 
-.generic-container {
-    min-height: 100vh;
-}
-/** thread view */
-#thread-container {
-    /*width: 80%;*/
-    margin: 0 var(--side-width);
-    /*padding: 1em;*/
-    display: grid;
-    grid-template-columns: 3em 1fr 10em 10em 4em 4em;
-    align-content: start;
-}
-#thread-container > span:not(div:last-child) {
-    border-right: 1px solid #d1d4d6;
-}
-.thread-odd {
-    background-color: #ecedee;
-}
-.thread-even {
-}
-.thread-item {
-    height: 3em;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    padding: 4px;
-    border-bottom: 1px solid #d1d4d6;
-}
-.thread-header {
-    font-weight: bold;
-    border-top: 1px solid #d1d4d6;
-}
-.thread-title {
-    overflow: hidden;
-}
-.thread-index {
-    border-left: 1px solid #d1d4d6;
-}
-.thread-title > a {
-    font-weight: bold;
-}
-.thread-item > a{
-    color: black;
-    text-decoration: none;
-}
-
 /* pagination */
 .paginate {
     display: flex;
@@ -422,23 +376,28 @@ h1, h2, h3, h5 {
     width: 8em;
 }
 
-
-
+/* desktop */
 :root {
-    --side-width: 1rem;
+    --side-width: 5rem;
+    --nav-font-size: 1.1rem;
+    --nav-height: 3rem;
 }
-
-@media (min-width:768px) {
+/* tablet */
+@media (max-width:1024px) {
     :root {
-        --side-width: 2rem;
+        --side-width: 3rem;
+    }
+}
+/* mobile */
+@media (max-width:768px) {
+    :root {
+        --side-width: 1.5rem;
+        --nav-font-size: 1.3rem;
+        --nav-height: 4rem;
     }
 }
 
-@media (min-width:1024px) {
-    :root {
-        --side-width: 5rem;
-    }
-}
+
 
 
 /**
@@ -452,7 +411,8 @@ h1, h2, h3, h5 {
 
 .layout-nav {
     /**background-color: red;*/
-    height: 3.2rem;
+    height: var(--nav-height);
+    font-size: var(--nav-font-size);
     background-color: rgb(255, 255, 255);
     display: flex;
 }
@@ -485,23 +445,83 @@ h1, h2, h3, h5 {
     color: black;
 }
 .nav-item {
-    font-size: 1.1rem;
+    /**font-size: 1.1rem;*/
     align-self: center;
-    padding-left: 1em;
-    padding-right: 1em;
+    padding: 0 0.8rem;
 }
 #nav-logo {
-    height: 3em;
+    height: var(--nav-height);
 }
 .nav-highlight > a {
     color: rgb(1, 124, 55);
 }
 
 
+/** 
+    Thread Layout 
+*/
+.thread-container {
+    min-height: 30rem;
+    margin: auto var(--side-width);
+    display: grid;
+    grid-template-columns: 1fr 10rem 10rem 4rem 4rem;
+    align-content: start;
+}
+.thread-item {
+    height: 2rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: calc(1rem / 2);
+    border-bottom: 1px solid #d1d4d6;
+}
+.thread-item-title{
+    overflow: hidden;
+    border-left: 1px solid #d1d4d6;
+    padding-left: 1.5rem
+}
+.thread-item-title > a {
+    font-weight: bold;
+}
+
+@media (max-width:1200px) {
+    .thread-container{
+        grid-template-columns: 1fr 10rem 4rem 4rem;
+    }
+    .thread-item-board{
+        display: none;
+    }
+}
+@media (max-width:768px) {
+    .thread-container{
+        grid-template-columns: 1fr 4rem 4rem;
+    }
+    .thread-item-board,.thread-item-author{
+        display: none;
+    }
+}
+
+
+.thread-container > span:not(div:last-child) {
+    border-right: 1px solid #d1d4d6;
+}
+
+.thread-odd {
+    background-color: #ecedee;
+}
+.thread-even {
+}
 
 
 
-
+.thread-item > a{
+    color: black;
+    text-decoration: none;
+}
+.thread-header {
+    font-weight: bold;
+    border-top: 1px solid #d1d4d6;
+}
 
 
 

@@ -2,34 +2,32 @@
 @model (IEnumerable<Comicvine.Core.Parsers.Thread>, Func<Comicvine.Core.Parsers.Thread,string>)
 
 
-<div id="thread-container" class="generic-container">
-    <span class="thread-odd thread-item thread-header thread-index">#</span>
-    <span class="thread-odd thread-item thread-title thread-header">Title</span>
-    <span class="thread-odd thread-item thread-header">Board</span>
-    <span class="thread-odd thread-item thread-header">Author</span>
-    <span class="thread-odd thread-item thread-header">Posts</span>
-    <span class="thread-odd thread-item thread-header">Views</span>
+<div class="thread-container" >
+    <span class="thread-odd thread-item thread-header thread-item-title">Title</span>
+    <span class="thread-odd thread-item thread-header thread-item-board">Board</span>
+    <span class="thread-odd thread-item thread-header thread-item-author">Author</span>
+    <span class="thread-odd thread-item thread-header thread-item-posts">Posts</span>
+    <span class="thread-odd thread-item thread-header thread-item-views">Views</span>
     @foreach (var (index, thread) in Model.Item1.Select((t, i) => (i,t))) {
-        <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-index")"></span>
-        <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-title")">
+        <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-title")">
             <a href="@Url.Content(Model.Item2(thread))">
                 @await Html.PartialAsync("Shared/Components/Lock", thread.IsLocked)
                 @await Html.PartialAsync("Shared/Components/Pin" , thread.IsPinned)
                 @Html.Raw(thread.Thread.Text)
             </a>
         </span>
-        <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">
+        <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-board")">
             @Html.Raw(thread.Board.Text)
         </span>
-        <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">
+        <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-author")">
             <a href="@thread.Creator.Link">
                 @thread.Creator.Text
             </a>
         </span>
-        <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">
+        <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-posts")">
             @thread.TotalPosts
         </span>
-        <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item")">
+        <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-views")">
             @thread.TotalView
         </span>
     }
