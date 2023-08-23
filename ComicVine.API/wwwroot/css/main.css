@@ -56,242 +56,6 @@ h1, h2, h3, h5 {
 }
 
 
-/* posts */
-#post-container {
-    display: flex;
-    width: 80%;
-    flex-direction: column;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.post-item {
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 4px;
-    background-color: white;
-}
-
-.post-deleted {
-    background-color: #ff000014;
-}
-
-.post-no {
-    color: rgb(1, 124, 55);
-}
-
-.post-creator{
-    color: #999999;
-}
-.post-title {
-    margin-bottom: 1em;
-}
-.post-edited{
-    background-color: #d9d9d9;
-    display: inline-block;
-    width: 3em;
-    text-align: center;
-    border-radius: 2px;
-    font-size: 13px;
-}
-.post-item a {
-    color: #017c37;
-    text-decoration: none;
-}
-
-.post-thread {
-    font-weight: bold;
-    padding-bottom: 3px;
-}
-
-
-/* quotes */
-.post-item div[data-embed-type="message-quote"] div[data-embed-type="message-quote-content"] {
-    border-left: 1px solid #cccfd1;
-    margin: 10px 0 10px 40px;
-    padding: 0 0 0 10px;
-    overflow: hidden;
-}
-.post-item blockquote {
-    font-family: -apple-system,".SFNSText-Regular",BlinkMacSystemFont,"San Francisco","Roboto","Segoe UI","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue","Helvetica","Lucida Grande",sans-serif;
-    padding: 10px 20px;
-    margin: 0 0 20px;
-    border-left: 2px solid rgba(0,0,0,0.05);
-    background-image: none;
-    opacity: .75;
-    font-size: 14px;
-    line-height: 20px;
-}
-/** blog **/
-.poll-header {
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 20px;
-}
-
-.post-item symbol {
-    fill: currentColor;
-    position: relative;
-    top: -1px;
-    height: 1em;
-    width: 1em;
-    vertical-align: middle;
-}
-
-.poll-header span {
-    color: #198f19;
-}
-.progress {
-    overflow: hidden;
-    height: 14px;
-    padding: 2px;
-    margin-bottom: 18px;
-    border-radius: 10px;
-    box-sizing: content-box;
-    background-color: #3d4043;
-    background-image: linear-gradient(#303336,rgba(61,64,67,0));
-    background-repeat: repeat-x;
-}
-.progress .bar {
-    width: 0;
-    height: 14px;
-    color: #fff;
-    font-size: 12px;
-    text-align: center;
-    background: #21ba21;
-    border-radius: 10px;
-    transition: width 0.6s ease;
-}
-
-.post-item figure[data-size="large"] {
-    clear: both;
-    max-width: 100%;
-}
-.post-item [data-align="center"] {
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
-}
-.post-content h2 {
-    clear: both;
-    margin-bottom: 20px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #bfbfbf;
-}
-/* spoiler */
-.post-item div[data-embed-type="spoiler"] {
-    border-left: solid 2px #017c37;
-    padding-left: 10px;
-}
-.post-item [data-embed-type="spoiler"] {
-    margin-bottom: 1em;
-}
-.post-item div[data-embed-type="spoiler"] .header::before {
-    display: block;
-    color: #017c37;
-    content: "Click to reveal **SPOILERS**";
-}
-
-/* images */
-.post-item figcaption {
-    clear: both;
-    display: block;
-    font-family: Georgia, serif;
-    font-style: oblique;
-    margin: 10px 0;
-    text-align: center;
-    text-shadow: rgba(255,255,255,0.5) 0 1px 0;
-}
-
-.post-item figure[data-embed-type="gallery"] {
-    margin: 20px 0;
-    position: relative;
-    border-bottom: 1px solid #bfbfbf;
-    border-top: 1px solid #bfbfbf;
-}
-.post-item figure[data-embed-type="gallery"] a {
-    float: left;
-    width: 8%;
-    margin: 10px 1%;
-}
-.post-item figure[data-embed-type="gallery"] .image-gallery__label {
-    display: none;
-}
-.post-item figure[data-embed-type="gallery"]::after {
-    clear: both;
-}
-.post-item figure[data-embed-type="gallery"]::after {
-    content: "";
-    display: table;
-}
-/* spoil */
-.post-item span[data-embed-type="spoiler"] {
-    background-color: #191919;
-    color: #191919;
-}
-.post-item span[data-embed-type="spoiler"]:hover {
-    background-color: white;
-    color: black;
-}
-
-/* video */
-.post-item div[data-embed-type="video"]::before {
-    display: block;
-    content: " ";
-    height: 0;
-    width: 100%;
-    padding: 56.25% 0 0 0;
-}
-.post-item div[data-embed-type="video"] {
-    position: relative;
-    width: 100%;
-    max-width: inherit;
-}
-
-.post-item div[data-embed-type="video"] iframe {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-}
-/** tables **/
-.post-item table {
-    margin: 20px 0;
-    overflow: hidden
-}
-
-.post-item table[data-max-width="true"] {
-    width: 100%
-}
-
-.post-item table th,.post-item table td {
-    padding: 8px;
-    text-align: left;
-    border-collapse: collapse
-}
-
-.post-item table th {
-    background-color: rgba(0,0,0,0.3);
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    border-left: 1px solid rgba(255,255,255,0.1);
-    border-right: 1px solid rgba(0,0,0,0.1)
-}
-
-.post-item table th:first-child {
-    border-left: none
-}
-
-.post-item table th:last-child {
-    border-right: none
-}
-
-.post-item table tr:nth-of-type(odd) td {
-    background-color: rgba(0,0,0,0.15)
-}
-
 /* blog */
 #blog-container {
     width: 80%;
@@ -521,6 +285,244 @@ h1, h2, h3, h5 {
 .thread-header {
     font-weight: bold;
     border-top: 1px solid #d1d4d6;
+}
+
+/**
+    Posts Layout
+*/
+
+.post-container {
+    margin: auto var(--side-width);
+    display: flex;
+    flex-direction: column;
+}
+
+.post-item {
+    padding: 0.8rem;
+    margin-bottom: 1.2rem;
+    border-radius: calc(1rem/4);
+    background-color: white;
+}
+
+.post-deleted {
+    background-color: #ff000014;
+}
+
+.post-no {
+    color: rgb(1, 124, 55);
+}
+
+.post-creator{
+    color: #999999;
+}
+.post-title {
+    margin-bottom: 1rem;
+}
+.post-edited{
+    background-color: #9cc47c;
+    display: inline-block;
+    width: 3em;
+    text-align: center;
+    border-radius: 2px;
+    font-size: 13px;
+    margin-left: 5px;
+}
+.post-item a {
+    color: #017c37;
+    text-decoration: none;
+}
+
+.post-thread {
+    font-weight: bold;
+    padding-bottom: 3px;
+}
+
+
+/* quotes */
+.post-item div[data-embed-type="message-quote"] div[data-embed-type="message-quote-content"] {
+    border-left: 1px solid #cccfd1;
+    margin: 10px 0 10px 40px;
+    padding: 0 0 0 10px;
+    overflow: hidden;
+}
+.post-item blockquote {
+    font-family: -apple-system,".SFNSText-Regular",BlinkMacSystemFont,"San Francisco","Roboto","Segoe UI","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue","Helvetica","Lucida Grande",sans-serif;
+    padding: 10px 20px;
+    margin: 0 0 20px;
+    border-left: 2px solid rgba(0,0,0,0.05);
+    background-image: none;
+    opacity: .75;
+    font-size: 14px;
+    line-height: 20px;
+}
+/** blog **/
+.poll-header {
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 20px;
+}
+
+.post-item symbol {
+    fill: currentColor;
+    position: relative;
+    top: -1px;
+    height: 1em;
+    width: 1em;
+    vertical-align: middle;
+}
+
+.poll-header span {
+    color: #198f19;
+}
+.progress {
+    overflow: hidden;
+    height: 14px;
+    padding: 2px;
+    margin-bottom: 18px;
+    border-radius: 10px;
+    box-sizing: content-box;
+    background-color: #3d4043;
+    background-image: linear-gradient(#303336,rgba(61,64,67,0));
+    background-repeat: repeat-x;
+}
+.progress .bar {
+    width: 0;
+    height: 14px;
+    color: #fff;
+    font-size: 12px;
+    text-align: center;
+    background: #21ba21;
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+.post-item figure[data-size="large"] {
+    clear: both;
+    max-width: 100%;
+}
+.post-item [data-align="center"] {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+.post-content h2 {
+    clear: both;
+    margin-bottom: 20px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #bfbfbf;
+}
+/* spoiler */
+.post-item div[data-embed-type="spoiler"] {
+    border-left: solid 2px #017c37;
+    padding-left: 10px;
+}
+.post-item [data-embed-type="spoiler"] {
+    margin-bottom: 1em;
+}
+.post-item div[data-embed-type="spoiler"] .header::before {
+    display: block;
+    color: #017c37;
+    content: "Click to reveal **SPOILERS**";
+}
+
+/* images */
+.post-item figcaption {
+    clear: both;
+    display: block;
+    font-family: Georgia, serif;
+    font-style: oblique;
+    margin: 10px 0;
+    text-align: center;
+    text-shadow: rgba(255,255,255,0.5) 0 1px 0;
+}
+
+.post-item figure[data-embed-type="gallery"] {
+    margin: 20px 0;
+    position: relative;
+    border-bottom: 1px solid #bfbfbf;
+    border-top: 1px solid #bfbfbf;
+}
+.post-item figure[data-embed-type="gallery"] a {
+    float: left;
+    width: 8%;
+    margin: 10px 1%;
+}
+.post-item figure[data-embed-type="gallery"] .image-gallery__label {
+    display: none;
+}
+.post-item figure[data-embed-type="gallery"]::after {
+    clear: both;
+}
+.post-item figure[data-embed-type="gallery"]::after {
+    content: "";
+    display: table;
+}
+/* spoil */
+.post-item span[data-embed-type="spoiler"] {
+    background-color: #191919;
+    color: #191919;
+}
+.post-item span[data-embed-type="spoiler"]:hover {
+    background-color: white;
+    color: black;
+}
+
+/* video */
+.post-item div[data-embed-type="video"]::before {
+    display: block;
+    content: " ";
+    height: 0;
+    width: 100%;
+    padding: 56.25% 0 0 0;
+}
+.post-item div[data-embed-type="video"] {
+    position: relative;
+    width: 100%;
+    max-width: inherit;
+}
+
+.post-item div[data-embed-type="video"] iframe {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+/** tables **/
+.post-item table {
+    margin: 20px 0;
+    overflow: hidden
+}
+
+.post-item table[data-max-width="true"] {
+    width: 100%
+}
+
+.post-item table th,.post-item table td {
+    padding: 8px;
+    text-align: left;
+    border-collapse: collapse
+}
+
+.post-item table th {
+    background-color: rgba(0,0,0,0.3);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-left: 1px solid rgba(255,255,255,0.1);
+    border-right: 1px solid rgba(0,0,0,0.1)
+}
+
+.post-item table th:first-child {
+    border-left: none
+}
+
+.post-item table th:last-child {
+    border-right: none
+}
+
+.post-item table tr:nth-of-type(odd) td {
+    background-color: rgba(0,0,0,0.15)
 }
 
 

@@ -11,8 +11,8 @@
     @foreach (var (index, thread) in Model.Item1.Select((t, i) => (i,t))) {
         <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-title")">
             <a href="@Url.Content(Model.Item2(thread))">
-                @await Html.PartialAsync("Shared/Components/Lock", thread.IsLocked)
                 @await Html.PartialAsync("Shared/Components/Pin" , thread.IsPinned)
+                @await Html.PartialAsync("Shared/Components/Lock", thread.IsLocked)
                 @Html.Raw(thread.Thread.Text)
             </a>
         </span>

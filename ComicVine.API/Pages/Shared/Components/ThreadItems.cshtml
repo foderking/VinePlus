@@ -1,7 +1,7 @@
 ﻿@using ComicVine.API.Pages
 @model IEnumerable<Comicvine.Core.Parsers.Post>
 
-<div id="post-container" class="generic-container">
+<div class="post-container" >
     @foreach (var post in Model) {
         <div class="@Util.GetPostClass(post)">
             <div class="post-title">
