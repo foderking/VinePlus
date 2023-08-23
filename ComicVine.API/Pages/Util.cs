@@ -170,7 +170,7 @@ public static class Util
 
     public static class Image
     {
-        public static int BatchSize = 30;
+        public static int BatchSize = 36;
         
         public static async Task<IEnumerable<ImgData>> GetImages(Parsers.Image data, int offset) {
 

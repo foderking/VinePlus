@@ -10,13 +10,13 @@
 }
 
 @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
-<div id="img-container" class="generic-container">
+<div class="img-container">
 @foreach (var img in Model.Entities) {
-    <a href="@img.Original" target="_blank">
-        <div class="img-item">
+    <div class="img-item">
+        <a href="@img.Original" target="_blank">
             <img class="img-img" src="@img.Gallery" alt="A user's image"/>
-        </div>
-    </a>
+        </a>
+    </div>
 }
 </div>
 @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
