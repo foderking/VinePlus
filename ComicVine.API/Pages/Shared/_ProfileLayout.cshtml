@@ -9,48 +9,48 @@
 </head>
 
 <body>
-    <header>
+    <div class="layout">
         <nav class="layout-nav profile-nav">
-                <a href="/forums" class="nav-item">
-                    <img src="/images/logo.png" alt="logo" id="nav-logo"/>
+            <a href="/forums" class="nav-item">
+                <img src="/images/logo.png" alt="logo" id="nav-logo"/>
+            </a>
+            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Main)">
+                <a href="@Util.Profile.GetLink(ViewData, "/profile/")">
+                    Profile
                 </a>
-                <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Main)">
-                    <a href="@Util.Profile.GetLink(ViewData, "/profile/")">
-                        Profile
-                    </a>
-                </span>
-                @if ((bool?)ViewData[Keys.ProfileHasImage] ?? false) {
-                }
-                <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Images)">
-                    <a href="@Util.Profile.GetLink(ViewData, "/profile/images/")">
-                        Images
-                    </a>
-                </span>
-                @if ((bool?)ViewData[Keys.ProfileHasBlog] ?? false) {
-                }
-                <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Blogs)">
-                    <a href="@Util.Profile.GetLink(ViewData, "/profile/blogs/")">
-                        Blogs
-                    </a>
-                </span>
-                <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Threads)">
-                    <a href="@Util.Profile.GetLink(ViewData, "/profile/threads/")">
-                        Threads
-                    </a>
-                </span>
-                <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Posts)">
-                    <a href="@Util.Profile.GetLink(ViewData, "/profile/posts/")">
-                        Posts
-                    </a>
-                </span>
+            </span>
+            @if ((bool?)ViewData[Keys.ProfileHasImage] ?? false) {
+            }
+            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Images)">
+                <a href="@Util.Profile.GetLink(ViewData, "/profile/images/")">
+                    Images
+                </a>
+            </span>
+            @if ((bool?)ViewData[Keys.ProfileHasBlog] ?? false) {
+            }
+            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Blogs)">
+                <a href="@Util.Profile.GetLink(ViewData, "/profile/blogs/")">
+                    Blogs
+                </a>
+            </span>
+            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Threads)">
+                <a href="@Util.Profile.GetLink(ViewData, "/profile/threads/")">
+                    Threads
+                </a>
+            </span>
+            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Posts)">
+                <a href="@Util.Profile.GetLink(ViewData, "/profile/posts/")">
+                    Posts
+                </a>
+            </span>
         </nav>
-    </header>
 
-    <main class="layout-profile">
-        @RenderBody()
-    </main>
+        <main class="layout-profile">
+            @RenderBody()
+        </main>
 
         @await Html.PartialAsync("Shared/Components/Footer")
+    </div>
 <script>
 // loads lazy images
 let lazyLoad = node =>

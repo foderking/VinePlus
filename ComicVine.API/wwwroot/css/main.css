@@ -26,100 +26,21 @@ h1, h2, h3, h5 {
     font-weight: bold;
 }
 
-/* pagination */
-.paginate {
-    display: flex;
-    margin: 1em auto;
-    gap: 1em;
-    justify-content: center;
-}
-.pag-item {
-    /*align-self: center;*/
-    flex-basis: 1.5em;
-    color: #999;
-    background-color: rgb(247, 247, 248);
-    border-radius: 4px;
-    text-align: center;
-}
-.pag-on {
-    color: black;
-}
-.symbol{ 
-    /*width: inherit;*/
-    fill: currentColor;
-    height: 1em;
-    width: 1em;
-}
-
-.paginate > a {
-    text-decoration: none;
-}
-
-
-/* blog */
-#blog-container {
-    width: 80%;
-    margin: auto;
-}
-.blog-item {
-}
-.blog-item a {
-    color: #017c37;
-    text-decoration: none;
-}
-.blog-header {
-    font-size: 35px;
-    margin-top: 30px;
-    color: #105e10;
-}
-.blog-date {
-    flex-grow: 1;
-}
-.blog-comments{
-}
-
-.blog-bottom {
-    font-size: 20px;
-    border-bottom: 1px solid #bfbfbf;
-    font-style: italic;
-    display: flex;
-}
-
-/* profile images */
-#img-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    margin: auto;
-    width: 1440px;
-}
-.img-item {
-    height: 480px;
-    width: 480px;
-}
-
-/** profile error **/
-.profile-error {
-    font-size: 30px;
-    margin: 3em auto;
-    width: 60%;
-    text-align: center;
-}
-.profile-error  .profile-error-img {
-    display: block;
-    height: 15em;
-    margin: 0 auto;
-}
 
 /* desktop */
 :root {
     --side-width: 5rem;
     --nav-font-size: 1.1rem;
     --nav-height: 3rem;
+    --profile-img-size: 22rem;
+    --profile-avatar: 9.3rem;
+    --profile-title: 3.125rem;
 }
 /* tablet */
 @media (max-width:1024px) {
     :root {
         --side-width: 3rem;
+        --profile-img-size: 19rem;
     }
 }
 /* mobile */
@@ -128,6 +49,9 @@ h1, h2, h3, h5 {
         --side-width: 1.5rem;
         --nav-font-size: 1.3rem;
         --nav-height: 4rem;
+        --profile-img-size: 15rem;
+        --profile-avatar: 7rem;
+        --profile-title: 2.5rem;
     }
 }
 
@@ -162,7 +86,7 @@ h1, h2, h3, h5 {
 
 .heading {
     font-size: 2.5rem;
-    margin-top: 30px;
+    margin-top: 1.875rem;
     border-bottom: 1px solid #bfbfbf;
     color: #105e10;
     text-align: center;
@@ -247,7 +171,6 @@ h1, h2, h3, h5 {
 }
 
 
-
 .thread-item > a{
     color: black;
     text-decoration: none;
@@ -256,6 +179,8 @@ h1, h2, h3, h5 {
     font-weight: bold;
     border-top: 1px solid #d1d4d6;
 }
+
+
 
 /**
     Posts Layout
@@ -305,6 +230,7 @@ h1, h2, h3, h5 {
 .post-thread {
     font-weight: bold;
     padding-bottom: 3px;
+    font-size: 1.2rem;
 }
 
 
@@ -440,7 +366,7 @@ h1, h2, h3, h5 {
 .post-item figure[data-embed-type="gallery"] a {
     float: left;
     width: 8%;
-    margin: 10px 1%;
+    margin: 0.625rem 1%;
 }
 .post-item figure[data-embed-type="gallery"] .image-gallery__label {
     display: none;
@@ -488,7 +414,7 @@ h1, h2, h3, h5 {
 }
 
 .post-item table th,.post-item table td {
-    padding: 8px;
+    padding: 0.5rem;
     text-align: left;
     border-collapse: collapse
 }
@@ -512,6 +438,17 @@ h1, h2, h3, h5 {
     background-color: rgba(0,0,0,0.15)
 }
 
+
+/* post images */
+
+figure[data-size="medium"] {
+    /* medium image */
+    max-width: 19rem;
+}
+figure[data-size="small"] {
+    /* small image */
+    max-width: 10rem;
+}
 
 
 /** 
@@ -566,10 +503,10 @@ h1, h2, h3, h5 {
 }
 
 
+/** 
+    Profile Layout
+**/
 
-
-
-/* main profile */
 .profile-nav {
     background-color: #3b3b3b;
 }
@@ -579,6 +516,65 @@ h1, h2, h3, h5 {
 .profile-nav .nav-highlight > a {
     color: #21ba21;
 }
+
+    
+/* profile images */
+.img-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    margin: auto;
+    width: calc(var(--profile-img-size) * 4);
+}
+.img-item {
+    height: var(--profile-img-size);
+    width: var(--profile-img-size);
+}
+
+@media (max-width: 1024px) {
+    .img-container {
+        grid-template-columns: 1fr 1fr 1fr;
+        width: calc(var(--profile-img-size) * 3);
+    }
+}
+@media (max-width: 768px) {
+    .img-container {
+        grid-template-columns: 1fr 1fr;
+        width: calc(var(--profile-img-size) * 2);
+    }
+}
+
+/* profile blog */
+#blog-container {
+    width: 80%;
+    margin: auto;
+}
+.blog-item {
+}
+.blog-item a {
+    color: #017c37;
+    text-decoration: none;
+}
+.blog-header {
+    font-size: 2rem;
+    margin-top: 1.87rem;
+    color: #105e10;
+}
+.blog-date {
+    flex-grow: 1;
+}
+.blog-comments{
+}
+
+.blog-bottom {
+    font-size: 1.25rem;
+    border-bottom: 1px solid #bfbfbf;
+    font-style: italic;
+    display: flex;
+}
+
+
+/* main profile */
+
 .profile-header{
     background-size: cover;
     /*height: 300px;*/
@@ -598,8 +594,8 @@ h1, h2, h3, h5 {
 }
 .profile-avatar {
     /*width: 150px;*/
-    padding: 5px;
-    border-radius: 5px;
+    padding: 0.3rem;
+    border-radius: 0.3rem;
     box-shadow: rgba(255,255,255,0.15) 0 1px 0 inset;
     background-color: #2c3035;
     background-image: linear-gradient(#394046,rgba(44,48,53,0));
@@ -607,42 +603,105 @@ h1, h2, h3, h5 {
     border: 1px solid #0b0d0e;
 }
 .avatar {
-    width: 150px;
-    border-radius: 5px;
+    width: var(--profile-avatar);
+    border-radius: 0.3rem;
 }
 .profile-desc {
-    min-height: 150px;
+    min-height: var(--profile-title);
 }
 .profile-h {
-    font-size: 50px;
+    font-size: 3.125rem;
 }
 .profile-description {
     font-style: italic;
-    font-size: 22px;
+    font-size: 1.375rem;
     font-weight: bold;  
 }
 
+.activity {
+    font-size: 1.4rem;
+    text-transform: lowercase;
+    font-style: italic;
+    margin-bottom: 0.6rem;
+    color: #3b3b3b;
+}
+.activity-time {
+    color: #999999;
+}
+
+
 .profile-activity {
+    grid-area: activity;
     background-color: white;
+    width: 33rem;
     /*height: 100%;*/
-    display: grid;
-    grid-template-columns: 1fr 10em;
     padding: 1.5em;
-    border-radius: 5px;
+    border-radius: 0.3rem;
+    margin: 3rem 3rem;
+
+    display: grid;
+    grid-template-columns: 1fr 8em;
 }
 
 .profile-about {
     color: white;
-    border-radius: 5px;
+    border-radius: 0.3rem;
     /*background-color: blue;*/
+    grid-area: about;
     /*height: 100%;*/   
+    margin: 3rem 9rem;
 }
 .profile-main {
     /*height: 100px;*/
     display: grid;
-    grid-template-columns: 1fr 30em;
+    /*grid-template-columns: 1fr 30em;*/
+    grid-template-areas: "activity about";
     column-gap: 8em;
 }
+
+@media (max-width: 768px){
+    .profile-main {
+        grid-template-areas: 
+            "about"
+            "activity";
+    }
+    .profile-about, .profile-activity{
+        margin: 2rem 4rem;
+    }
+    .activity{
+        font-size: 1.25rem;
+    }
+
+    .profile-activity {
+    grid-template-columns: 1fr 8em;
+    }
+    .profile-stats {
+        grid-template-columns: 10em 1fr;
+    }
+}
+
+@media (max-width: 1024px){
+    .profile-main {
+        grid-template-areas: 
+            "about"
+            "activity";
+    }
+    .profile-about, .profile-activity{
+        margin: 2rem 4rem;
+    }
+    .activity{
+        font-size: 1.25rem;
+    }
+
+    .profile-activity {
+    grid-template-columns: 1fr 8em;
+    }
+    .profile-stats {
+        grid-template-columns: 10em 1fr;
+    }
+}
+
+
 .profile-stats {
     background: #3b3b3b;
     padding: 1em;
@@ -659,15 +718,46 @@ h1, h2, h3, h5 {
 .profile-stat-value {
     font-style: italic;
 }
-.activity {
-    font-size: 25px;
-    text-transform: lowercase;
-    font-style: italic;
-    margin-bottom: 10px;
-    color: #3b3b3b;
+
+/** profile error **/
+.profile-error {
+    font-size: 1.87rem;
+    margin: 3em auto;
+    width: 60%;
+    text-align: center;
 }
-.activity-time {
-    color: #999999;
+.profile-error  .profile-error-img {
+    display: block;
+    height: 15em;
+    margin: 0 auto;
 }
 
 
+/* pagination */
+.paginate {
+    display: flex;
+    margin: 1em auto;
+    gap: 1em;
+    justify-content: center;
+}
+.pag-item {
+    /*align-self: center;*/
+    flex-basis: 1.5em;
+    color: #999;
+    background-color: rgb(247, 247, 248);
+    border-radius: 0.25rem;
+    text-align: center;
+}
+.pag-on {
+    color: black;
+}
+.symbol{ 
+    /*width: inherit;*/
+    fill: currentColor;
+    height: 1em;
+    width: 1em;
+}
+
+.paginate > a {
+    text-decoration: none;
+}

@@ -31,68 +31,66 @@
             </div>
         </div>
     </div>
-    <div id="container">
-        <div class="profile-main">
-            <div class="profile-activity">
-                @foreach (var activity in Model.UserProfile.Activities) {
-                    <div class="activity">
-                        @Model.UserName added a new @activity.Type
-                    </div>
-                    <time class="activity-time">@activity.Date</time>
-                }
-            </div> 
-            <div class="profile-about">
-                <img 
-                    class="profile-cover" 
-                    src="@(Model.UserProfile.CoverImage == "" ? Model.FallBackImage : Model.UserProfile.CoverImage)" 
-                    alt="user's cover image"
-                />
-                
-                <div class="profile-stats">
-                    <div class="profile-stat-key">
-                        Date Joined
-                    </div>
-                    <div class="profile-stat-value">
-                        @Model.UserProfile.About.DateJoined
-                    </div>
-
-                    <div class="profile-stat-key">
-                        Alignment
-                    </div>
-                    <div class="profile-stat-value">
-                        @Model.UserProfile.About.Alignment
-                    </div>
- 
-                   <div class="profile-stat-key">
-                        Posts
-                    </div>
-                    <div class="profile-stat-value">
-                        @Model.UserProfile.Posts
-                    </div>
-
-                    <div class="profile-stat-key">
-                        Wiki Points
-                    </div>
-                    <div class="profile-stat-value">
-                        @Model.UserProfile.WikiPoints
-                    </div>
-                    
-                     <div class="profile-stat-key">
-                        Following
-                    </div>
-                    <div class="profile-stat-value">
-                        @Model.UserProfile.Following
-                    </div>
-
-                    <div class="profile-stat-key">
-                        Followers
-                    </div>
-                    <div class="profile-stat-value">
-                        @Model.UserProfile.Followers
-                    </div>
+    <div class="profile-main">
+        <div class="profile-activity">
+            @foreach (var activity in Model.UserProfile.Activities) {
+                <div class="activity">
+                    @Model.UserName added a new @activity.Type
                 </div>
-            </div> 
-        </div>
+                <time class="activity-time">@activity.Date</time>
+            }
+        </div> 
+        <div class="profile-about">
+            <img 
+                class="profile-cover" 
+                src="@(Model.UserProfile.CoverImage == "" ? Model.FallBackImage : Model.UserProfile.CoverImage)" 
+                alt="user's cover image"
+            />
+            
+            <div class="profile-stats">
+                <div class="profile-stat-key">
+                    Date Joined
+                </div>
+                <div class="profile-stat-value">
+                    @Model.UserProfile.About.DateJoined
+                </div>
+
+                <div class="profile-stat-key">
+                    Alignment
+                </div>
+                <div class="profile-stat-value">
+                    @Model.UserProfile.About.Alignment
+                </div>
+
+               <div class="profile-stat-key">
+                    Posts
+                </div>
+                <div class="profile-stat-value">
+                    @Model.UserProfile.Posts
+                </div>
+
+                <div class="profile-stat-key">
+                    Wiki Points
+                </div>
+                <div class="profile-stat-value">
+                    @Model.UserProfile.WikiPoints
+                </div>
+                
+                 <div class="profile-stat-key">
+                    Following
+                </div>
+                <div class="profile-stat-value">
+                    @Model.UserProfile.Following
+                </div>
+
+                <div class="profile-stat-key">
+                    Followers
+                </div>
+                <div class="profile-stat-value">
+                    @Model.UserProfile.Followers
+                </div>
+            </div>
+        </div> 
     </div>
 }
 else {
