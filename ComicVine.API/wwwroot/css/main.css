@@ -80,7 +80,7 @@ h1, h2, h3, h5 {
 }
 .layout-footer {
     margin-top: auto; /* forces footer to bottom. needs flexbox for some reason*/
-    background-color: green;
+    background-color: #f2f2f2;
     height: 4rem;
 }
 
@@ -214,7 +214,9 @@ h1, h2, h3, h5 {
     margin-bottom: 1rem;
 }
 .post-edited{
-    background-color: #9cc47c;
+    background-color: #017c37bd;
+    color: white;
+    padding: 0rem 0.1rem 0.1rem 0.1rem;
     display: inline-block;
     width: 3em;
     text-align: center;
@@ -253,6 +255,7 @@ h1, h2, h3, h5 {
     font-size: 0.9rem;
     line-height: 1.25rem;
 }
+
 /** blog **/
 .poll-header {
     font-weight: 600;
@@ -263,8 +266,10 @@ h1, h2, h3, h5 {
     font-size: 1.7rem; /* font size of poll's title*/
 }
 .poll > .number {
-    font-size: 1.3rem; /* font size of poll entry */
-    padding-left: 0.5rem;
+    font-size: 1.2rem; /* font size of poll entry */
+    font-weight: 500;
+    padding-left: 0.2rem;
+    margin-bottom: 0.2rem;
 }
 
 .post-item symbol {
@@ -319,6 +324,12 @@ h1, h2, h3, h5 {
 }
 .post-content {
     overflow-wrap: anywhere; /* prevent overflowing out of border*/
+}
+/* time */
+.post-time {
+    color: #6d6d6d;
+    font-weight: 500;
+    font-size: 0.9rem;
 }
 /* spoiler */
 .post-item div[data-embed-type="spoiler"] {
@@ -633,7 +644,6 @@ figure[data-size="small"] {
 .profile-activity {
     grid-area: activity;
     background-color: white;
-    width: 33rem;
     /*height: 100%;*/
     padding: 1.5em;
     border-radius: 0.3rem;
@@ -659,6 +669,32 @@ figure[data-size="small"] {
     column-gap: 8em;
 }
 
+@media(min-width: 1024px){
+    /* seperate formatting for desktop */
+    .profile-activity {
+        width: 33rem;
+    }
+}
+@media (max-width: 1024px){
+    .profile-main {
+        grid-template-areas: 
+            "about"
+            "activity";
+    }
+    .profile-about, .profile-activity{
+        margin: 2rem 14rem;
+    }
+    .activity{
+        font-size: 1.25rem;
+    }
+
+    .profile-activity {
+    grid-template-columns: 1fr 8em;
+    }
+    .profile-stats {
+        grid-template-columns: 10em 1fr;
+    }
+}
 @media (max-width: 768px){
     .profile-main {
         grid-template-areas: 
@@ -680,26 +716,6 @@ figure[data-size="small"] {
     }
 }
 
-@media (max-width: 1024px){
-    .profile-main {
-        grid-template-areas: 
-            "about"
-            "activity";
-    }
-    .profile-about, .profile-activity{
-        margin: 2rem 4rem;
-    }
-    .activity{
-        font-size: 1.25rem;
-    }
-
-    .profile-activity {
-    grid-template-columns: 1fr 8em;
-    }
-    .profile-stats {
-        grid-template-columns: 10em 1fr;
-    }
-}
 
 
 .profile-stats {
