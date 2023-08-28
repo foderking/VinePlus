@@ -38,12 +38,24 @@
 
 <script>
 // loads lazy images
-let lazyLoad = node =>
-    node.setAttribute("src", node.getAttribute("data-src"))
-
 document
     .querySelectorAll(".js-lazy-load-image")
-    .forEach(lazyLoad)
+    .forEach(node =>
+        node.setAttribute("src", node.getAttribute("data-src"))
+    )
+// loads lazy videos
+document
+    .querySelectorAll(".js-lazy-load-video")
+    .forEach(vid => {
+        if (vid.getAttribute("data-lazy-load")) {
+            const iframe = document.createElement("iframe")
+            for (const attr of vid.attributes) {
+                iframe.setAttributeNS(null, attr.name, attr.value)
+            }
+            iframe.setAttributeNS(null, "data-lazy-load", false)
+            vid.replaceWith(iframe)
+        }
+    })
 </script>
 </body>
 </html>
