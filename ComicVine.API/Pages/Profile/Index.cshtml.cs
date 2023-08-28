@@ -21,6 +21,7 @@ public class Index : PageModel
             HasImage = UserProfile.HasImages;
         }
         catch {
+            /* needed for navigation to work for deactivated accounts */
             if (user.StartsWith("deactivated")) {
                 UserName = user;
             }
