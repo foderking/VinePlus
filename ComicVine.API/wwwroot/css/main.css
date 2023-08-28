@@ -82,6 +82,9 @@ h1, h2, h3, h5 {
     margin-top: auto; /* forces footer to bottom. needs flexbox for some reason*/
     background-color: #f2f2f2;
     height: 4rem;
+    display: flex;
+    gap: 1rem;
+    padding-left: 1rem;
 }
 
 .heading {
@@ -791,4 +794,10 @@ figure[data-size="small"] {
 
 .paginate > a {
     text-decoration: none;
+}
+
+/* footer images */
+.footer-img {
+    height: 20px;
+    width: 20px;
 }
