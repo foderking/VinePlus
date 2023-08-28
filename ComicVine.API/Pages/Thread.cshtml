@@ -10,6 +10,5 @@
 
 @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
 @await Html.PartialAsync("Shared/Components/ThreadItems", Model.Entities)
-@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
-
 @await Html.PartialAsync("Shared/Components/ThreadFooter", $"https://comicvine.gamespot.com{Model.OriginalThread}")
+@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
