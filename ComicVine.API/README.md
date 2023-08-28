@@ -22,7 +22,7 @@
 - [x] add way to copy link to a specific post
 
 ### Threads 
-- [ ] ability to sort threads by different criteria
+- [ ] ~~ability to sort threads by different criteria~~
 - [ ] thread should have a link to the og post on cv
 - [ ] shows full title of thread on hover
 - [ ] forum should be able to link to the last post
@@ -34,7 +34,7 @@
 ### Search
 - [x] add search
 - [x] search from user
-- [ ] possibly filter thread search by board, type
+- ~~[ ] possibly filter thread search by board, type~~
 
 ### Stats
 - [ ] add stats UI
@@ -51,5 +51,5 @@
 
 ## Archives
 - [x] sorting of threads by no of posts 
-- [ ] sorting of posts by date created
+- [ ] ~~sorting of posts by date created~~
 - [x] highlight for deleted posts
