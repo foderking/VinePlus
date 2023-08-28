@@ -11,12 +11,12 @@
 @if (Model.NavRecord.CurrentPage <= 0)
 {
     @await Html.PartialAsync("Shared/Components/ThreadItems", Model.Entities)
+    @await Html.PartialAsync("Shared/Components/ThreadFooter", $"https://comicvine.gamespot.com{Model.CurrentThread?.Thread.Link ?? ""}")
 }
 else
 {
     @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
     @await Html.PartialAsync("Shared/Components/ThreadItems", Model.Entities)
+    @await Html.PartialAsync("Shared/Components/ThreadFooter", $"https://comicvine.gamespot.com{Model.CurrentThread?.Thread.Link ?? ""}")
     @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
 }
-
-@await Html.PartialAsync("Shared/Components/ThreadFooter", $"https://comicvine.gamespot.com{Model.CurrentThread?.Thread.Link ?? ""}")

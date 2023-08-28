@@ -85,6 +85,7 @@ h1, h2, h3, h5 {
     display: flex;
     gap: 1rem;
     padding-left: 1rem;
+    align-items: center;
 }
 
 .heading {
@@ -800,4 +801,12 @@ figure[data-size="small"] {
 .footer-img {
     height: 20px;
     width: 20px;
+}
+
+
+.original-thread {
+    text-decoration: none;
+    color: #017c37;
+    margin-left: var(--side-width);
+    font-weight: 500;
 }
