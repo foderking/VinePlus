@@ -19,7 +19,7 @@
 - [x] add time stamp to posts
 - [x] ui improvements on timestamp
 - [x] change color of edited button
-- [ ] add way to copy link to a specific post
+- [x] add way to copy link to a specific post
 
 ### Threads 
 - [ ] ability to sort threads by different criteria
