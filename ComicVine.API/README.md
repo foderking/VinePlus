@@ -10,7 +10,7 @@
 - [ ] refactor internals
 - [x] add polling worker
 - [x] default error pages for web interface
-- [ ] error handling for deactivated profiles
+- [x] error handling for deactivated profiles
 - [ ] add footer linking to api on forums
 - [ ] add ui icons for polls and stuff
 
