@@ -15,7 +15,7 @@
 - [ ] add ui icons for polls and stuff
 
 ### Posts
-- [ ] fix youtube video in posts (http://localhost:5119/archives/thread/2308691#11)
+- [x] fix youtube video in posts (http://localhost:5119/archives/thread/2308691#11)
 - [x] add time stamp to posts
 - [x] ui improvements on timestamp
 - [x] change color of edited button
