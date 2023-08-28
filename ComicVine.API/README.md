@@ -11,8 +11,8 @@
 - [x] add polling worker
 - [x] default error pages for web interface
 - [x] error handling for deactivated profiles
-- [ ] add footer linking to api on forums
-- [ ] add ui icons for polls and stuff
+- [x] add footer linking to api on forums
+- [ ] ~~add ui icons for polls and stuff~~
 
 ### Posts
 - [x] fix youtube video in posts (http://localhost:5119/archives/thread/2308691#11)
@@ -23,7 +23,7 @@
 
 ### Threads 
 - [ ] ~~ability to sort threads by different criteria~~
-- [ ] thread should have a link to the og post on cv
+- [x] thread should have a link to the og post on cv
 - [ ] shows full title of thread on hover
 - [ ] forum should be able to link to the last post
 
