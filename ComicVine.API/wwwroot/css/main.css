@@ -29,7 +29,7 @@ h1, h2, h3, h5 {
 
 /* desktop */
 :root {
-    --side-width: 5rem;
+    --side-width: 7rem;
     --nav-font-size: 1.1rem;
     --nav-height: 3rem;
     --profile-img-size: 22rem;
@@ -46,7 +46,7 @@ h1, h2, h3, h5 {
 /* mobile */
 @media (max-width:768px) {
     :root {
-        --side-width: 1.5rem;
+        --side-width: 1rem;
         --nav-font-size: 1.3rem;
         --nav-height: 4rem;
         --profile-img-size: 15rem;
@@ -197,7 +197,15 @@ h1, h2, h3, h5 {
     margin-bottom: 1.2rem;
     border-radius: calc(1rem/4);
     background-color: white;
+    font-size: 1.0rem;
 }
+
+/*@media(max-width: 768px){
+    .post-item{
+
+        font-size: 1.1rem;
+    }
+}*/
 
 .post-deleted {
     background-color: #ff000014;
@@ -209,20 +217,23 @@ h1, h2, h3, h5 {
 
 .post-creator{
     color: #999999;
+    margin-left: 0.4rem;
+    margin-right: auto;
+    /*font-weight: 500;*/
 }
 .post-title {
-    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
 }
 .post-edited{
-    background-color: #017c37bd;
+    background-color: #017c378a;
     color: white;
-    padding: 0rem 0.1rem 0.1rem 0.1rem;
+    padding: 0.05rem;
     display: inline-block;
     width: 3em;
     text-align: center;
     border-radius: 2px;
     font-size: 0.8rem;
-    margin-left: 5px;
 }
 .post-item a {
     color: #017c37;
@@ -346,17 +357,21 @@ h1, h2, h3, h5 {
     content: "Click to reveal **SPOILERS**";
 }
 
-.post-item span[data-embed-type="spoiler"] {
+.post-item span[data-embed-type="spoiler"], .post-item span[data-embed-type="spoiler"] a {
     /* color of spoiler*/
     background-color: #191919;
     color: #191919;
 }
 .post-item span[data-embed-type="spoiler"]:hover {
     /* color of hover */
-    background-color: #191919;
-    color: white;
+    background-color: white;
+    color: black;
 }
-
+ .post-item span[data-embed-type="spoiler"]:hover a {
+     /* undo spoiler of mentions specially */
+     color: #017c37;
+     background-color: white;
+ }
 /* images */
 .post-item figcaption {
     clear: both;
