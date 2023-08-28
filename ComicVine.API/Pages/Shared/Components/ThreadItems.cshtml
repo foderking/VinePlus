@@ -6,7 +6,9 @@
         <div class="@Util.GetPostClass(post)">
             <div class="post-title">
                 <span class="post-no" id="@post.PostNo.ToString()">
-                    #@post.PostNo
+                    <a href="#@(post.PostNo)">
+                        #@post.PostNo
+                    </a>
                 </span>
                 <span class="post-creator">
                     <a href="@post.Creator.Link">
