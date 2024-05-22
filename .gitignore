@@ -10,3 +10,6 @@ bin/*
 /VinePlus.Web/bin
 /VinePlus.Polling/obj
 /VinePlus.Seed/obj
+/VinePlus.Web/obj
+*.user
+/VinePlus.Web/Properties
