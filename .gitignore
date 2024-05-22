@@ -1,10 +1,1 @@
-bin/
-obj/
-/packages/
-riderModule.iml
-/_ReSharper.Caches/
-settings.json
 .vs
-.idea
-*.sln.DotSettings.user
-/ComicVine.API/efbundle
