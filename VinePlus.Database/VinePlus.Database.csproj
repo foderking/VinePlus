@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>Comicvine.Database</RootNamespace>
+        <UserSecretsId>816e9259-ccc9-444b-9439-af883f6815d4</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
