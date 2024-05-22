@@ -1,2 +1,12 @@
 .vs
-*/bin/*
+bin/*
+/VinePlus.Core/bin
+/VinePlus.Core.Test/bin
+/VinePlus.Core/obj
+/VinePlus.Core.Test/obj
+/VinePlus.Polling/bin
+/VinePlus.Seed/bin/Release/net6.0
+/VinePlus.Web/ApiControllers.cs
+/VinePlus.Web/bin
+/VinePlus.Polling/obj
+/VinePlus.Seed/obj
