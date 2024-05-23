@@ -18,7 +18,7 @@ The database can be hydrated in two methods. You can either download all the dat
 - Go to [web application](../VinePlus.Web)
 - push migrations to the database with `dotnet-ef database update --connection="connection string"`. Now the schema is on the db
 - Build the [seed project](../VinePlus.Seed/README.md)
-- Run it
+- Follow the instructions there to download the data in CSV files
 - import the generated csv file into the database with pgadmin or any other method of your choice
 
 ### Method 2
