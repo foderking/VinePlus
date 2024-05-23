@@ -7,7 +7,7 @@ After it is done, a bunch of csv files are created: `threads_full.csv` containin
 ## Prerequisites
 - Make sure you have [installed dotnet 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 - Make sure you have [installed redis](https://redis.io/docs/getting-started/installation/)
-- Bash shell
+- Bash shell, jq
 
 ## Getting Started
 - Make sure redis is installed and star the redis server with `redis-server`
