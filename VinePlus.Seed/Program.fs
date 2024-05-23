@@ -16,13 +16,13 @@ type PollCreator<'T> =
 /// A function that takes the dependency and makes a request to comicvine for the required data
 type PollUser<'T,'U> =
   'T -> Task<'U>
-  
-/// A single page of a particular thread on comicvine
-type ThreadPage = string * int
 
 /// A function that stores required data in redis
 type PollConsumer<'U> =
   IDatabase -> 'U -> Task
+  
+/// A single page of a particular thread on comicvine
+type ThreadPage = string * int
 
 
 /// Key to the redis hash containing all threads parsed from comicvine so far

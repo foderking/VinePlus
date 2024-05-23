@@ -13,3 +13,4 @@ bin/*
 /VinePlus.Web/obj
 *.user
 /VinePlus.Web/Properties
+/VinePlus.Seed/bin/Debug/net6.0
