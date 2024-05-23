@@ -1,7 +1,7 @@
 ﻿# VinePlus
 
 This project helps run the [comic-vine forum](https://comicvine.gamespot.com/forums/) locally.
-A postgres database `VinePlus.Database` is used for storage. A background worker in `VinePlus.Polling` is used to keeps the database up to date.
+`VinePlus.Web` contains the main web application. A postgres database `VinePlus.Database` is used for storage. A background worker in `VinePlus.Polling` is used to keeps the database up to date.
 
 ## Getting Started
 

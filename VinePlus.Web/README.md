@@ -66,6 +66,8 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [x] add search
 - [x] search from user
 - ~~[ ] possibly filter thread search by board, type~~
+- [ ] "How to search" UI
+- [ ] pagination for search
 
 ### Stats
 - [ ] add stats UI
