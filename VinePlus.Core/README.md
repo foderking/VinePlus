@@ -1,3 +1,3 @@
 ﻿# VinePlus.Core
 
-Core library for the whole project
+Core library containing base types and function used in the whole project
