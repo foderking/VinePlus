@@ -5,7 +5,7 @@ As of the time of writing, there are about 840,000 threads and 22,000,000 posts 
 After it is done, a bunch of csv files are created: `threads_full.csv` containing the data for all threads, and `posts_<x>.csv` for all the <x> posts
 
 ## Prerequisites
-- Make sure you have [installed dotnet 6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+- Make sure you have [installed dotnet 9.0](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
 - Make sure you have [installed redis](https://redis.io/docs/getting-started/installation/)
 - Bash shell, jq
 
