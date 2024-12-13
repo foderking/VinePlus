@@ -10,6 +10,9 @@
     <span class="thread-odd thread-item thread-header thread-item-views">Views</span>
     @foreach (var (index, thread) in Model.Item1.Select((t, i) => (i,t))) {
         <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-title")">
+            <a class="last-post-no" href="@Url.Content(Model.Item2(thread) + $"&p={thread.LastPostPage}#{thread.LastPostNo}")">
+                 »
+            </a>
             <span class="thread-tooltip">
                 @thread.Thread.Text    
             </span>
@@ -17,9 +20,6 @@
                 @await Html.PartialAsync("Shared/Components/Pin" , thread.IsPinned)
                 @await Html.PartialAsync("Shared/Components/Lock", thread.IsLocked)
                 @Html.Raw(thread.Thread.Text)
-            </a>
-            <a class="last-post-no" href="@Url.Content(Model.Item2(thread) + $"&p={thread.LastPostPage}#{thread.LastPostNo}")">
-                 »
             </a>
                                                                                           </span>
         <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-board")">

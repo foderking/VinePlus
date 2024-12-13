@@ -140,7 +140,6 @@ h1, h2, h3, h5 {
 .thread-item-title{
     overflow: hidden;
     border-left: 1px solid #d1d4d6;
-    padding-left: 1.5rem
 }
 .thread-item-title > a {
     font-weight: bold;
