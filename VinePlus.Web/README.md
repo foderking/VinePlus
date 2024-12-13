@@ -56,7 +56,7 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [ ] ~~ability to sort threads by different criteria~~
 - [x] thread should have a link to the og post on cv
 - [ ] shows full title of thread on hover
-- [ ] forum should be able to link to the last post
+- [x] forum should be able to link to the last post
 
 ### Profile
 - [x] make images and blogs on user profile optional
