@@ -15,7 +15,10 @@
                 @await Html.PartialAsync("Shared/Components/Lock", thread.IsLocked)
                 @Html.Raw(thread.Thread.Text)
             </a>
-        </span>
+            <a class="last-post-no" href="@Url.Content(Model.Item2(thread) + $"&p={thread.LastPostPage}#{thread.LastPostNo}")">
+                 »
+            </a>
+                                                                                          </span>
         <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-board")">
             @Html.Raw(thread.Board.Text)
         </span>

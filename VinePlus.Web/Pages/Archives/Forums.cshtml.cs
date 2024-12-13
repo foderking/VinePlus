@@ -9,7 +9,6 @@ public class Forums : Navigator<Parsers.Thread>, IForum
 
     public Forums(ComicvineContext context) {
         _context = context;
-
     }
     
     public void OnGet(int p) {

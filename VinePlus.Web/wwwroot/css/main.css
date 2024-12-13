@@ -810,3 +810,7 @@ figure[data-size="small"] {
     margin-left: var(--side-width);
     font-weight: 500;
 }
+
+.last-post-no {
+    color: #017c37 !important;
+}
