@@ -55,7 +55,7 @@ The first can be time consuming - especially on low internet speed, while the ba
 ### Threads 
 - [ ] ~~ability to sort threads by different criteria~~
 - [x] thread should have a link to the og post on cv
-- [ ] shows full title of thread on hover
+- [x] shows full title of thread on hover
 - [x] forum should be able to link to the last post
 
 ### Profile

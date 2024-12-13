@@ -814,3 +814,33 @@ figure[data-size="small"] {
 .last-post-no {
     color: #017c37 !important;
 }
+
+.thread-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    transform: translateY(-100%);
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+}
+.thread-item-title:hover .thread-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 1s; /* 2-second delay */
+}
+
+.thread-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
