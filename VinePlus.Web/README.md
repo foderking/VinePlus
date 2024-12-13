@@ -61,6 +61,9 @@ The first can be time consuming - especially on low internet speed, while the ba
 ### Profile
 - [x] make images and blogs on user profile optional
 - [x] refactors for thread and post view on user profile (and errors for deactivated accounts)
+- [ ] more stuff on deactivated users
+- [ ] fallbacks when profile not found
+- [ ] different color for nav header
 
 ### Search
 - [x] add search
@@ -84,5 +87,6 @@ The first can be time consuming - especially on low internet speed, while the ba
 
 ## Archives
 - [x] sorting of threads by no of posts 
+- [ ] sorting by various parameters
 - [ ] ~~sorting of posts by date created~~
 - [x] highlight for deleted posts
