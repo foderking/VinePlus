@@ -95,5 +95,6 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [x] highlight for deleted posts
 
 ## Features
-- ability to view all posts, threads, and blog made by users
-- ability to view deleted posts
+- Viewing posts, threads, and blog made by a specific user
+- Viewing deleted posts
+- Sorting forums by number of posts, views, and date created
