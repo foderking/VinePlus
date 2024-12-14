@@ -35,6 +35,6 @@ public class Thread : Navigator<Parsers.Post>
     }
     
     public override Func<string, int, string> PageDelegate() {
-        return (id, page) => $"/archives/thread/{id}/{page}";
+        return (id, page) => $"/archives/thread/{id}/?p={page}";
     }
 }
