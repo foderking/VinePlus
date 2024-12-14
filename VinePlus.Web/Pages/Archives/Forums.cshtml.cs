@@ -13,7 +13,7 @@ public class Forums : Navigator<Parsers.Thread>, IForum
     }
     
     public void OnGet(int p, string? sort_by) {
-        sort_param = $"?sort_by={sort_by}" ?? ""; 
+        sort_param = sort_by!=null ? $"?sort_by={sort_by}" : ""; 
         SortForumBy sort = sort_by switch
         {
             "views" => SortForumBy.NoViews,
