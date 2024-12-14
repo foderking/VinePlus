@@ -51,6 +51,13 @@ public static class MainHighlight
     public const string Stats = "stats";
 }
 
+public enum SortForumBy
+{
+    DateCreated, // sorts by id
+    NoViews,
+    NoPosts
+}
+
 public class ImgData
 {
     [JsonPropertyName("dateCreated")]
@@ -131,13 +138,29 @@ public static class Util
             ;
     }
 
-    public static IEnumerable<Parsers.Thread> GetArchivedThreads(ComicvineContext context, int page) {
-        return context
-            .Threads
-            .OrderByDescending(t => t.Id)
-            .Skip(ThreadPerPage * (page - 1))
-            .Take(ThreadPerPage)
-            ;
+    public static IEnumerable<Parsers.Thread> getArchivedThreads(ComicvineContext context, int page, SortForumBy sort_by = SortForumBy.DateCreated) {
+        return sort_by switch
+        {
+            SortForumBy.DateCreated => 
+                context
+                .Threads
+                .OrderByDescending(t => t.Id)
+                .Skip(ThreadPerPage * (page - 1))
+                .Take(ThreadPerPage),
+            SortForumBy.NoViews => 
+                context
+                .Threads
+                .OrderByDescending(t => t.TotalView)
+                .Skip(ThreadPerPage * (page - 1))
+                .Take(ThreadPerPage),
+            SortForumBy.NoPosts => 
+                context
+                .Threads
+                .OrderByDescending(t => t.TotalPosts)
+                .Skip(ThreadPerPage * (page - 1))
+                .Take(ThreadPerPage),
+            _ => throw new ArgumentOutOfRangeException(nameof(sort_by), sort_by, null)
+        };
     }
 
     public static int GetThreadsMaxPage(ComicvineContext context) {
