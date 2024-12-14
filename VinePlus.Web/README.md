@@ -64,6 +64,7 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [ ] more stuff on deactivated users
 - [ ] fallbacks when profile not found
 - [ ] different color for nav header
+- [ ] add stats user
 
 ### Search
 - [x] add search
@@ -84,9 +85,14 @@ The first can be time consuming - especially on low internet speed, while the ba
 ### Users archives
 - [x] posts view in user profile should have link to the thread
 - [x] there should be a way to link to a specific post in a thread
+- [ ] an option of viewing all threads a user has posted in, and number of posts
 
 ## Archives
 - [x] sorting of threads by no of posts 
 - [ ] sorting by various parameters
 - [ ] ~~sorting of posts by date created~~
 - [x] highlight for deleted posts
+
+## Features
+- ability to view all posts, threads, and blog made by users
+- ability to view deleted posts
