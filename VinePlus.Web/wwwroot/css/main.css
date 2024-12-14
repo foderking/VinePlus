@@ -849,3 +849,6 @@ figure[data-size="small"] {
     margin: auto var(--side-width);
     color: #017c37 !important;
 }
+.thread-item-views:not(.thread-header), .thread-item-posts:not(.thread-header) {
+    text-align: right;
+}
