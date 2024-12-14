@@ -90,7 +90,7 @@ The first can be time consuming - especially on low internet speed, while the ba
 ## Archives
 - [x] sorting of threads by no of posts 
 - [x] sorting by various parameters
-- [ ] UI option to change sort type
+- [x] UI option to change sort type
 - [ ] ~~sorting of posts by date created~~
 - [x] highlight for deleted posts
 

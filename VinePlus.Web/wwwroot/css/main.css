@@ -843,3 +843,9 @@ figure[data-size="small"] {
     border-style: solid;
     border-color: #333 transparent transparent transparent;
 }
+#sort-by > a {
+    display: block;
+    text-decoration: none;
+    margin: auto var(--side-width);
+    color: #017c37 !important;
+}
