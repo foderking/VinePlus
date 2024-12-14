@@ -14,7 +14,7 @@ public class Threads : Navigator<Parsers.Thread>, IForum
     
     public void OnGet(string user, int p) {
         UserName = user;
-        Entities = Util.GetUsersThreads(_context, UserName, p);
+        Entities = Util.getUsersThreads(_context, UserName, p);
         NavRecord = new(p, 100000, user);
     }
 

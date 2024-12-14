@@ -100,14 +100,14 @@ public static class Util
         return index % 2  == 1? "thread-odd" : "";
     }
      
-    public static IEnumerable<Parsers.Thread> GetUsersThreads(ComicvineContext context, string user, int page=1) {
+    public static IEnumerable<Parsers.Thread> getUsersThreads(ComicvineContext context, string user, int page=1) {
         return context
             .Threads
             .Where(thread => thread.Creator.Text == user)
-            .OrderByDescending(each => each.TotalPosts)
+            .OrderByDescending(thread => thread.TotalPosts)
+            .ThenBy(thread => thread.TotalView )
             .Skip(ThreadPerPage * (page-1))
-            .Take(ThreadPerPage)
-            ;
+            .Take(ThreadPerPage);
     }
 
     public static IEnumerable<Parsers.Post> GetUserPosts(ComicvineContext context, string user, int page=1) {
@@ -144,19 +144,19 @@ public static class Util
             SortForumBy.DateCreated => 
                 context
                 .Threads
-                .OrderByDescending(t => t.Id)
+                .OrderByDescending(thread => thread.Id)
                 .Skip(ThreadPerPage * (page - 1))
                 .Take(ThreadPerPage),
             SortForumBy.NoViews => 
                 context
                 .Threads
-                .OrderByDescending(t => t.TotalView)
+                .OrderByDescending(thread => thread.TotalView)
                 .Skip(ThreadPerPage * (page - 1))
                 .Take(ThreadPerPage),
             SortForumBy.NoPosts => 
                 context
                 .Threads
-                .OrderByDescending(t => t.TotalPosts)
+                .OrderByDescending(thread => thread.TotalPosts)
                 .Skip(ThreadPerPage * (page - 1))
                 .Take(ThreadPerPage),
             _ => throw new ArgumentOutOfRangeException(nameof(sort_by), sort_by, null)
