@@ -322,7 +322,7 @@ type PollingWorker(logger: ILogger<PollingWorker>, scopeFactory: IServiceScopeFa
     task {
       // scoping stuff for injection database context: https://pgroene.wordpress.com/2018/07/12/injecting-a-scoped-service-into-ihostedservice/
       use scope = scopeFactory.CreateScope()
-      use timer = new PeriodicTimer(TimeSpan.FromMinutes(5))
+      use timer = new PeriodicTimer(TimeSpan.FromMinutes(5L))
 
       let dbCtx =
         scope.ServiceProvider.GetRequiredService<ComicvineContext>()
