@@ -1,4 +1,4 @@
-namespace Comicvine.Polling
+namespace VinePlus.Polling
 
 open System
 open System.Collections.Generic

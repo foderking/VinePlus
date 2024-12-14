@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using ComicVine.API;
 using Microsoft.OpenApi.Models;
 using Comicvine.Database;
-using Comicvine.Polling;
+using VinePlus.Polling;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +13,7 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true); // https://s
 builder.Services.AddControllers().AddJsonOptions( 
     x => x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())
 );
-//builder.Services.AddHostedService<PollingWorker>(); // adds the pollng background service
+builder.Services.AddHostedService<PollingWorker>(); // adds the pollng background service
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
