@@ -94,6 +94,10 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [ ] ~~sorting of posts by date created~~
 - [x] highlight for deleted posts
 
+## Tables
+- [ ] add indexes on `posts.created`,`creator->>'Text'`.
+- [ ] remove unnecessary columns in queries
+
 ## Features
 - Viewing posts, threads, and blog made by a specific user
 - Viewing deleted posts

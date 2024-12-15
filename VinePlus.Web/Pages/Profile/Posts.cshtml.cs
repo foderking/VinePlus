@@ -14,7 +14,7 @@ public class Posts : Navigator<Util.PostWithThread>
     
     public void OnGet(string user, int p) {
         UserName = user;
-        Entities = Util.GetUserPostsWithThread(_context, user, p);
+        Entities = Util.getUserPostsWithThread(_context, user, p);
         NavRecord = new(p, 1000, user);
     }
 
