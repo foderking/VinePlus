@@ -137,6 +137,25 @@ public static class Util
             .Take(PostsPerPage);
     }
 
+    public record ThreadsPosted(int thread_id, string thread_text, int no_posts);
+
+    public static IEnumerable<ThreadsPosted> getThreadsPosted(ComicvineContext context, string user, int page = 1) {
+        return context
+            .Posts
+            .Where(posts => posts.Creator.Text == user)
+            .Join(
+                context.Threads,
+                post => post.ThreadId,
+                thread => thread.Id,
+                (post, thread) => new { Thread = thread, Post = post }
+            )
+            .GroupBy(x => new { x.Thread.Id, x.Thread.Thread.Text })
+            .Select(x => new ThreadsPosted(x.Key.Id, x.Key.Text, x.Count()));
+        //.OrderByDescending(x => x.no_posts)
+        //.Skip(PostsPerPage * (page-1))
+        //.Take(PostsPerPage);
+    }
+
     public static IEnumerable<Parsers.Thread> getArchivedThreads(ComicvineContext context, int page, SortForumBy sort_by = SortForumBy.DateCreated) {
         return sort_by switch
         {

@@ -76,6 +76,7 @@ The first can be time consuming - especially on low internet speed, while the ba
 ### Stats
 - [ ] add stats UI
 - [ ] board stats
+- [x] viewing all threads a user has posted in, and number of posts
 
 ### Api
 - [ ] better styling for api documentation
@@ -85,7 +86,6 @@ The first can be time consuming - especially on low internet speed, while the ba
 ### Users archives
 - [x] posts view in user profile should have link to the thread
 - [x] there should be a way to link to a specific post in a thread
-- [ ] an option of viewing all threads a user has posted in, and number of posts
 
 ## Archives
 - [x] sorting of threads by no of posts 

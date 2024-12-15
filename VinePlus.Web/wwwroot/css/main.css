@@ -852,3 +852,16 @@ figure[data-size="small"] {
 .thread-item-views:not(.thread-header), .thread-item-posts:not(.thread-header) {
     text-align: right;
 }
+.userpost-container {
+    min-height: 30rem;
+    margin: auto calc(2*var(--side-width));
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-content: start;
+}
+.userpost-container > span:not(div:last-child) {
+    border-right: 1px solid #d1d4d6;
+}
+.userpost-container > thread-item-views {
+    min-width: 5rem;
+}
