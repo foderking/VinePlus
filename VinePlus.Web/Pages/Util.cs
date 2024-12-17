@@ -235,16 +235,19 @@ public static class Util
 
     public static class Search
     {
-        public static IEnumerable<Parsers.Thread> searchThreads(ComicvineContext context, string query) {
+        public static IEnumerable<Parsers.Thread> searchThreads(ComicvineContext context, string query, int page) {
             return context
                 .Threads
                 .Where(thread => 
                     EF.Functions
                         .ToTsVector(thread.Thread.Text)
                         .Matches(EF.Functions.WebSearchToTsQuery(query))
-                );
+                )
+                .OrderByDescending(thread => thread.TotalPosts)
+                .Skip(ThreadPerPage * (page - 1))
+                .Take(ThreadPerPage);
         }
-        public static IEnumerable<Parsers.Thread> searchThreadsFromUser(ComicvineContext context, string query, string creator) {
+        public static IEnumerable<Parsers.Thread> searchThreadsFromUser(ComicvineContext context, string query, string creator, int page) {
             return context
                 .Threads
                 .Where(thread => 
@@ -252,7 +255,10 @@ public static class Util
                         .ToTsVector(thread.Thread.Text)
                         .Matches(EF.Functions.WebSearchToTsQuery(query))
                     && thread.Creator.Link.EndsWith(creator + "/")
-                );
+                )
+                .OrderByDescending(thread => thread.TotalPosts)
+                .Skip(ThreadPerPage * (page - 1))
+                .Take(ThreadPerPage);
         }
 
         public static IEnumerable<Parsers.Post> searchUserPosts(ComicvineContext context, string query, string user) {

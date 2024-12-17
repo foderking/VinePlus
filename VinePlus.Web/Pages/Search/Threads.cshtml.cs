@@ -13,9 +13,9 @@ public class SearchThreads : PageModel
          return creator switch
          {
              null => 
-                 Redirect($"/search/results?searchPost=false&query={searchQuery.Trim()}"),
+                 Redirect($"/search/results?searchPost=false&query={searchQuery.Trim()}&p=1"),
              _ =>
-                 Redirect($"/search/results?searchPost=false&query={searchQuery.Trim()}&creator={creator.Trim()}")
+                 Redirect($"/search/results?searchPost=false&query={searchQuery.Trim()}&creator={creator.Trim()}%p=1")
          };
     }
 }

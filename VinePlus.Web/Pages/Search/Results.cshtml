@@ -1,8 +1,14 @@
 ﻿@page
+@using ComicVine.API.Pages
 @model ComicVine.API.Pages.Search.Results
 
 @{
     Layout = "Shared/_Layout";
+    ViewData[Keys.Title]     = "Search Results";
+    ViewData[Keys.Headings]  = "Search Results";
+    ViewData[Keys.Highlight] = MainHighlight.Search;
 }
 
-@await Html.PartialAsync("Shared/Components/ForumItems", (Model.ThreadResult , Model.GetThreadLink()))
+@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
+@await Html.PartialAsync("Shared/Components/ForumItems", (Model.Entities , Model.GetThreadLink()))
+@await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
