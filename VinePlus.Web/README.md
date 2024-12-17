@@ -44,6 +44,7 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [x] error handling for deactivated profiles
 - [x] add footer linking to api on forums
 - [ ] ~~add ui icons for polls and stuff~~
+- [ ] better error pages
 
 ### Posts
 - [x] fix youtube video in posts (http://localhost:5119/archives/thread/2308691#11)
@@ -62,16 +63,17 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [x] make images and blogs on user profile optional
 - [x] refactors for thread and post view on user profile (and errors for deactivated accounts)
 - [ ] more stuff on deactivated users
-- [ ] fallbacks when profile not found
-- [ ] different color for nav header
+- [x] fallbacks when profile not found
+- [ ] ~~different color for nav header~~
 - [ ] add stats user
 
 ### Search
 - [x] add search
 - [x] search from user
-- ~~[ ] possibly filter thread search by board, type~~
-- [ ] "How to search" UI
+- [ ] ~~possibly filter thread search by board, type~~
+- [x] "How to search" UI
 - [ ] pagination for search
+- [ ] add ability to search posts
 
 ### Stats
 - [ ] add stats UI
@@ -97,8 +99,11 @@ The first can be time consuming - especially on low internet speed, while the ba
 ## Tables
 - [ ] add indexes on `posts.created`,`creator->>'Text'`.
 - [ ] remove unnecessary columns in queries
+- [ ] improvements for search
 
 ## Features
 - Viewing posts, threads, and blog made by a specific user
 - Viewing deleted posts
 - Sorting forums by number of posts, views, and date created
+- Viewing posts, and threads by deactivated user
+- full text search with filtering by user
