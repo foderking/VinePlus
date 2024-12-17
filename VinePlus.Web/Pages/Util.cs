@@ -235,7 +235,7 @@ public static class Util
 
     public static class Search
     {
-        public static IEnumerable<Parsers.Thread> SearchThreads(ComicvineContext context, string query) {
+        public static IEnumerable<Parsers.Thread> searchThreads(ComicvineContext context, string query) {
             return context
                 .Threads
                 .Where(thread => 
@@ -244,7 +244,7 @@ public static class Util
                         .Matches(EF.Functions.WebSearchToTsQuery(query))
                 );
         }
-        public static IEnumerable<Parsers.Thread> SearchThreadsFromUser(ComicvineContext context, string query, string creator) {
+        public static IEnumerable<Parsers.Thread> searchThreadsFromUser(ComicvineContext context, string query, string creator) {
             return context
                 .Threads
                 .Where(thread => 
