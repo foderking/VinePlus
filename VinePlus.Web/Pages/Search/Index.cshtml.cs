@@ -5,7 +5,7 @@ namespace ComicVine.API.Pages.Search;
 
 public class Index : PageModel
 {
-    public IActionResult OnGet() {
-        return Redirect("/search/threads");
+    public void OnGet() {
+        //return Redirect("/search/threads");
     }
 }

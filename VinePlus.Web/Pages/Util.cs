@@ -254,5 +254,16 @@ public static class Util
                     && thread.Creator.Link.EndsWith(creator + "/")
                 );
         }
+
+        public static IEnumerable<Parsers.Post> searchUserPosts(ComicvineContext context, string query, string user) {
+            return context
+                .Posts
+                .Where(post => 
+                    EF.Functions
+                        .ToTsVector(post.Content)
+                        .Matches(EF.Functions.WebSearchToTsQuery(query))
+                    && post.Creator.Link.EndsWith(user + "/")
+                );
+        }
     }
 }
