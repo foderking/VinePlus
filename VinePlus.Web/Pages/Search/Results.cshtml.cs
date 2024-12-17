@@ -15,8 +15,8 @@ public class Results : PageModel, IForum
     public void OnGet(bool searchPost, string query, string? creator) {
         ThreadResult = creator switch
         {
-            null => Util.Search.SearchThreads(_context, query),
-            _ => Util.Search.SearchThreadsFromUser(_context, query, creator!)
+            null => Util.Search.searchThreads(_context, query),
+            _ => Util.Search.searchThreadsFromUser(_context, query, creator)
         };
 
     }
