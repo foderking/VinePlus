@@ -1,12 +1,12 @@
 ﻿using Comicvine.Core;
 using Comicvine.Database;
 
-namespace ComicVine.API.Pages.Archives;
+namespace VinePlus.Web.Pages.Archives;
 
 public class Forums : Navigator<Parsers.Thread>, IForum
 {
     private ComicvineContext _context;
-    private string sort_param;
+    private string sort_param = "";
 
     public Forums(ComicvineContext context) {
         _context = context;

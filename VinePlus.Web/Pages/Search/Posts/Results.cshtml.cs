@@ -2,7 +2,7 @@
 using Comicvine.Database;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ComicVine.API.Pages.Search.Posts;
+namespace VinePlus.Web.Pages.Search.Posts;
 
 public class Results(ComicvineContext context) : Navigator<PostSummary>
 {

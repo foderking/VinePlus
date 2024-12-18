@@ -2,7 +2,7 @@
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ComicVine.API.Pages.Profile;
+namespace VinePlus.Web.Pages.Profile;
 
 public class Blogs : Navigator<Parsers.Blog>
 {

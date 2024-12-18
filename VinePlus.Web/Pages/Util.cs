@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 
-namespace ComicVine.API.Pages;
+namespace VinePlus.Web.Pages;
 
 public record Nav(int CurrentPage, int LastPage, string DelegateParam);
 
@@ -99,7 +99,42 @@ public static class Util
     public static string GetThreadRow(int index) {
         return index % 2  == 1? "thread-odd" : "";
     }
+        public static IEnumerable<PostView> getAllPosts(ComicvineContext context, int thread_id) {
+            return context
+                .Posts
+                .Where(p => p.ThreadId == thread_id)
+                .OrderBy(p => p.PostNo)
+                .Select(post =>
+                    new PostView(
+                        post.PostNo,
+                        post.Creator,
+                        post.IsDeleted,
+                        post.IsEdited,
+                        post.Created,
+                        post.Content
+                    )
+                );
+        }
      
+    public static IEnumerable<PostView> getAllPosts(ComicvineContext context, int thread_id, int page) {
+        return context
+            .Posts
+            .Where(p => p.ThreadId == thread_id)
+            .OrderBy(p => p.PostNo)
+            .Select(post =>
+                new PostView(
+                    post.PostNo,
+                    post.Creator,
+                    post.IsDeleted,
+                    post.IsEdited,
+                    post.Created,
+                    post.Content
+                )
+            )
+            .Skip(PostsPerPage * (page - 1))
+            .Take(PostsPerPage);
+    }
+      
     public static IEnumerable<Parsers.Thread> getUsersThreads(ComicvineContext context, string user, int page=1) {
         return context
             .Threads

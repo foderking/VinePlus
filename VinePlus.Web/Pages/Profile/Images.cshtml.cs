@@ -1,7 +1,7 @@
 ﻿using Comicvine.Core;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ComicVine.API.Pages.Profile;
+namespace VinePlus.Web.Pages.Profile;
 
 public class Images : Navigator<ImgData>
 {

@@ -1,7 +1,7 @@
 ﻿using Comicvine.Core;
 using Comicvine.Database;
 
-namespace ComicVine.API.Pages.Profile;
+namespace VinePlus.Web.Pages.Profile;
 
 public class Posts : Navigator<PostSummary>
 {

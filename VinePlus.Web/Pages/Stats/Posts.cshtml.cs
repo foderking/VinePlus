@@ -2,7 +2,7 @@
 using Comicvine.Database;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ComicVine.API.Pages.Stats;
+namespace VinePlus.Web.Pages.Stats;
 
 public class Posts(ComicvineContext context): Navigator<Util.ThreadsPosted>
 {

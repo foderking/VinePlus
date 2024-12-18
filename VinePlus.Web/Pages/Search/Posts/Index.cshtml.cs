@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ComicVine.API.Pages.Search.Posts;
+namespace VinePlus.Web.Pages.Search.Posts;
 
 [IgnoreAntiforgeryToken(Order = 1001)]
 public class Index : PageModel

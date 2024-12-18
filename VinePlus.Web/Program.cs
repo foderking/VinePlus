@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
-using ComicVine.API;
 using Microsoft.OpenApi.Models;
 using Comicvine.Database;
 using VinePlus.Polling;

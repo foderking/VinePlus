@@ -1,7 +1,7 @@
 ﻿using Comicvine.Core;
 using HtmlAgilityPack;
 
-namespace ComicVine.API.Pages;
+namespace VinePlus.Web.Pages;
 
 public class Forums : Navigator<Parsers.Thread>, IForum
 {

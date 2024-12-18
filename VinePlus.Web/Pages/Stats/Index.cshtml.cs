@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ComicVine.API.Pages.Stats;
+namespace VinePlus.Web.Pages.Stats;
 
 public class Index : PageModel
 {
