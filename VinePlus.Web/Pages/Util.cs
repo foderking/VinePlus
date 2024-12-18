@@ -261,15 +261,21 @@ public static class Util
                 .Take(ThreadPerPage);
         }
 
-        public static IEnumerable<Parsers.Post> searchUserPosts(ComicvineContext context, string query, string user) {
+        public static IEnumerable<PostWithThread> searchUserPosts(ComicvineContext context, string query, string user, int page) {
             return context
                 .Posts
                 .Where(post => 
-                    EF.Functions
-                        .ToTsVector(post.Content)
-                        .Matches(EF.Functions.WebSearchToTsQuery(query))
-                    && post.Creator.Link.EndsWith(user + "/")
-                );
+                    post.Content.Contains(query)
+                )
+                .Join(
+                    context.Threads,
+                    post => post.ThreadId,
+                    thread => thread.Id,
+                    (post, thread) => new PostWithThread(post,thread)
+                )
+                .OrderByDescending(x => x.P.Created)
+                .Skip(ThreadPerPage * (page - 1))
+                .Take(ThreadPerPage);
         }
     }
 }

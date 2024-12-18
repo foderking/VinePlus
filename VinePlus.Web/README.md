@@ -45,6 +45,7 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [x] add footer linking to api on forums
 - [ ] ~~add ui icons for polls and stuff~~
 - [ ] better error pages
+- [ ] validation for forms
 
 ### Posts
 - [x] fix youtube video in posts (http://localhost:5119/archives/thread/2308691#11)
@@ -74,6 +75,7 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [x] "How to search" UI
 - [x] pagination for search
 - [ ] add ability to search posts
+- [ ] highlight search term
 
 ### Stats
 - [ ] add stats UI

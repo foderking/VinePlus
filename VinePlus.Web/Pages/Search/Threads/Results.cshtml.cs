@@ -20,6 +20,6 @@ public class Results(ComicvineContext context) : Navigator<Parsers.Thread>, IFor
         return (thread) => $"/archives/thread/{thread.Id}";
     }
     public override Func<string, int, string> PageDelegate() {
-        return (s_query, page) => $"/search/results?{s_query}&p={page}";
+        return (s_query, page) => $"/search/threads/results?{s_query}&p={page}";
     }
 }

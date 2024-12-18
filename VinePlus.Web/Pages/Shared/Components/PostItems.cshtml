@@ -1,0 +1,31 @@
+﻿@using ComicVine.API.Pages
+@model IEnumerable<ComicVine.API.Pages.Util.PostWithThread>
+
+<div class="post-container">
+    @foreach (var pwt in Model) {
+        <div class="@Util.GetPostClass(pwt.P)">
+            <div class="post-thread">
+                <a href="/archives/thread/@pwt.T.Id#@pwt.P.PostNo">
+                    @Html.Raw(pwt.T.Thread.Text)
+                </a>
+            </div>
+            <div class="post-title">
+                <span class="post-no" id="@pwt.P.PostNo.ToString()">
+                    #@pwt.P.PostNo
+                </span>
+                <span class="post-creator">
+                    <a href="@pwt.P.Creator.Link">
+                        @pwt.P.Creator.Text
+                    </a>
+                </span>
+                @if (pwt.P.IsEdited) {
+                    <span class="post-edited">Edited</span>
+                }
+            </div>
+            <div class="post-content">
+                @Html.Raw(pwt.P.Content)
+            </div>
+            <time class="post-time">@Util.GetDuration(DateTime.Now, pwt.P.Created)</time>
+        </div>
+    }
+</div>

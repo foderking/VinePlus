@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ComicVine.API.Pages.Search;
+namespace ComicVine.API.Pages.Search.Posts;
 
-public class Posts : PageModel
+[IgnoreAntiforgeryToken(Order = 1002)]
+public class Index : PageModel
 {
     public void OnGet() {
         

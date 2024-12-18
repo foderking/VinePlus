@@ -32,6 +32,9 @@
 
     <ItemGroup>
 <!--      <AdditionalFiles Include="Pages\Search\Search.cshtml" />-->
+      <AdditionalFiles Include="Pages\Search\Posts\Posts.cshtml" />
+      <AdditionalFiles Include="Pages\Search\Threads\Results.cshtml" />
+      <AdditionalFiles Include="Pages\Search\Threads\Threads.cshtml" />
       <AdditionalFiles Include="Pages\Shared\Components\ForumItems.cshtml" />
       <AdditionalFiles Include="Pages\Shared\Components\Lock.cshtml" />
       <AdditionalFiles Include="Pages\Shared\Components\Navigation.cshtml" />
