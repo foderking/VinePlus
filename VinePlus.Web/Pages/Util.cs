@@ -266,7 +266,7 @@ public static class Util
                 .Take(ThreadPerPage);
         }
 
-        public static IEnumerable<PostWithThread> searchUserPosts(ComicvineContext context, string query, string user, int page) {
+        public static IEnumerable<PostSummary> searchUserPosts(ComicvineContext context, string query, string user, int page) {
             return context
                 .Posts
                 .Where(post => 
@@ -279,7 +279,17 @@ public static class Util
                     context.Threads,
                     post => post.ThreadId,
                     thread => thread.Id,
-                    (post, thread) => new PostWithThread(post,thread)
+                    (post, thread) => 
+                        new PostSummary(
+                            thread.Id,
+                            thread.Thread.Text,
+                            post.PostNo,
+                            post.Creator,
+                            post.IsDeleted,
+                            post.IsEdited,
+                            post.Created,
+                            post.Content
+                        )
                 )
                 .Skip(ThreadPerPage * (page - 1))
                 .Take(ThreadPerPage);

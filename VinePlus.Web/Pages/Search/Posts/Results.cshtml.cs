@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ComicVine.API.Pages.Search.Posts;
 
-public class Results(ComicvineContext context) : Navigator<Util.PostWithThread>
+public class Results(ComicvineContext context) : Navigator<PostSummary>
 {
     public void OnGet(bool searchPost, string query, string creator, int p) {
         string s_query = $"searchPost={searchPost}&query={query}" + (creator==null ? "" : "&creator=takenstew22");
