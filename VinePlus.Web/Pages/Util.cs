@@ -265,15 +265,17 @@ public static class Util
             return context
                 .Posts
                 .Where(post => 
-                    post.Content.Contains(query)
+                    post.Creator.Text == user 
+                    && 
+                    EF.Functions.Like(post.Content, $"%{query}%")
                 )
+                .OrderByDescending(x => x.Created)
                 .Join(
                     context.Threads,
                     post => post.ThreadId,
                     thread => thread.Id,
                     (post, thread) => new PostWithThread(post,thread)
                 )
-                .OrderByDescending(x => x.P.Created)
                 .Skip(ThreadPerPage * (page - 1))
                 .Take(ThreadPerPage);
         }

@@ -10,6 +10,6 @@ public class Index : PageModel
         
     }
     public IActionResult OnPost(string creator, string searchQuery) {
-        return Redirect($"/search/posts/results?searchPost=true&query={searchQuery.Trim()}&creator={creator.Trim()}");
+        return Redirect($"/search/posts/results?searchPost=true&query={searchQuery.Trim()}&creator={creator.Trim()}&p=1");
     }
 }
