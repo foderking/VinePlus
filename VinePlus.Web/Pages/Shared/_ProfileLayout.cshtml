@@ -14,32 +14,32 @@
             <a href="/forums" class="nav-item">
                 <img src="/images/logo.png" alt="logo" id="nav-logo"/>
             </a>
-            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Main)">
-                <a href="@Util.Profile.GetLink(ViewData, "/profile/")">
+            <span class="@Helpers.getHighlightClass(ViewData, ProfileHighlight.Main)">
+                <a href="@Helpers.getProfileLink(ViewData, "/profile/")">
                     Profile
                 </a>
             </span>
             @if ((bool?)ViewData[Keys.ProfileHasImage] ?? false) {
             }
-            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Images)">
-                <a href="@Util.Profile.GetLink(ViewData, "/profile/images/")">
+            <span class="@Helpers.getHighlightClass(ViewData, ProfileHighlight.Images)">
+                <a href="@Helpers.getProfileLink(ViewData, "/profile/images/")">
                     Images
                 </a>
             </span>
             @if ((bool?)ViewData[Keys.ProfileHasBlog] ?? false) {
             }
-            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Blogs)">
-                <a href="@Util.Profile.GetLink(ViewData, "/profile/blogs/")">
+            <span class="@Helpers.getHighlightClass(ViewData, ProfileHighlight.Blogs)">
+                <a href="@Helpers.getProfileLink(ViewData, "/profile/blogs/")">
                     Blogs
                 </a>
             </span>
-            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Threads)">
-                <a href="@Util.Profile.GetLink(ViewData, "/profile/threads/")">
+            <span class="@Helpers.getHighlightClass(ViewData, ProfileHighlight.Threads)">
+                <a href="@Helpers.getProfileLink(ViewData, "/profile/threads/")">
                     Threads
                 </a>
             </span>
-            <span class="@Util.GetHighlightClass(ViewData, ProfileHighlight.Posts)">
-                <a href="@Util.Profile.GetLink(ViewData, "/profile/posts/")">
+            <span class="@Helpers.getHighlightClass(ViewData, ProfileHighlight.Posts)">
+                <a href="@Helpers.getProfileLink(ViewData, "/profile/posts/")">
                     Posts
                 </a>
             </span>

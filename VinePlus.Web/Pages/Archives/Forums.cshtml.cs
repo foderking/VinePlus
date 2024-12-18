@@ -21,7 +21,7 @@ public class Forums : Navigator<ThreadView>, IForum
             _ => SortForumBy.DateCreated
         };
         Entities = Queries.getArchivedThreads(_context, p, sort);
-        NavRecord = new(p, Util.GetThreadsMaxPage(_context), p.ToString());
+        NavRecord = new(p, Queries.getThreadsMaxPage(_context), p.ToString());
     }
 
     public override Func<string, int, string> PageDelegate() {

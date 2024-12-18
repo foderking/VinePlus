@@ -277,4 +277,18 @@ public static class Queries
             .Skip(Util.ThreadPerPage * (page - 1))
             .Take(Util.ThreadPerPage);
     }
+
+    public static IEnumerable<Parsers.Post> getUserPosts(ComicvineContext context, string user, int page=1) {
+        return context
+                .Posts
+                .Where(posts => posts.Creator.Text == user)
+                // .OrderByDescending(each => each.Id)
+                .Skip(Util.PostsPerPage * (page-1))
+                .Take(Util.PostsPerPage)
+            ;
+    }
+
+    public static int getThreadsMaxPage(ComicvineContext context) {
+        return context.Threads.Count() / Util.ThreadPerPage + 1;
+    }
 }

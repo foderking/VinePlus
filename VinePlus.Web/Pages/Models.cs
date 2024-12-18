@@ -1,4 +1,5 @@
-﻿using Comicvine.Core;
+﻿using System.Text.Json.Serialization;
+using Comicvine.Core;
 
 namespace VinePlus.Web.Pages;
 
@@ -68,3 +69,16 @@ public record ThreadView(
         );
     }
 };
+
+public record ImageData(
+    [property: JsonPropertyName("dateCreated")]
+    string date_created,
+    [property: JsonPropertyName("gallery")]
+    string gallery,
+    [property: JsonPropertyName("original")]
+    string original
+);
+public record ImageResponse(
+    [property: JsonPropertyName("images")] 
+    IEnumerable<ImageData> images
+);

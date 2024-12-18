@@ -3,7 +3,7 @@
 
 <div class="post-container">
     @foreach (var summary in Model) {
-        <div class="@Util.getPostClass(summary.post_is_deleted)">
+        <div class="@Helpers.getPostClass(summary.post_is_deleted)">
             <div class="post-thread">
                 <a href="/archives/thread/@summary.thread_id#@summary.post_no">
                     @Html.Raw(summary.thread_text)
@@ -25,7 +25,7 @@
             <div class="post-content">
                 @Html.Raw(summary.post_content)
             </div>
-            <time class="post-time">@Util.GetDuration(DateTime.Now, summary.post_created)</time>
+            <time class="post-time">@Helpers.getDuration(DateTime.Now, summary.post_created)</time>
         </div>
     }
 </div>

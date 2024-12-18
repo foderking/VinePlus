@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace VinePlus.Web.Pages.Profile;
 
-public class Images : Navigator<ImgData>
+public class Images : Navigator<ImageData>
 {
     public string UserName = "";
     public Parsers.Image? Img;
@@ -13,7 +13,7 @@ public class Images : Navigator<ImgData>
         {
             var profile = await Parsers.ProfileParser.ParseDefault($"/profile/{user}");
             Img = await Parsers.ImageParser.ParseDefault($"/profile/{user}/images");
-            Entities = await Util.Image.GetImages(Img,p-1);
+            Entities = await Helpers.getImages(Img,p-1);
             UserName = profile.UserName;
             NavRecord = new(p, Int32.MaxValue, UserName);
         }

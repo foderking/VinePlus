@@ -3,7 +3,7 @@
 
 <div class="post-container" >
     @foreach (var post in Model) {
-        <div class="@Util.getPostClass(post.post_is_deleted)">
+        <div class="@Helpers.getPostClass(post.post_is_deleted)">
             <div class="post-title">
                 <span class="post-no" id="@post.post_no.ToString()">
                     <a href="#@(post.post_no)">
@@ -22,7 +22,7 @@
             <div class="post-content">
                 @Html.Raw(post.post_content)
             </div>
-            <time class="post-time">@Util.GetDuration(DateTime.Now, post.post_created)</time>
+            <time class="post-time">@Helpers.getDuration(DateTime.Now, post.post_created)</time>
         </div>
     }
 </div>

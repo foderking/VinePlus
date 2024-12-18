@@ -14,7 +14,7 @@
     <span class="thread-odd thread-item thread-header thread-item-title">Title</span>
     <span class="thread-odd thread-item thread-header thread-item-posts"># Posts</span>
     @foreach (var (index, threadPosted) in Model.Entities.Select((t, i) => (i,t))) {
-        <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-title")">
+        <span class="@Url.Content($"{Helpers.getThreadRow(index)} thread-item thread-item-title")">
             <span class="thread-tooltip">
                 @Html.Raw(threadPosted.thread_text)
             </span>
@@ -22,7 +22,7 @@
                 @Html.Raw(threadPosted.thread_text)
             </a>
         </span>
-        <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-posts")">
+        <span class="@Url.Content($"{Helpers.getThreadRow(index)} thread-item thread-item-posts")">
             @threadPosted.no_posts
         </span>
     }
