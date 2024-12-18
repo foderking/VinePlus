@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace VinePlus.Web.Pages.Stats;
 
-public class Posts(ComicvineContext context): Navigator<Util.ThreadsPosted>
+public class Posts(ComicvineContext context): Navigator<ThreadsSummary>
 {
     public void OnGet(string user, int p) {
-        Entities = Util.getThreadsPosted(context, user, p);
+        Entities = Queries.getThreadsPosted(context, user, p);
         NavRecord = new(p, 1000, user);
     }
     

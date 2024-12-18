@@ -21,7 +21,7 @@ public abstract class Navigator<T>: PageModel
 
 public interface IForum
 {
-    public Func<Parsers.Thread, string> GetThreadLink();
+    public Func<ThreadView, string> GetThreadLink();
 }
 
 public static class ProfileHighlight
@@ -99,51 +99,6 @@ public static class Util
     public static string GetThreadRow(int index) {
         return index % 2  == 1? "thread-odd" : "";
     }
-        public static IEnumerable<PostView> getAllPosts(ComicvineContext context, int thread_id) {
-            return context
-                .Posts
-                .Where(p => p.ThreadId == thread_id)
-                .OrderBy(p => p.PostNo)
-                .Select(post =>
-                    new PostView(
-                        post.PostNo,
-                        post.Creator,
-                        post.IsDeleted,
-                        post.IsEdited,
-                        post.Created,
-                        post.Content
-                    )
-                );
-        }
-     
-    public static IEnumerable<PostView> getAllPosts(ComicvineContext context, int thread_id, int page) {
-        return context
-            .Posts
-            .Where(p => p.ThreadId == thread_id)
-            .OrderBy(p => p.PostNo)
-            .Select(post =>
-                new PostView(
-                    post.PostNo,
-                    post.Creator,
-                    post.IsDeleted,
-                    post.IsEdited,
-                    post.Created,
-                    post.Content
-                )
-            )
-            .Skip(PostsPerPage * (page - 1))
-            .Take(PostsPerPage);
-    }
-      
-    public static IEnumerable<Parsers.Thread> getUsersThreads(ComicvineContext context, string user, int page=1) {
-        return context
-            .Threads
-            .Where(thread => thread.Creator.Text == user)
-            .OrderByDescending(thread => thread.TotalPosts)
-            .ThenBy(thread => thread.TotalView )
-            .Skip(ThreadPerPage * (page-1))
-            .Take(ThreadPerPage);
-    }
 
     public static IEnumerable<Parsers.Post> GetUserPosts(ComicvineContext context, string user, int page=1) {
         return context
@@ -156,75 +111,7 @@ public static class Util
     }
 
     public record PostWithThread(Parsers.Post P, Parsers.Thread T);
-    
-    public static IEnumerable<PostSummary> getUserPostSummary(ComicvineContext context, string user, int page=1) {
-        return context
-            .Posts
-            .Where(posts => posts.Creator.Text == user)
-            .OrderByDescending(each => each.Created)
-            .Join(
-                context.Threads,
-                post => post.ThreadId,
-                thread => thread.Id,
-                (post, thread) => 
-                    new PostSummary(
-                        thread.Id,
-                        thread.Thread.Text,
-                        post.PostNo,
-                        post.Creator,
-                        post.IsDeleted,
-                        post.IsEdited,
-                        post.Created,
-                        post.Content
-                    )
-            )
-            .Skip(PostsPerPage * (page-1))
-            .Take(PostsPerPage);
-    }
 
-    public record ThreadsPosted(int thread_id, string thread_text, int no_posts);
-
-    public static IEnumerable<ThreadsPosted> getThreadsPosted(ComicvineContext context, string user, int page = 1) {
-        return context
-            .Posts
-            .Where(posts => posts.Creator.Text == user)
-            .Join(
-                context.Threads,
-                post => post.ThreadId,
-                thread => thread.Id,
-                (post, thread) => new { Thread = thread, Post = post }
-            )
-            .GroupBy(x => new { x.Thread.Id, x.Thread.Thread.Text })
-            .Select(x => new ThreadsPosted(x.Key.Id, x.Key.Text, x.Count()));
-        //.OrderByDescending(x => x.no_posts)
-        //.Skip(PostsPerPage * (page-1))
-        //.Take(PostsPerPage);
-    }
-
-    public static IEnumerable<Parsers.Thread> getArchivedThreads(ComicvineContext context, int page, SortForumBy sort_by = SortForumBy.DateCreated) {
-        return sort_by switch
-        {
-            SortForumBy.DateCreated => 
-                context
-                .Threads
-                .OrderByDescending(thread => thread.Id)
-                .Skip(ThreadPerPage * (page - 1))
-                .Take(ThreadPerPage),
-            SortForumBy.NoViews => 
-                context
-                .Threads
-                .OrderByDescending(thread => thread.TotalView)
-                .Skip(ThreadPerPage * (page - 1))
-                .Take(ThreadPerPage),
-            SortForumBy.NoPosts => 
-                context
-                .Threads
-                .OrderByDescending(thread => thread.TotalPosts)
-                .Skip(ThreadPerPage * (page - 1))
-                .Take(ThreadPerPage),
-            _ => throw new ArgumentOutOfRangeException(nameof(sort_by), sort_by, null)
-        };
-    }
 
     public static int GetThreadsMaxPage(ComicvineContext context) {
         return context.Threads.Count() / ThreadPerPage + 1;
@@ -271,63 +158,5 @@ public static class Util
 
     public static string getPostClass(bool post_is_deleted) {
         return post_is_deleted ? "post-item post-deleted" : "post-item";
-    }
-
-    public static class Search
-    {
-        public static IEnumerable<Parsers.Thread> searchThreads(ComicvineContext context, string query, int page) {
-            return context
-                .Threads
-                .Where(thread => 
-                    EF.Functions
-                        .ToTsVector(thread.Thread.Text)
-                        .Matches(EF.Functions.WebSearchToTsQuery(query))
-                )
-                .OrderByDescending(thread => thread.TotalPosts)
-                .Skip(ThreadPerPage * (page - 1))
-                .Take(ThreadPerPage);
-        }
-        public static IEnumerable<Parsers.Thread> searchThreadsFromUser(ComicvineContext context, string query, string creator, int page) {
-            return context
-                .Threads
-                .Where(thread => 
-                    EF.Functions
-                        .ToTsVector(thread.Thread.Text)
-                        .Matches(EF.Functions.WebSearchToTsQuery(query))
-                    && thread.Creator.Link.EndsWith(creator + "/")
-                )
-                .OrderByDescending(thread => thread.TotalPosts)
-                .Skip(ThreadPerPage * (page - 1))
-                .Take(ThreadPerPage);
-        }
-
-        public static IEnumerable<PostSummary> searchUserPosts(ComicvineContext context, string query, string user, int page) {
-            return context
-                .Posts
-                .Where(post => 
-                    post.Creator.Text == user 
-                    && 
-                    EF.Functions.Like(post.Content, $"%{query}%")
-                )
-                .OrderByDescending(x => x.Created)
-                .Join(
-                    context.Threads,
-                    post => post.ThreadId,
-                    thread => thread.Id,
-                    (post, thread) => 
-                        new PostSummary(
-                            thread.Id,
-                            thread.Thread.Text,
-                            post.PostNo,
-                            post.Creator,
-                            post.IsDeleted,
-                            post.IsEdited,
-                            post.Created,
-                            post.Content
-                        )
-                )
-                .Skip(ThreadPerPage * (page - 1))
-                .Take(ThreadPerPage);
-        }
     }
 }

@@ -16,8 +16,8 @@ public class Thread : Navigator<PostView>
         CurrentThread = _context.Threads.Find(id);
         Entities = p switch 
         {
-            null => Util.getAllPosts(_context, id),
-            { } page => Util.getAllPosts(_context, id, page)
+            null => Queries.getAllPosts(_context, id),
+            { } page => Queries.getAllPosts(_context, id, page)
         };
         NavRecord = new(p ?? -1, CurrentThread?.LastPostPage ?? 1, id.ToString());
     }

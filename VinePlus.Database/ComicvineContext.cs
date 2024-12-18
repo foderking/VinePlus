@@ -12,6 +12,13 @@ public class ComicvineContext: DbContext
     
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        // index
+        //modelBuilder.Entity<Parsers.Post>()
+        //    .HasIndex(post => post.Created)
+        //    .IsDescending(true);
+        modelBuilder.Entity<Parsers.Thread>()
+            .HasIndex(thread => thread.Created)
+            .IsDescending(true);
         // Link type should be serialized as json
         modelBuilder.Entity<Parsers.Thread>()
             .Property(x => x.Board)

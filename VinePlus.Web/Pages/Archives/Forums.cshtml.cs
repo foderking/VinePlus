@@ -3,7 +3,7 @@ using Comicvine.Database;
 
 namespace VinePlus.Web.Pages.Archives;
 
-public class Forums : Navigator<Parsers.Thread>, IForum
+public class Forums : Navigator<ThreadView>, IForum
 {
     private ComicvineContext _context;
     private string sort_param = "";
@@ -20,7 +20,7 @@ public class Forums : Navigator<Parsers.Thread>, IForum
             "posts" => SortForumBy.NoPosts,
             _ => SortForumBy.DateCreated
         };
-        Entities = Util.getArchivedThreads(_context, p, sort);
+        Entities = Queries.getArchivedThreads(_context, p, sort);
         NavRecord = new(p, Util.GetThreadsMaxPage(_context), p.ToString());
     }
 
@@ -28,7 +28,7 @@ public class Forums : Navigator<Parsers.Thread>, IForum
         return (_, page) => $"/archives/forums/{page}/{sort_param}";
     }
     
-    public Func<Parsers.Thread, string> GetThreadLink() {
-        return (thread) => $"/archives/thread/{thread.Id}?p=1";
+    public Func<ThreadView, string> GetThreadLink() {
+        return (thread) => $"/archives/thread/{thread.thread_id}?p=1";
     }
 }

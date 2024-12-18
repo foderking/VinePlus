@@ -14,7 +14,7 @@ public class Posts : Navigator<PostSummary>
     
     public void OnGet(string user, int p) {
         UserName = user;
-        Entities = Util.getUserPostSummary(_context, user, p);
+        Entities = Queries.getUserPostSummary(_context, user, p);
         NavRecord = new(p, 1000, user);
     }
 

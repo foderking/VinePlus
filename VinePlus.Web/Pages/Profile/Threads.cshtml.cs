@@ -3,7 +3,7 @@ using Comicvine.Database;
 
 namespace VinePlus.Web.Pages.Profile;
 
-public class Threads : Navigator<Parsers.Thread>, IForum
+public class Threads : Navigator<ThreadView>, IForum
 {
     private ComicvineContext _context;
     public string UserName = "";
@@ -14,7 +14,7 @@ public class Threads : Navigator<Parsers.Thread>, IForum
     
     public void OnGet(string user, int p) {
         UserName = user;
-        Entities = Util.getUsersThreads(_context, UserName, p);
+        Entities = Queries.getUsersThreads(_context, UserName, p);
         NavRecord = new(p, 100000, user);
     }
 
@@ -22,7 +22,7 @@ public class Threads : Navigator<Parsers.Thread>, IForum
         return (user, page) => $"/profile/threads/{user}/{page}";
     }
 
-    public Func<Parsers.Thread, string> GetThreadLink() {
-        return (thread) => $"/archives/thread/{thread.Id}";
+    public Func<ThreadView, string> GetThreadLink() {
+        return (thread) => $"/archives/thread/{thread.thread_id}";
     }
 }

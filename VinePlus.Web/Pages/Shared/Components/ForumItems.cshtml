@@ -1,5 +1,5 @@
 ﻿@using VinePlus.Web.Pages
-@model (IEnumerable<Comicvine.Core.Parsers.Thread>, Func<Comicvine.Core.Parsers.Thread,string>)
+@model (IEnumerable<ThreadView>, Func<ThreadView,string>)
 
 
 <div class="thread-container" >
@@ -10,31 +10,31 @@
     <span class="thread-odd thread-item thread-header thread-item-views">Views</span>
     @foreach (var (index, thread) in Model.Item1.Select((t, i) => (i,t))) {
         <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-title")">
-            <a class="last-post-no" href="@Url.Content(Model.Item2(thread) + $"&p={thread.LastPostPage}#{thread.LastPostNo}")">
+            <a class="last-post-no" href="@Url.Content(Model.Item2(thread) + $"&p={thread.last_post_page}#{thread.last_post_no}")">
                  »
             </a>
             <span class="thread-tooltip">
-                @thread.Thread.Text    
+                @thread.thread_name
             </span>
             <a href="@Url.Content(Model.Item2(thread))">
-                @await Html.PartialAsync("Shared/Components/Pin" , thread.IsPinned)
-                @await Html.PartialAsync("Shared/Components/Lock", thread.IsLocked)
-                @Html.Raw(thread.Thread.Text)
+                @await Html.PartialAsync("Shared/Components/Pin" , thread.is_pinned)
+                @await Html.PartialAsync("Shared/Components/Lock", thread.is_locked)
+                @Html.Raw(thread.thread_name)
             </a>
-                                                                                          </span>
+        </span>
         <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-board")">
-            @Html.Raw(thread.Board.Text)
+            @Html.Raw(thread.board)
         </span>
         <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-author")">
-            <a href="@thread.Creator.Link">
-                @thread.Creator.Text
+            <a href="@thread.creator_link">
+                @thread.creator
             </a>
         </span>
         <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-posts")">
-            @thread.TotalPosts
+            @thread.total_posts
         </span>
         <span class="@Url.Content($"{Util.GetThreadRow(index)} thread-item thread-item-views")">
-            @thread.TotalView
+            @thread.total_views
         </span>
     }
 </div>
