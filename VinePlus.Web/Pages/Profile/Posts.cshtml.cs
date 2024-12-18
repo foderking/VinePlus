@@ -3,7 +3,7 @@ using Comicvine.Database;
 
 namespace ComicVine.API.Pages.Profile;
 
-public class Posts : Navigator<Util.PostWithThread>
+public class Posts : Navigator<PostSummary>
 {
     public string UserName = "";
     private ComicvineContext _context;
@@ -14,7 +14,7 @@ public class Posts : Navigator<Util.PostWithThread>
     
     public void OnGet(string user, int p) {
         UserName = user;
-        Entities = Util.getUserPostsWithThread(_context, user, p);
+        Entities = Util.getUserPostSummary(_context, user, p);
         NavRecord = new(p, 1000, user);
     }
 

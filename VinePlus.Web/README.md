@@ -101,7 +101,7 @@ The first can be time consuming - especially on low internet speed, while the ba
 ## Tables
 - [ ] add indexes on `posts.created`,`creator->>'Text'`.
 - [ ] remove unnecessary columns in queries
-- [ ] improvements for search
+- [ ] search data structure for threads, and posts
 
 ## Features
 - Viewing posts, threads, and blog made by a specific user

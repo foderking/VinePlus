@@ -1,31 +1,31 @@
 ﻿@using ComicVine.API.Pages
-@model IEnumerable<ComicVine.API.Pages.Util.PostWithThread>
+@model IEnumerable<PostSummary>
 
 <div class="post-container">
-    @foreach (var pwt in Model) {
-        <div class="@Util.GetPostClass(pwt.P)">
+    @foreach (var summary in Model) {
+        <div class="@Util.getPostClass(summary.post_is_deleted)">
             <div class="post-thread">
-                <a href="/archives/thread/@pwt.T.Id#@pwt.P.PostNo">
-                    @Html.Raw(pwt.T.Thread.Text)
+                <a href="/archives/thread/@summary.thread_id#@summary.post_no">
+                    @Html.Raw(summary.thread_text)
                 </a>
             </div>
             <div class="post-title">
-                <span class="post-no" id="@pwt.P.PostNo.ToString()">
-                    #@pwt.P.PostNo
+                <span class="post-no" id="@summary.post_no.ToString()">
+                    #@summary.post_no
                 </span>
                 <span class="post-creator">
-                    <a href="@pwt.P.Creator.Link">
-                        @pwt.P.Creator.Text
+                    <a href="@summary.post_creator.Link">
+                        @summary.post_creator.Text
                     </a>
                 </span>
-                @if (pwt.P.IsEdited) {
+                @if (summary.post_is_edited) {
                     <span class="post-edited">Edited</span>
                 }
             </div>
             <div class="post-content">
-                @Html.Raw(pwt.P.Content)
+                @Html.Raw(summary.post_content)
             </div>
-            <time class="post-time">@Util.GetDuration(DateTime.Now, pwt.P.Created)</time>
+            <time class="post-time">@Util.GetDuration(DateTime.Now, summary.post_created)</time>
         </div>
     }
 </div>

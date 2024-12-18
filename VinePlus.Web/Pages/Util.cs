@@ -122,7 +122,7 @@ public static class Util
 
     public record PostWithThread(Parsers.Post P, Parsers.Thread T);
     
-    public static IEnumerable<PostWithThread> getUserPostsWithThread(ComicvineContext context, string user, int page=1) {
+    public static IEnumerable<PostSummary> getUserPostSummary(ComicvineContext context, string user, int page=1) {
         return context
             .Posts
             .Where(posts => posts.Creator.Text == user)
@@ -131,7 +131,17 @@ public static class Util
                 context.Threads,
                 post => post.ThreadId,
                 thread => thread.Id,
-                (post, thread) => new PostWithThread(post, thread)
+                (post, thread) => 
+                    new PostSummary(
+                        thread.Id,
+                        thread.Thread.Text,
+                        post.PostNo,
+                        post.Creator,
+                        post.IsDeleted,
+                        post.IsEdited,
+                        post.Created,
+                        post.Content
+                    )
             )
             .Skip(PostsPerPage * (page-1))
             .Take(PostsPerPage);
@@ -224,13 +234,8 @@ public static class Util
         }
     }
 
-    public static string GetPostClass(Parsers.Post post) {
-        if (post.IsDeleted) {
-            return "post-item post-deleted";
-        }
-        else {
-            return "post-item";
-        }
+    public static string getPostClass(bool post_is_deleted) {
+        return post_is_deleted ? "post-item post-deleted" : "post-item";
     }
 
     public static class Search
