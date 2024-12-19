@@ -1,5 +1,5 @@
 ﻿using Comicvine.Core;
-using Comicvine.Database;
+using VinePlus.Database;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace VinePlus.Web.Pages.Stats;

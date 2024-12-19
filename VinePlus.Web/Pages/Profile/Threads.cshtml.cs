@@ -1,5 +1,5 @@
 ﻿using Comicvine.Core;
-using Comicvine.Database;
+using VinePlus.Database;
 
 namespace VinePlus.Web.Pages.Profile;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Comicvine.Core;
 
-namespace Comicvine.Database;
+namespace VinePlus.Database;
 
 public class ComicvineContext: DbContext
 {

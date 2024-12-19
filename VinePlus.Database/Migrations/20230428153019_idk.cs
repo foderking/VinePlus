@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Comicvine.Database.Migrations
+namespace VinePlus.Database.Migrations
 {
     /// <inheritdoc />
     public partial class idk : Migration

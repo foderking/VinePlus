@@ -1,5 +1,5 @@
 ﻿using Comicvine.Core;
-using Comicvine.Database;
+using VinePlus.Database;
 using Microsoft.EntityFrameworkCore;
 using VinePlus.Web.Pages;
 

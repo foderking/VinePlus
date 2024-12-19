@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
-using Comicvine.Database;
+using VinePlus.Database;
 using VinePlus.Polling;
 
 var builder = WebApplication.CreateBuilder(args);

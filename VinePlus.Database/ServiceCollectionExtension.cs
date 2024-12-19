@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Comicvine.Database;
+namespace VinePlus.Database;
 
 // https://medium.com/swlh/creating-a-multi-project-net-core-database-solution-a69decdf8d7e
 // when running migrations, web project should be referenced as startup project
