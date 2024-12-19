@@ -3,7 +3,7 @@ using VinePlus.Database;
 
 namespace VinePlus.Web.Pages.Archives;
 
-public class Thread : Navigator<PostView>
+public class Thread : Pagination<PostView>
 {
     private ComicvineContext _context;
     public Parsers.Thread? CurrentThread;

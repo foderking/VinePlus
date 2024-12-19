@@ -72,7 +72,7 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [x] add search
 - [x] search from user
 - [ ] ~~possibly filter thread search by board, type~~
-- [x] "How to search" UI
+- [ ] "How to search" UI
 - [x] pagination for search
 - [ ] add ability to search posts
 - [ ] highlight search term

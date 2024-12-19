@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace VinePlus.Web.Pages.Search.Posts;
 
-public class Results(ComicvineContext context) : Navigator<PostSummary>
+public class Results(ComicvineContext context) : Pagination<PostSummary>
 {
     public void OnGet(bool searchPost, string query, string creator, int p) {
         string s_query = $"searchPost={searchPost}&query={query}" + (creator==null ? "" : "&creator=takenstew22");

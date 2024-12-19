@@ -3,7 +3,7 @@ using VinePlus.Database;
 
 namespace VinePlus.Web.Pages.Archives;
 
-public class Forums : Navigator<ThreadView>, IForum
+public class Forums : Pagination<ThreadView>, IForum
 {
     private ComicvineContext _context;
     private string sort_param = "";

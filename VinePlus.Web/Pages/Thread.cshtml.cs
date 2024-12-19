@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace VinePlus.Web.Pages;
 
-public class Thread : Navigator<PostView>
+public class Thread : Pagination<PostView>
 {
     public string ThreadTitle = "";
     public string OriginalThread = "";

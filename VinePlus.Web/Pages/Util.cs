@@ -12,7 +12,7 @@ namespace VinePlus.Web.Pages;
 
 public record Nav(int CurrentPage, int LastPage, string DelegateParam);
 
-public abstract class Navigator<T>: PageModel
+public abstract class Pagination<T>: PageModel
 {
     public IEnumerable<T> Entities = Enumerable.Empty<T>();
     public Nav NavRecord = new(0, 0, "");

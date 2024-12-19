@@ -3,7 +3,7 @@ using VinePlus.Database;
 
 namespace VinePlus.Web.Pages.Profile;
 
-public class Posts : Navigator<PostSummary>
+public class Posts : Pagination<PostSummary>
 {
     public string UserName = "";
     private ComicvineContext _context;

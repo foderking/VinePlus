@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace VinePlus.Web.Pages.Profile;
 
-public class Blogs : Navigator<Parsers.Blog>
+public class Blogs : Pagination<Parsers.Blog>
 {
     public string UserProfile = "";
 

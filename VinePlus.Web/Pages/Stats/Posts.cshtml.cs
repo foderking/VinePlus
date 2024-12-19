@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace VinePlus.Web.Pages.Stats;
 
-public class Posts(ComicvineContext context): Navigator<ThreadsSummary>
+public class Posts(ComicvineContext context): Pagination<ThreadsSummary>
 {
     public void OnGet(string user, int p) {
         Entities = Queries.getThreadsPosted(context, user, p);

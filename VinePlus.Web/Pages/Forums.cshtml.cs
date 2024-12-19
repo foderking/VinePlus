@@ -3,7 +3,7 @@ using HtmlAgilityPack;
 
 namespace VinePlus.Web.Pages;
 
-public class Forums : Navigator<ThreadView>, IForum
+public class Forums : Pagination<ThreadView>, IForum
 {
     public async Task OnGet(int p) {
         HtmlNode rootNode = await Net.getNodeFromPage("/forums", p);

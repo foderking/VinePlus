@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace VinePlus.Web.Pages.Profile;
 
-public class Images : Navigator<ImageData>
+public class Images : Pagination<ImageData>
 {
     public string UserName = "";
     public Parsers.Image? Img;
