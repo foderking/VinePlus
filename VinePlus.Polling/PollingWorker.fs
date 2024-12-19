@@ -8,7 +8,7 @@ open System.Threading
 open System.Threading.Tasks
 open Comicvine.Core
 open Comicvine.Core.Parsers
-open Comicvine.Database
+open VinePlus.Database
 open FSharp.Control
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting

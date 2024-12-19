@@ -4,7 +4,7 @@ open System
 open System.Collections.Generic
 open System.Linq
 open System.Threading.Tasks
-open Comicvine.Database
+open VinePlus.Database
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 
