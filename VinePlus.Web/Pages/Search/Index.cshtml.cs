@@ -6,6 +6,5 @@ namespace VinePlus.Web.Pages.Search;
 public class Index : PageModel
 {
     public void OnGet() {
-        //return Redirect("/search/threads");
     }
 }

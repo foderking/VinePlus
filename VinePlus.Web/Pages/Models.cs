@@ -3,6 +3,8 @@ using Comicvine.Core;
 
 namespace VinePlus.Web.Pages;
 
+public record Nav(int CurrentPage, int LastPage, string DelegateParam);
+
 public record ThreadHeading(string thread_title, string thread_link);
 
 public record ThreadsSummary(int thread_id, string thread_text, int no_posts);
@@ -80,7 +82,7 @@ public record ImageData(
     [property: JsonPropertyName("original")]
     string original
 );
+
 public record ImageResponse(
-    [property: JsonPropertyName("images")] 
-    IEnumerable<ImageData> images
+    [property: JsonPropertyName("images")] IEnumerable<ImageData> images
 );

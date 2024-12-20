@@ -1,16 +1,7 @@
 ﻿
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
-using Comicvine.Core;
-using VinePlus.Database;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.EntityFrameworkCore;
 
 namespace VinePlus.Web.Pages;
-
-public record Nav(int CurrentPage, int LastPage, string DelegateParam);
 
 public abstract class Pagination<T>: PageModel
 {
