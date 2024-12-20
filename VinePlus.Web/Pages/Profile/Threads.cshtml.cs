@@ -3,18 +3,13 @@ using VinePlus.Database;
 
 namespace VinePlus.Web.Pages.Profile;
 
-public class Threads : Pagination<ThreadView>, IForum
+public class Threads(ComicvineContext context) : Pagination<ThreadView>, IForum
 {
-    private ComicvineContext _context;
     public string UserName = "";
 
-    public Threads(ComicvineContext ctx) {
-        _context = ctx;
-    }
-    
     public void OnGet(string user, int p) {
         UserName = user;
-        Entities = Queries.getUsersThreads(_context, UserName, p);
+        Entities = Queries.getUsersThreads(context, UserName, p);
         NavRecord = new(p, 100000, user);
     }
 
