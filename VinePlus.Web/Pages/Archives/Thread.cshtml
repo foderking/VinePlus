@@ -4,19 +4,19 @@
 
 @{
     Layout = "Shared/_Layout";
-    ViewData[Keys.Title]    = Model.CurrentThread?.Thread.Text ?? "";
-    ViewData[Keys.Headings] = Model.CurrentThread?.Thread.Text ?? "";
+    ViewData[Keys.Title] = Model.thread_heading.thread_title;
+    ViewData[Keys.Headings] = Model.thread_heading.thread_title;
 }
 
 @if (Model.NavRecord.CurrentPage <= 0)
 {
     @await Html.PartialAsync("Shared/Components/ThreadItems", Model.Entities)
-    @await Html.PartialAsync("Shared/Components/ThreadFooter", $"https://comicvine.gamespot.com{Model.CurrentThread?.Thread.Link ?? ""}")
+    @await Html.PartialAsync("Shared/Components/ThreadFooter", $"https://comicvine.gamespot.com{Model.thread_heading.thread_link}")
 }
 else
 {
     @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
     @await Html.PartialAsync("Shared/Components/ThreadItems", Model.Entities)
-    @await Html.PartialAsync("Shared/Components/ThreadFooter", $"https://comicvine.gamespot.com{Model.CurrentThread?.Thread.Link ?? ""}")
+    @await Html.PartialAsync("Shared/Components/ThreadFooter", $"https://comicvine.gamespot.com{Model.thread_heading.thread_link}")
     @await Html.PartialAsync("Shared/Components/Navigation", (Model.NavRecord, Model.PageDelegate()))
 }

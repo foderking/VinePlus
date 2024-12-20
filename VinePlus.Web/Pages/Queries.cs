@@ -7,6 +7,18 @@ namespace VinePlus.Web.Pages;
 
 public static class Queries
 {
+    public static ThreadHeading getThreadTitle(ComicvineContext context, int thread_id) {
+        var thread = context
+            .Threads
+            .Where(thread => thread.Id == thread_id)
+            .Select(thread => new { title = thread.Thread.Text, link = thread.Thread.Link })
+            .FirstOrDefault();
+        return thread switch
+        {
+            null => new ThreadHeading("", ""),
+            { } t => new ThreadHeading(t.title, t.link)
+        };
+    }
     public static IEnumerable<PostView> getAllPosts(ComicvineContext context, int thread_id) {
         return context
             .Posts
@@ -22,6 +34,17 @@ public static class Queries
                     post.Content
                 )
             );
+    }
+
+    public static int getPostsMaxPage(ComicvineContext context, int thread_id) {
+        int count = context
+            .Posts
+            .Count(p => p.ThreadId == thread_id);
+        return count / Util.PostsPerPage + 1;
+    }
+        
+    public static int getThreadsMaxPage(ComicvineContext context) {
+        return context.Threads.Count() / Util.ThreadPerPage + 1;
     }
 
     public static IEnumerable<PostView> getAllPosts(ComicvineContext context, int thread_id, int page) {
@@ -288,7 +311,4 @@ public static class Queries
             ;
     }
 
-    public static int getThreadsMaxPage(ComicvineContext context) {
-        return context.Threads.Count() / Util.ThreadPerPage + 1;
-    }
 }

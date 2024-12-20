@@ -3,6 +3,8 @@ using Comicvine.Core;
 
 namespace VinePlus.Web.Pages;
 
+public record ThreadHeading(string thread_title, string thread_link);
+
 public record ThreadsSummary(int thread_id, string thread_text, int no_posts);
 
 public record PostSummary(
