@@ -62,6 +62,6 @@ app.UseSwaggerUI( c =>
 app.UseStaticFiles();
 app.MapRazorPages();
 //app.AddApiEndpoints();
-app.UseStatusCodePages(); // add default status page for errors
+app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
 app.Run();

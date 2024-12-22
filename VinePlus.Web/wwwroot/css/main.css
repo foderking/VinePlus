@@ -870,3 +870,23 @@ figure[data-size="small"] {
     text-decoration: none;
     font-size: calc(1.3*var(--nav-font-size));
 }
+
+.error {
+    width: 50rem;
+    margin: 0 auto;
+}
+.error>div{
+    text-align: center;
+}
+.error-heading {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+.error-content {
+    font-style: italic;
+    font-size: 1.5rem;
+}
+.error-img > img {
+    margin: auto;
+}

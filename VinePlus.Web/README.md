@@ -63,10 +63,10 @@ The first can be time consuming - especially on low internet speed, while the ba
 ### Profile
 - [x] make images and blogs on user profile optional
 - [x] refactors for thread and post view on user profile (and errors for deactivated accounts)
-- [ ] more stuff on deactivated users
+- [ ] ?? more stuff on deactivated users ??
 - [x] fallbacks when profile not found
 - [ ] ~~different color for nav header~~
-- [ ] add stats user
+- [ ] ?? add stats user ??
 
 ### Search
 - [x] add search

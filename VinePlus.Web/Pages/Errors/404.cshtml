@@ -1,0 +1,21 @@
+﻿@page "{p=1}"
+@using VinePlus.Web.Pages
+
+@{
+    Layout= "Shared/_Layout";
+    ViewData[Keys.Title]     = "404 - Not Found";
+    ViewData[Keys.Headings]  = "";
+    ViewData[Keys.Highlight] = MainHighlight.Vine;
+}
+
+
+
+<div class="error">
+    <div class="error-img">
+        <img src="/images/404.jpg" />
+    </div>
+    <div class="error-heading">404: NOT FOUND</div>
+    <div class="error-content">
+        This page doesn't exist. You must have made a typo or something
+    </div>
+</div>
