@@ -4,9 +4,11 @@ Web frontend and RESTful api interface for VinePlus.
 Supports fetching content from either a local postgres database or directly from comicvine servers.
 
 ## Features
-- Provides restful api for querying posts, threads, user profiles and more
-- Advanced search features (requires postgres database)
-- Sorting of threads (requires postgres databases)
+- Viewing posts, threads, and blog made by a specific user
+- Viewing deleted posts
+- Sorting threads by number of posts, views, and date created
+- Viewing posts, and threads by deactivated user
+- full text search with filtering by user
 
 ## How to set up the database
 
@@ -34,6 +36,10 @@ The database can be hydrated in two methods. You can either download all the dat
 
 The first can be time consuming - especially on low internet speed, while the backup might not have the most recent data
 
+### How to run
+- make sure you have net9 (you can check installed sdks with `dotnet --list-sdks`)
+- You can either run the project with `dotnet run` or download the latest release and run with `dotnet VinePlus.Web.dll`
+- *make sure the database is initialized and the connection string is stored in `appsettings.json` or as the `ConnectionStrings:comicvine_db` environment variable as described earlier*
 
 ## TODO
 - [x] improve styling
@@ -102,10 +108,3 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [ ] add indexes on `posts.created`,`creator->>'Text'`.
 - [ ] remove unnecessary columns in queries
 - [ ] search data structure for threads, and posts
-
-## Features
-- Viewing posts, threads, and blog made by a specific user
-- Viewing deleted posts
-- Sorting forums by number of posts, views, and date created
-- Viewing posts, and threads by deactivated user
-- full text search with filtering by user
