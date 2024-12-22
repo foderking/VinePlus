@@ -44,7 +44,7 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [x] error handling for deactivated profiles
 - [x] add footer linking to api on forums
 - [ ] ~~add ui icons for polls and stuff~~
-- [ ] better error pages
+- [x] better error pages
 - [ ] validation for forms
 
 ### Posts

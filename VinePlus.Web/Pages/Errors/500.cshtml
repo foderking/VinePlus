@@ -1,0 +1,19 @@
+﻿@page "{p=1}"
+@using VinePlus.Web.Pages
+
+@{
+    Layout= "Shared/_Layout";
+    ViewData[Keys.Title]     = "404 - Not Found";
+    ViewData[Keys.Headings]  = "";
+    ViewData[Keys.Highlight] = MainHighlight.Vine;
+}
+
+<div class="error">
+    <div class="error-img">
+        <img src="/images/404.jpg" />
+    </div>
+    <div class="error-heading">500: INTERNAL SERVER ERROR</div>
+    <div class="error-content">
+        Uhm... an error occured. sorry?
+    </div>
+</div>
