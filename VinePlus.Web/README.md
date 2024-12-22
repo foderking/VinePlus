@@ -38,7 +38,7 @@ The first can be time consuming - especially on low internet speed, while the ba
 ## TODO
 - [x] improve styling
 - [x] responsive UI
-- [ ] refactor internals
+- [x] refactor internals
 - [x] add polling worker
 - [x] default error pages for web interface
 - [x] error handling for deactivated profiles

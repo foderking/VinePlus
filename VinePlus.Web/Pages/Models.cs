@@ -3,6 +3,46 @@ using Comicvine.Core;
 
 namespace VinePlus.Web.Pages;
 
+public static class Util
+{
+    public static int ThreadPerPage = 50;
+    public static int PostsPerPage = 50;
+}
+
+public enum SortForumBy
+{
+    DateCreated, // sorts by id
+    NoViews,
+    NoPosts
+}
+
+public static class MainHighlight
+{
+    public const string Vine = "vine";
+    public const string Archives = "archives";
+    public const string Search = "search";
+    public const string Stats = "stats";
+}
+
+public static class Keys
+{
+    public const string Highlight = "highlight";
+    public const string Headings = "headings";
+    public const string Title = "title";
+    public const string ProfileName = "profile-name";
+    public const string ProfileHasBlog = "profile-blog";
+    public const string ProfileHasImage = "profile-image";
+}
+
+public static class ProfileHighlight
+{
+    public const string Main = "profile";
+    public const string Images = "images";
+    public const string Blogs = "blogs";
+    public const string Threads = "threads";
+    public const string Posts = "posts";
+}
+
 public record Nav(int CurrentPage, int LastPage, string DelegateParam);
 
 public record ThreadHeading(string thread_title, string thread_link);
