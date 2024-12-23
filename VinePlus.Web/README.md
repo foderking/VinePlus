@@ -8,7 +8,8 @@ Supports fetching content from either a local postgres database or directly from
 - Viewing deleted posts
 - Sorting threads by number of posts, views, and date created
 - Viewing posts, and threads by deactivated user
-- full text search with filtering by user
+- full text search of threads with filtering by user
+- searching posts made by a specific user
 
 ## How to set up the database
 
@@ -80,13 +81,14 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [ ] ~~possibly filter thread search by board, type~~
 - [ ] "How to search" UI
 - [x] pagination for search
-- [ ] add ability to search posts
+- [x] add ability to search posts
 - [ ] highlight search term
 
 ### Stats
 - [ ] add stats UI
 - [ ] board stats
 - [x] viewing all threads a user has posted in, and number of posts
+- [ ] stats for number of posts, and threads a user has made
 
 ### Api
 - [ ] better styling for api documentation
