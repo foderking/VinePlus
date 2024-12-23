@@ -18,6 +18,6 @@ public class Threads(ComicvineContext context) : Pagination<ThreadView>, IForum
     }
 
     public Func<ThreadView, string> GetThreadLink() {
-        return (thread) => $"/archives/thread/{thread.thread_id}";
+        return (thread) => $"/archives/thread/{thread.thread_id}?p=1";
     }
 }
