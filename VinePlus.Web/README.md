@@ -105,6 +105,6 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [x] highlight for deleted posts
 
 ## Tables
-- [ ] add indexes on `posts.created`,`creator->>'Text'`.
-- [ ] remove unnecessary columns in queries
+- [x] add indexes on `posts.created`,`creator->>'Text'`.
+- [x] remove unnecessary columns in queries
 - [ ] search data structure for threads, and posts
