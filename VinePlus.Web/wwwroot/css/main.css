@@ -890,3 +890,9 @@ figure[data-size="small"] {
 .error-img > img {
     margin: auto;
 }
+.search-highlight {
+    background-color: yellow;
+    font-weight: bold;
+    color: gray;
+    padding: 0 0.2rem;
+}

@@ -298,7 +298,8 @@ public static class Queries
                     )
             )
             .Skip(Util.ThreadPerPage * (page - 1))
-            .Take(Util.ThreadPerPage);
+            .Take(Util.ThreadPerPage)
+            .ToList();
     }
 
     public static IEnumerable<Parsers.Post> getUserPosts(ComicvineContext context, string user, int page=1) {

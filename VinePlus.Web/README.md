@@ -82,7 +82,7 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [ ] "How to search" UI
 - [x] pagination for search
 - [x] add ability to search posts
-- [ ] highlight search term
+- [x] highlight search term
 
 ### Stats
 - [ ] add stats UI
