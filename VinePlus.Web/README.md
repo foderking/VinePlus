@@ -35,6 +35,11 @@ The database can be hydrated in two methods. You can either download all the dat
 - restore the dump to the database with `pg_restore -v -h <postgres-server-address> -U <username> -d <databasename> -j 2 comicvine_seed_v1`
 - after a while, all the tables, and data should be restored
 
+## Method 3
+- navigate to `VinePlus.Database`
+- run `migrations.sql`. this would initialize the schema
+- then you can populate the data with either method 1 or 2
+
 The first can be time consuming - especially on low internet speed, while the backup might not have the most recent data
 
 ### How to run
