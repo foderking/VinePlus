@@ -181,6 +181,7 @@ h1, h2, h3, h5 {
 .thread-header {
     font-weight: bold;
     border-top: 1px solid #d1d4d6;
+    color: #6d6d6d;
 }
 
 
@@ -901,4 +902,18 @@ figure[data-size="small"] {
      font-weight: 600;
      color: #105e10;
      text-align: center;
+    margin-bottom: 0.7rem;
+    margin-top: 1rem;
  }
+
+.user-container {
+    min-height: 30rem;
+    margin: auto calc(4*var(--side-width));
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-content: start;
+}
+.user-container > span:not(div:last-child) {
+    border-right: 1px solid #d1d4d6;
+}
+

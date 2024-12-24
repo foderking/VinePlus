@@ -5,8 +5,10 @@ namespace VinePlus.Web.Pages.Stats;
 
 public class Index(ComicvineContext context) : PageModel
 {
-    public IEnumerable<ThreadView> top10_threads;
+    public IEnumerable<ThreadView> top_threads;
+    public IEnumerable<ProfilePostView> top_users;
     public void OnGet() {
-        top10_threads = Queries.getArchivedThreads(context, 1, SortForumBy.NoPosts).Take(10);
+        top_threads = Queries.getArchivedThreads(context, 1, SortForumBy.NoPosts).Take(10);
+        top_users = Queries.getPostViews(context);
     }
 }

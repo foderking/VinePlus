@@ -8,11 +8,11 @@
     ViewData[Keys.Headings]  = "General statistics";
     ViewData[Keys.Highlight] = MainHighlight.Stats;
 }
-<div class="mini-heading">Top 10 threads by posts</div>
+<div class="mini-heading">Top threads</div>
 <div class="userpost-container" >
-    <span class="thread-odd thread-item thread-header thread-item-title">Title</span>
+    <span class="thread-odd thread-item thread-header thread-item-title">Thread</span>
     <span class="thread-odd thread-item thread-header thread-item-posts"># Posts</span>
-    @foreach (var (index, threadPosted) in Model.top10_threads.Select((t, i) => (i,t))) {
+    @foreach (var (index, threadPosted) in Model.top_threads.Select((t, i) => (i,t))) {
         <span class="@Url.Content($"{Helpers.getThreadRow(index)} thread-item thread-item-title")">
             <span class="thread-tooltip">
                 @Html.Raw(threadPosted.thread_name)
@@ -26,7 +26,21 @@
         </span>
     }
 </div>
-<div class="mini-heading">Top 10 users by posts</div>
+<div class="mini-heading">Top users</div>
+<div class="user-container" >
+<span class="thread-odd thread-item thread-header thread-item-title">User</span>
+<span class="thread-odd thread-item thread-header thread-item-posts"># Posts</span>
+    @foreach (var (index, threadPosted) in Model.top_users.Select((t, i) => (i,t))) {
+        <span class="@Url.Content($"{Helpers.getThreadRow(index)} thread-item thread-item-title")">
+            <a href="@Url.Content($"/profile/{threadPosted.username}")">
+                @threadPosted.username
+            </a>
+        </span>
+        <span class="@Url.Content($"{Helpers.getThreadRow(index)} thread-item thread-item-posts")">
+            @threadPosted.no_posts
+        </span>
+    }
+</div>
 <div class="mini-heading">number of threads for each board</div>
 <div class="mini-heading">total number of posts</div>
 <div class="mini-heading">total number of threads</div>

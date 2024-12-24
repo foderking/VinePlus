@@ -114,6 +114,8 @@ public record ThreadView(
     }
 };
 
+public record ProfilePostView(string username, int no_posts);
+
 public record ImageData(
     [property: JsonPropertyName("dateCreated")]
     string date_created,
