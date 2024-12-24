@@ -21,6 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Pages\Stats\User\" />
       <Folder Include="wwwrooot\images" />
     </ItemGroup>
 

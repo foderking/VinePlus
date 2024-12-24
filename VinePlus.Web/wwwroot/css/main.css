@@ -896,3 +896,9 @@ figure[data-size="small"] {
     color: gray;
     padding: 0 0.2rem;
 }
+.mini-heading {
+     font-size: 1.7rem;
+     font-weight: 600;
+     color: #105e10;
+     text-align: center;
+ }
