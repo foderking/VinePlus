@@ -6,12 +6,12 @@ namespace VinePlus.Web.Pages.Stats;
 
 public class Posts(ComicvineContext context): Pagination<ThreadsSummary>
 {
-    public void OnGet(string user, int p) {
+    public void OnGet(string user, int p=1) {
         Entities = Queries.getThreadsPosted(context, user, p);
         NavRecord = new(p, 1000, user);
     }
     
     public override Func<string, int, string> PageDelegate() {
-        return (user, page) => $"/profile/threads/{user}/{page}";
+        return (user, page) => $"/stats/posts/{user}?p={page}";
     }
 }

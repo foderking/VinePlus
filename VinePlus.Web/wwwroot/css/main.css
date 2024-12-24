@@ -854,7 +854,7 @@ figure[data-size="small"] {
 }
 .userpost-container {
     min-height: 30rem;
-    margin: auto calc(2*var(--side-width));
+    margin: auto calc(2.5*var(--side-width));
     display: grid;
     grid-template-columns: 1fr auto;
     align-content: start;

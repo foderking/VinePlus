@@ -129,15 +129,18 @@ public static class Queries
             )
             .GroupBy(x => new { x.Thread.Id, x.Thread.Thread.Text })
             .Select(x => 
-                new ThreadsSummary(
+                new
+                {
                     x.Key.Id, 
                     x.Key.Text, 
-                    x.Count()
-                )
-            );
-        //.OrderByDescending(x => x.no_posts)
-        //.Skip(PostsPerPage * (page-1))
-        //.Take(PostsPerPage);
+                    Count = x.Count()
+                    
+                }
+            )
+            .OrderByDescending(x => x.Count)
+            .Skip(Util.PostsPerPage * (page-1))
+            .Take(Util.PostsPerPage)
+            .Select(e => new ThreadsSummary(e.Id, e.Text, e.Count));
     }
 
     public static IEnumerable<ThreadView> getArchivedThreads(ComicvineContext context, int page, SortForumBy sort_by = SortForumBy.DateCreated) {

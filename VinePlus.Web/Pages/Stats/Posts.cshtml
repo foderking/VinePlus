@@ -1,4 +1,4 @@
-﻿@page "{user}/{p=1}"
+﻿@page "{user}"
 @using VinePlus.Web.Pages
 @model VinePlus.Web.Pages.Stats.Posts
 
@@ -18,7 +18,7 @@
             <span class="thread-tooltip">
                 @Html.Raw(threadPosted.thread_text)
             </span>
-            <a href="@Url.Content($"/archives/thread/{threadPosted.thread_id}")">
+            <a href="@Url.Content($"/archives/thread/{threadPosted.thread_id}?p=1")">
                 @Html.Raw(threadPosted.thread_text)
             </a>
         </span>
