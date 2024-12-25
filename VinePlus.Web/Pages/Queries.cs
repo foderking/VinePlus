@@ -332,4 +332,18 @@ public static class Queries
     public static int getTotalThreads(ComicvineContext context) {
         return context.Threads.Count();
     }
+
+    public static int getUserThreadCount(ComicvineContext context, string user) {
+        return context
+            .Threads
+            .Where(thread => thread.Creator.Text == user)
+            .Count();
+    }
+
+    public static int getUserPostCount(ComicvineContext context, string user) {
+        return context
+            .Posts
+            .Where(post => post.Creator.Text == user)
+            .Count();
+    }
 }

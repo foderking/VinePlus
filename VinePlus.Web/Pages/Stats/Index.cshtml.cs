@@ -11,7 +11,7 @@ public class Index(ComicvineContext context) : PageModel
     public IEnumerable<BoardView> board_summary;
     public int total_threads;
     public int total_posts;
-    
+     
     public void OnGet() {
         top_threads = Queries.getArchivedThreads(context, 1, SortForumBy.NoPosts).Take(10);
         total_posts = Queries.getTotalPosts(context);
@@ -20,6 +20,6 @@ public class Index(ComicvineContext context) : PageModel
     }
 
     public IActionResult OnPost(string searchQuery) {
-        return Redirect($"/stats/posts/{searchQuery.Trim()}");
+        return Redirect($"/stats/user?username={searchQuery.Trim()}");
     }
 }
