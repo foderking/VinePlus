@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using VinePlus.Database;
 
 namespace VinePlus.Web.Pages.Stats;
 
+[IgnoreAntiforgeryToken(Order = 1001)] // disables anti-forgery token requirement   https://www.learnrazorpages.com/security/request-verification
 public class Index(ComicvineContext context) : PageModel
 {
     public IEnumerable<ThreadView> top_threads;
@@ -15,5 +17,9 @@ public class Index(ComicvineContext context) : PageModel
         total_posts = Queries.getTotalPosts(context);
         total_threads = Queries.getTotalThreads(context);
         board_summary = Queries.getBoardsViews(context);
+    }
+
+    public IActionResult OnPost(string searchQuery) {
+        return Redirect($"/stats/posts/{searchQuery.Trim()}");
     }
 }

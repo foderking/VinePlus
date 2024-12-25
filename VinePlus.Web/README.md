@@ -90,8 +90,8 @@ The first can be time consuming - especially on low internet speed, while the ba
 - [x] highlight search term
 
 ### Stats
-- [ ] add stats UI
-- [ ] board stats
+- [x] add stats UI
+- [x] board stats
 - [x] viewing all threads a user has posted in, and number of posts
 - [ ] stats for number of posts, and threads a user has made
 

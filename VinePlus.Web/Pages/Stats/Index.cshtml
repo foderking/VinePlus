@@ -8,6 +8,13 @@
     ViewData[Keys.Headings]  = "General statistics";
     ViewData[Keys.Highlight] = MainHighlight.Stats;
 }
+
+<div id="search">
+    <form method="post">
+        <input class="searchQuery" name="searchQuery" id="searchQuery" type="search" placeholder="Search users stats"/>
+        <input class="searchSubmit" type="submit"/>
+    </form>
+</div>
 <div class="mini-heading">Top threads</div>
 <div class="userpost-container" >
     <span class="thread-odd thread-item thread-header thread-item-title">Thread</span>
@@ -52,3 +59,4 @@
     <span class="thread-odd thread-item thread-item-title">Number of Threads</span>
     <span class="thread-odd thread-item thread-item-posts">@Model.total_threads</span>
 </div>
+
