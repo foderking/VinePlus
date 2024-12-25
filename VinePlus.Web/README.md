@@ -10,6 +10,7 @@ Supports fetching content from either a local postgres database or directly from
 - Viewing posts, and threads by deactivated user
 - full text search of threads with filtering by user
 - searching posts made by a specific user
+- lots of stats for users, threads, and posts etc.
 
 ## How to set up the database
 
