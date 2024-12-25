@@ -315,14 +315,6 @@ public static class Queries
             ;
     }
 
-    public static IEnumerable<ProfilePostView> getPostViews(ComicvineContext context) {
-        return context
-            .Posts
-            .GroupBy(post => post.Creator.Text)
-            .OrderByDescending(group => group.Count())
-            .Take(10)
-            .Select(x => new ProfilePostView(x.Key, x.Count()));
-    }
 
     public static IEnumerable<BoardView> getBoardsViews(ComicvineContext context) {
         return context
