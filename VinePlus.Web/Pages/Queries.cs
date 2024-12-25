@@ -324,4 +324,20 @@ public static class Queries
             .Select(x => new ProfilePostView(x.Key, x.Count()));
     }
 
+    public static IEnumerable<BoardView> getBoardsViews(ComicvineContext context) {
+        return context
+            .Threads
+            .GroupBy(thread => thread.Board.Text)
+            .OrderByDescending(group => group.Count())
+            .Take(10)
+            .Select(x => new BoardView(x.Key, x.Count()));
+    }
+    
+    public static int getTotalPosts(ComicvineContext context) {
+        return context.Posts.Count();
+    }
+
+    public static int getTotalThreads(ComicvineContext context) {
+        return context.Threads.Count();
+    }
 }

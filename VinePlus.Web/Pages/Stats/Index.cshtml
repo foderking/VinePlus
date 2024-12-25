@@ -41,7 +41,28 @@
         </span>
     }
 </div>
-<div class="mini-heading">number of threads for each board</div>
-<div class="mini-heading">total number of posts</div>
-<div class="mini-heading">total number of threads</div>
-<div class="mini-heading">link to user stats</div>
+<div class="mini-heading">Boards summary</div>
+<div class="user-container" >
+    <span class="thread-odd thread-item thread-header thread-item-title">Board</span>
+    <span class="thread-odd thread-item thread-header thread-item-posts"># Posts</span>
+    @foreach (var (index, item) in Model.board_summary.Select((t, i) => (i,t))) {
+        <span class="@Url.Content($"{Helpers.getThreadRow(index)} thread-item thread-item-title")">
+            <a>
+                @item.board
+            </a>
+        </span>
+        <span class="@Url.Content($"{Helpers.getThreadRow(index)} thread-item thread-item-posts")">
+            @item.no_posts
+        </span>
+    }
+</div>
+
+<div class="mini-heading">More stats</div>
+<div class="user-container" >
+    <span class="thread-odd thread-item thread-header thread-item-title">Statistic</span>
+    <span class="thread-odd thread-item thread-header thread-item-posts">Value</span>
+    <span class="thread-item thread-item-title">Number of Posts</span>
+    <span class="thread-item thread-item-posts">@Model.total_posts</span>
+    <span class="thread-odd thread-item thread-item-title">Number of Threads</span>
+    <span class="thread-odd thread-item thread-item-posts">@Model.total_threads</span>
+</div>
