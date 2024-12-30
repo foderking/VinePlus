@@ -1,9 +1,8 @@
 ﻿# VinePlus.Web
 
-Web frontend and RESTful api interface for VinePlus. 
-Supports fetching content from either a local postgres database or directly from comicvine servers.
+VinePlus is a different way to browse the ComicVine forum. It saves forum content in a PostgreSQL database, making it easier to add features like better search and filtering. The app also gets live updates directly from ComicVine servers, so users always have the latest content
 
-## Features
+## 1. Features
 - Viewing posts, threads, and blog made by a specific user
 - Viewing deleted posts
 - Sorting threads by number of posts, views, and date created
@@ -12,107 +11,43 @@ Supports fetching content from either a local postgres database or directly from
 - searching posts made by a specific user
 - lots of stats for users, threads, and posts etc.
 
-## How to set up the database
+## 2. Prerequisites
+- Make sure you have [.net 9](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) installed
+- PostgreSQL
+- dotnet-ef tool `dotnet tool install --global dotnet-ef`
 
-- Install postgresql
+## 3. Setting up the database
+### 3.1. Setting up postgres
 - Create a database with the name `comic_vine`
-- Add the connection string with the name `comicvine_db` to the appsettings.json file or add as an environment variable in the form: `ConnectionStrings:comicvine_db=<connectionstring>`
-- Hydrate the database
+- Add the connection string named `comicvine_db` either to the appsettings.json file or as an environment variable in the format: `ConnectionStrings:comicvine_db=<connectionstring>`
 
-## How to hydrate the database
+### 3.2. Initializing schema
+You can update the database to the latest schema through either of these ways:
+- Navigate to the [database project](../VinePlus.Database) and run the `migrations.sql` script, or...
+- Run `dotnet-ef database update` (make sure you've set up the connection strings)
 
-The database can be hydrated in two methods. You can either download all the data from comicvine's servers or restore the database from an backup.
+### 3.3. Seeding the database
 
-### Method 1
-- Change directory to this folder
-- install dotnet ef `dotnet tool install --global dotnet-ef`
-- push migrations to the database with `dotnet-ef database update --connection="connection string"`. Now the schema is on the db
+The database can be hydrated in two methods. You can either directly download all the data from comicvine's servers or restore the database from a backup.
+
+#### 3.3.1 - Seeding database from backup
+- Download the [latest backup](https://mega.nz/file/KX4kCCzL#ue4ZPxWDqRYBjCQSeww_M_aOsTonAkKKwo2yWHIlcDQ)
+- Restore the dump to the database with `pg_restore -v -h <postgres-server-address> -U <username> -d <databasename> -j 2 comicvine_seed_v1`
+- after a while, all the tables, and data should be restored
+- **NOTE:** The backup might not have the most recent data
+
+#### 3.3.2 - Seeding database directly
 - Build the [seed project](../VinePlus.Seed/README.md)
 - Follow the instructions there to download the data in CSV files
 - import the generated csv file into the database with pgadmin or any other method of your choice
+- **NOTE:** This can be time-consuming on low internet speed
 
-### Method 2
-- download a [database dump](https://mega.nz/file/KX4kCCzL#ue4ZPxWDqRYBjCQSeww_M_aOsTonAkKKwo2yWHIlcDQ)
-- restore the dump to the database with `pg_restore -v -h <postgres-server-address> -U <username> -d <databasename> -j 2 comicvine_seed_v1`
-- after a while, all the tables, and data should be restored
+### 3.4 Running VinePlus
+- Make sure the database is set up.
+- Run the command `dotnet run`. This will build the project, restore any necessary files, and then execute it.
+- You can also download the latest release from the GitHub Releases section and run the prebuilt application using `dotnet VinePlus.Web.dll`
 
-## Method 3
-- navigate to `VinePlus.Database`
-- run `migrations.sql`. this would initialize the schema
-- then you can populate the data with either method 1 or 2
-
-The first can be time consuming - especially on low internet speed, while the backup might not have the most recent data
-
-### How to run
-- make sure you have net9 (you can check installed sdks with `dotnet --list-sdks`)
-- You can either run the project with `dotnet run` or download the latest release and run with `dotnet VinePlus.Web.dll`
-- *make sure the database is initialized and the connection string is stored in `appsettings.json` or as the `ConnectionStrings:comicvine_db` environment variable as described earlier*
-
-## TODO
-- [x] improve styling
-- [x] responsive UI
-- [x] refactor internals
-- [x] add polling worker
-- [x] default error pages for web interface
-- [x] error handling for deactivated profiles
-- [x] add footer linking to api on forums
-- [ ] ~~add ui icons for polls and stuff~~
-- [x] better error pages
+### TODO
 - [ ] validation for forms
-
-### Posts
-- [x] fix youtube video in posts (http://localhost:5119/archives/thread/2308691#11)
-- [x] add time stamp to posts
-- [x] ui improvements on timestamp
-- [x] change color of edited button
-- [x] add way to copy link to a specific post
-
-### Threads 
-- [ ] ~~ability to sort threads by different criteria~~
-- [x] thread should have a link to the og post on cv
-- [x] shows full title of thread on hover
-- [x] forum should be able to link to the last post
-
-### Profile
-- [x] make images and blogs on user profile optional
-- [x] refactors for thread and post view on user profile (and errors for deactivated accounts)
-- [ ] ?? more stuff on deactivated users ??
-- [x] fallbacks when profile not found
-- [ ] ~~different color for nav header~~
-- [ ] ?? add stats user ??
-
-### Search
-- [x] add search
-- [x] search from user
-- [ ] ~~possibly filter thread search by board, type~~
 - [ ] "How to search" UI
-- [x] pagination for search
-- [x] add ability to search posts
-- [x] highlight search term
-
-### Stats
-- [x] add stats UI
-- [x] board stats
-- [x] viewing all threads a user has posted in, and number of posts
-- [x] stats for number of posts, and threads a user has made
-
-### Api
-- [ ] better styling for api documentation
-- [ ] more documentation for api
-- [ ] add format for api errors
-
-### Users archives
-- [x] posts view in user profile should have link to the thread
-- [x] there should be a way to link to a specific post in a thread
-
-## Archives
-- [x] sorting of threads by no of posts 
-- [x] sorting by various parameters
-- [x] UI option to change sort type
-- [ ] ~~sorting of posts by date created~~
-- [x] highlight for deleted posts
-
-## Tables
-- [x] add indexes on `posts.created`,`creator->>'Text'`.
-- [x] remove unnecessary columns in queries
 - [ ] search data structure for threads, and posts
