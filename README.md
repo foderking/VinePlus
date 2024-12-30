@@ -1,14 +1,9 @@
 ﻿# VinePlus
 
-This project helps run the [comic-vine forum](https://comicvine.gamespot.com/forums/) locally.
-- `VinePlus.Web` contains the main web application.
-- A postgres database `VinePlus.Database` is used for storage.
-- A background worker in `VinePlus.Polling` is used to keeps the database up to date.
-- Use `VinePlus.Seed` to populate database from scratch
+This project helps run the [comic-vine forum](https://comicvine.gamespot.com/forums/) locally. It contains:
+- A web application: `VinePlus.Web`
+- A PostgreSQL database project: `VinePlus.Database`
+- A background worker for updating the database: `VinePlus.Polling`
+- A project for initializing the database: `VinePlus.Seed`
 
-## Getting Started
-
-- Clone the project, or download a binary [here](https://github.com/foderking/VinePlus/releases)
-- follow the instruction [here](https://github.com/foderking/VinePlus/blob/master/VinePlus.Web/README.md) to set up the postgres database
-- if you are running for the first time, follow the instruction [here](https://github.com/foderking/VinePlus/tree/master/VinePlus.Seed) to download all the content from comicvine. After this is done, a bunch of csv files are created which you import into postgres
-- run the application at `Comicvine.API` to start the server
+To run the app, follow the instructions [here](https://github.com/foderking/VinePlus/blob/master/VinePlus.Web/README.md)
